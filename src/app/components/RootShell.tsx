@@ -846,6 +846,7 @@ export function RootShell() {
         image: s.imageUrl,
         meta: s.category,
         likes: 0,
+        videoUrl: s.videoUrl,
       })),
     [snap.stories],
   );

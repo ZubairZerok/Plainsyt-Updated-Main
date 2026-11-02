@@ -589,7 +589,7 @@ insert into public.articles (
     'keyMetric', '500 kCi Cobalt-60'
   ),
   jsonb_build_object(
-    'views', 1420,
+    'views', 0,
     'likes', 0,
     'commentsCount', 0,
     'shares', 0

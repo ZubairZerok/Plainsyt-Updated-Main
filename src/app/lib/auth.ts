@@ -19,9 +19,9 @@ export const ADMIN_PROFILE: UserProfile = {
   coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
   isVerified: true,
   focusArea: 'Nuclear Agronomy, Agro-IoT & Biotech',
-  publicationsCount: 1,
-  followersCount: 1420,
-  followingCount: 12,
+  publicationsCount: 0,
+  followersCount: 0,
+  followingCount: 0,
   email: 'plaiinsyt@gmail.com',
   createdAt: '2026-01-01T00:00:00.000Z',
 };
@@ -40,8 +40,8 @@ export const ZUBAIR_PROFILE: UserProfile = {
   isVerified: true,
   focusArea: 'Agri-Tech & Agronomy',
   publicationsCount: 0,
-  followersCount: 42,
-  followingCount: 15,
+  followersCount: 0,
+  followingCount: 0,
   email: ZUBAIR_EMAIL,
   createdAt: '2026-02-01T00:00:00.000Z',
 };

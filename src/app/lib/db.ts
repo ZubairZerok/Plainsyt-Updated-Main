@@ -48,9 +48,9 @@ export const ADMIN_PROFILE: UserProfile = {
   focusArea: 'Agro-Tech Editorial & Publishing',
   website: 'https://plainsyt.org',
   email: 'plaiinsyt@gmail.com',
-  publicationsCount: 3,
-  followersCount: 1420,
-  followingCount: 12,
+  publicationsCount: 0,
+  followersCount: 0,
+  followingCount: 0,
   createdAt: '2026-01-01T00:00:00Z',
 };
 
@@ -69,9 +69,9 @@ export const ZUBAIR_PROFILE: UserProfile = {
   focusArea: 'Precision Ag & IoT',
   website: '',
   email: 'z65gt9@gmail.com',
-  publicationsCount: 2,
-  followersCount: 890,
-  followingCount: 45,
+  publicationsCount: 0,
+  followersCount: 0,
+  followingCount: 0,
   createdAt: '2026-02-15T00:00:00Z',
 };
 
@@ -120,7 +120,7 @@ export const BINA_ARTICLE: Article = {
     keyMetric: '500 kCi Cobalt-60 Gamma Source',
   },
   stats: {
-    views: 1420,
+    views: 0,
     likes: 0,
     commentsCount: 0,
     shares: 0,
@@ -179,7 +179,7 @@ export const JAPAN_ROBOT_ARTICLE: Article = {
     keyMetric: '120 Cucumbers / 40 min (80% Precision Vision AI)',
   },
   stats: {
-    views: 1840,
+    views: 0,
     likes: 0,
     commentsCount: 0,
     shares: 0,
@@ -228,7 +228,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
         'প্রতি কেজি চালে ২৫.৫ মি.গ্রা. জিংক, শিশুপুষ্টিতে সরাসরি প্রভাব',
         'হেক্টরপ্রতি গড় ফলন ৭.৫–৮.০ টন',
       ],
-      stats: { views: 1240, likes: 0, commentsCount: 0, shares: 0 },
+      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
       reactionCounts: {},
       comments: [],
     },
@@ -266,7 +266,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
         'বিঘাপ্রতি জরিপ খরচ মাত্র ১২০ টাকা',
         'লিফ কালার চার্টের সাথে ৯২% মিল',
       ],
-      stats: { views: 980, likes: 0, commentsCount: 0, shares: 0 },
+      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
       reactionCounts: {},
       comments: [],
     },
@@ -303,7 +303,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
         'বিদ্যুৎ গ্রিড ছাড়াই সম্পূর্ণ সৌরশক্তিতে পরিচালিত',
         'স্থানীয় কৃষকদের সমবায় ভিত্তিক বিনিয়োগ মডেল',
       ],
-      stats: { views: 820, likes: 0, commentsCount: 0, shares: 0 },
+      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
       reactionCounts: {},
       comments: [],
     },
@@ -340,7 +340,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
         'মাটির লবণাক্ততাকে সংকট না ভেবে সম্পদে রূপান্তর',
         'আমেরিকান ও ইউরোপীয় বাজারে নরম খোলস কাঁকড়ার বিপুল চাহিদা',
       ],
-      stats: { views: 760, likes: 0, commentsCount: 0, shares: 0 },
+      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
       reactionCounts: {},
       comments: [],
     },
@@ -357,17 +357,97 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
       creatorAvatar: '/logos/icon.png',
       location: 'জাপান · স্মার্ট এগ্রিকালচার',
       duration: '0:58',
-      views: 1850,
+      views: 0,
       gradientTheme: 'from-emerald-950 via-slate-900 to-black',
       videoType: 'greenhouse-iot',
       mediaUrl: 'https://i.ytimg.com/vi/BKUmGkQxAUU/hqdefault.jpg',
       videoUrl: 'https://www.youtube.com/shorts/BKUmGkQxAUU',
-      likes: 142,
-      reactionCounts: { like: 142 },
+      likes: 0,
+      reactionCounts: {},
       createdAt: '2026-11-02T10:00:00+06:00',
     },
   ],
-  stories: [],
+  stories: [
+    {
+      id: 'story-japan-robot-night-2026',
+      title: 'রাত ২টায় ক্ষেতে কাজ করছে রোবট কৃষক! 🤖',
+      category: 'এগ্রি-টেক ও ড্রোন',
+      imageUrl: 'https://i.ytimg.com/vi/BKUmGkQxAUU/hqdefault.jpg',
+      videoUrl: 'https://www.youtube.com/shorts/BKUmGkQxAUU',
+      iconName: 'tech',
+      readsCount: '০',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-japan-cucumber-robot-2026',
+      createdAt: '2026-11-02T10:00:00+06:00',
+    },
+    {
+      id: 'story-bina-gamma',
+      title: 'গামা ইরেডিয়েশন সেন্টারে কৃষিপণ্য সংরক্ষণ',
+      category: 'কৃষি ও বায়োটেক',
+      imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&fit=crop',
+      iconName: 'seedling',
+      readsCount: '০',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-bina-gamma-2026',
+      createdAt: '2026-11-01T08:00:00+06:00',
+    },
+    {
+      id: 'story-brri-dhan102',
+      title: 'হাওরে ব্রি-১০২ এর মাঠ দিবস ও আগাম ফসল',
+      category: 'শস্য ও কৃষিবিজ্ঞান',
+      imageUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&fit=crop',
+      iconName: 'food',
+      readsCount: '০',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT Research',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-brri-dhan102-2026',
+      createdAt: '2026-10-30T10:00:00+06:00',
+    },
+    {
+      id: 'story-drone-spray',
+      title: 'ড্রোনে বালাইনাশক ও সার প্রয়োগের সাশ্রয়ী নিয়ম',
+      category: 'এগ্রি-টেক ও ড্রোন',
+      imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=600&fit=crop',
+      iconName: 'drone',
+      readsCount: '০',
+      authorId: 'usr-zubair',
+      authorName: 'Zubair Hasan',
+      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
+      articleId: 'art-drone-sensing-2026',
+      createdAt: '2026-10-29T15:45:00+06:00',
+    },
+    {
+      id: 'story-solar-cold-room',
+      title: 'সৌরচালিত কোল্ড চেম্বারে পেঁয়াজ সংরক্ষণ বিপ্লব',
+      category: 'খাদ্য ও কোল্ড চেইন',
+      imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&fit=crop',
+      iconName: 'climate',
+      readsCount: '০',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-solar-cold-room-2026',
+      createdAt: '2026-10-28T09:20:00+06:00',
+    },
+    {
+      id: 'story-coastal-crab-tilapia',
+      title: 'লবণাক্ত উপকূলে কাঁকড়া ও তেলাপিয়ার সমন্বিত চাষ',
+      category: 'মৎস্য ও প্রাণিসম্পদ',
+      imageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&fit=crop',
+      iconName: 'rural',
+      readsCount: '০',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-coastal-aquaculture-2026',
+      createdAt: '2026-10-27T11:40:00+06:00',
+    },
+  ],
   events: [],
   eventRegistrations: [],
   researchPapers: [],
@@ -427,6 +507,21 @@ export function readSnapshot(): DatabaseSnapshot {
           mergedReels.unshift(sr);
         }
       }
+      // Sanitize reels from browser cache (purge fake metrics like 142 likes and 1850 views)
+      const sanitizedReels = mergedReels.map((r) => {
+        if (r.id === 'reel-japan-robot-night-2026' || r.likes === 142 || r.views === 1850) {
+          return { ...r, likes: 0, views: 0, reactionCounts: {} };
+        }
+        return r;
+      });
+      // Sanitize articles from browser cache (purge hardcoded fake views)
+      const dummyViews = [1420, 1840, 1240, 980, 820, 760];
+      const sanitizedArticles = mergedArticles.map((a) => {
+        if (a.stats && dummyViews.includes(a.stats.views)) {
+          return { ...a, stats: { ...a.stats, views: 0 } };
+        }
+        return a;
+      });
       // Purge removed seed items from browser cache
       const cleanPosts = (parsed.posts ?? []).filter((p) => p.id !== 'post-zubair-1');
       const cleanEvents = (parsed.events ?? []).filter(
@@ -435,14 +530,27 @@ export function readSnapshot(): DatabaseSnapshot {
       const cleanStories = (parsed.stories ?? []).filter(
         (s) => s.id !== 'story-bina-1' && s.id !== 'story-bau-iot',
       );
+      const mergedStories = [...cleanStories];
+      for (const ss of DEFAULT_SEED_SNAPSHOT.stories) {
+        if (!mergedStories.some((s) => s.id === ss.id)) {
+          mergedStories.push(ss);
+        }
+      }
+      const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
+        if (p.id === 'usr-plainsyt-admin' || p.id === 'usr-zubair') {
+          return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
+        }
+        return p;
+      });
       memoryCache = {
         ...DEFAULT_SEED_SNAPSHOT,
         ...parsed,
-        articles: mergedArticles,
-        reels: mergedReels,
+        profiles: sanitizedProfiles,
+        articles: sanitizedArticles,
+        reels: sanitizedReels,
         posts: cleanPosts,
         events: cleanEvents,
-        stories: cleanStories,
+        stories: mergedStories,
       };
       return memoryCache;
     }
@@ -1053,6 +1161,13 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     const finalArticles = [...seedOnlyArticles, ...articles, ...localOnlyArticles].filter(
       (a) => a.id !== 'art-floating-hydroponics-2026',
     );
+    const dummyViews = [1420, 1840, 1240, 980, 820, 760];
+    const sanitizedArticles = finalArticles.map((a) => {
+      if (a.stats && dummyViews.includes(a.stats.views)) {
+        return { ...a, stats: { ...a.stats, views: 0 } };
+      }
+      return a;
+    });
     const finalPosts = (posts.length > 0 ? posts : local.posts).filter((p) => p.id !== 'post-zubair-1');
 
     // Filter out removed events and stories
@@ -1062,6 +1177,12 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     const cleanStories = (stories.length > 0 ? stories : local.stories).filter(
       (s) => s.id !== 'story-bina-1' && s.id !== 'story-bau-iot',
     );
+    const mergedStories = [...cleanStories];
+    for (const ss of DEFAULT_SEED_SNAPSHOT.stories) {
+      if (!mergedStories.some((s) => s.id === ss.id)) {
+        mergedStories.push(ss);
+      }
+    }
 
     let userFollows = local.followingIds || [];
     if (currentUserId) {
@@ -1078,10 +1199,15 @@ export async function fetchFromSupabase(limit = 60): Promise<{
 
     const merged: DatabaseSnapshot = {
       ...local,
-      profiles: profiles.length > 0 ? profiles : local.profiles,
+      profiles: (profiles.length > 0 ? profiles : local.profiles).map((p) => {
+        if (p.id === 'usr-plainsyt-admin' || p.id === 'usr-zubair') {
+          return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
+        }
+        return p;
+      }),
       currentUserId: currentUserId || local.currentUserId,
       followingIds: userFollows,
-      articles: finalArticles.length > 0 ? finalArticles : DEFAULT_SEED_SNAPSHOT.articles,
+      articles: sanitizedArticles.length > 0 ? sanitizedArticles : DEFAULT_SEED_SNAPSHOT.articles,
       posts: finalPosts,
       comments: commentsRes.data !== null && commentsRes.data !== undefined ? comments : local.comments,
       reactions: reactionsRes.data !== null && reactionsRes.data !== undefined ? reactions : local.reactions,
@@ -1091,9 +1217,14 @@ export async function fetchFromSupabase(limit = 60): Promise<{
         for (const sr of DEFAULT_SEED_SNAPSHOT.reels) {
           if (!combined.some((r) => r.id === sr.id)) combined.unshift(sr);
         }
-        return combined;
+        return combined.map((r) => {
+          if (r.id === 'reel-japan-robot-night-2026' || r.likes === 142 || r.views === 1850) {
+            return { ...r, likes: 0, views: 0, reactionCounts: {} };
+          }
+          return r;
+        });
       })(),
-      stories: cleanStories,
+      stories: mergedStories,
       events: cleanEvents,
       researchPapers: researchPapers.length > 0 ? researchPapers : local.researchPapers,
       storeProducts: storeProducts.length > 0 ? storeProducts : local.storeProducts,

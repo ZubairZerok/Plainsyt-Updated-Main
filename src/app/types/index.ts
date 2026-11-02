@@ -180,6 +180,7 @@ export interface TopicStory {
   authorName?: string;
   authorAvatar?: string;
   articleId?: string;
+  videoUrl?: string;
   createdAt?: string;
 }
 

@@ -138,16 +138,15 @@ export function CentralFeed(f: FeedApi) {
 
   return (
     <div className="flex flex-col gap-3 sm:gap-5">
-      {f.stories.length > 0 && (
-        <div className="bg-canvas-card py-2.5 sm:bg-transparent sm:py-0">
-          <TopicStoriesCarousel
-            stories={f.stories}
-            currentUser={f.currentUser}
-            onOpen={f.onOpenStory}
-            onNavigateProfile={f.onNavigateProfile}
-          />
-        </div>
-      )}
+      <div className="bg-canvas-card py-2.5 sm:bg-transparent sm:py-0">
+        <TopicStoriesCarousel
+          stories={f.stories ?? []}
+          currentUser={f.currentUser}
+          onOpen={f.onOpenStory}
+          onCreate={f.onCreateStory}
+          onNavigateProfile={f.onNavigateProfile}
+        />
+      </div>
 
       {isEmpty ? (
         <section className={cn(FEED_CARD, 'p-6 text-center sm:p-10')}>
