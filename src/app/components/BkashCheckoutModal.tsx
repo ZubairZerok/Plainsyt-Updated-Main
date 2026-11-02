@@ -42,6 +42,10 @@ export function CreateProductModal({
     e.preventDefault();
     const numericPrice = Number(price);
     if (!name.trim() || isNaN(numericPrice) || numericPrice <= 0) return;
+    if (!currentUser?.id) {
+      alert('পণ্য যোগ করতে অনুগ্রহ করে আগে লগইন করুন।');
+      return;
+    }
     const product: StoreProduct = {
       id: `prod-${Date.now().toString(36)}`,
       name: name.trim(),
@@ -50,8 +54,8 @@ export function CreateProductModal({
       unit: unit.trim() || 'পিস',
       tag: tag.trim() || 'Agri-Tech',
       image: image.trim(),
-      sellerId: currentUser?.id || 'seller-1',
-      seller: seller.trim() || currentUser?.name || 'Verified Seller',
+      sellerId: currentUser.id,
+      seller: seller.trim() || currentUser.name || 'যাচাইকৃত বিক্রেতা',
       stock: Math.max(1, Number(stock) || 10),
       createdAt: new Date().toISOString(),
     };

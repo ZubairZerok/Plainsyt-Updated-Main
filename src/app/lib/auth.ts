@@ -265,15 +265,45 @@ export async function signupWithEmail(email: string, pass: string, name: string)
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin,
+        skipBrowserRedirect: true,
       },
     });
+
     if (error) {
+      if (error.message.includes('not enabled') || error.message.includes('validation_failed')) {
+        return {
+          ok: false,
+          error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে লগইন/সাইনআপ করুন অথবা Supabase Console থেকে Google OAuth চালু করুন।',
+        };
+      }
       return { ok: false, error: error.message };
     }
+
+    if (data?.url) {
+      // Test if Supabase returns 400 (disabled provider) before navigating the browser tab
+      try {
+        const probe = await fetch(data.url, { method: 'GET' });
+        if (!probe.ok) {
+          const body = await probe.json().catch(() => null);
+          if (body?.msg?.includes('not enabled') || body?.error_code === 'validation_failed') {
+            return {
+              ok: false,
+              error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে সাইনআপ বা লগইন করুন।',
+            };
+          }
+        }
+      } catch {
+        // Network/CORS typically means redirect to Google OAuth is active and ready
+      }
+
+      window.location.assign(data.url);
+      return { ok: true };
+    }
+
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে।' };

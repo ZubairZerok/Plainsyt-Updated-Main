@@ -1037,10 +1037,24 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       (s) => s.id !== 'story-bina-1' && s.id !== 'story-bau-iot',
     );
 
+    let userFollows = local.followingIds || [];
+    if (currentUserId) {
+      try {
+        const followsRes = await supabase.from('follows').select('following_id').eq('follower_id', currentUserId);
+        if (followsRes.data && followsRes.data.length > 0) {
+          const remoteFollows = followsRes.data.map((r: Record<string, unknown>) => String(r.following_id));
+          userFollows = Array.from(new Set([...userFollows, ...remoteFollows]));
+        }
+      } catch {
+        // non-blocking
+      }
+    }
+
     const merged: DatabaseSnapshot = {
       ...local,
       profiles: profiles.length > 0 ? profiles : local.profiles,
       currentUserId: currentUserId || local.currentUserId,
+      followingIds: userFollows,
       articles: finalArticles.length > 0 ? finalArticles : DEFAULT_SEED_SNAPSHOT.articles,
       posts: finalPosts,
       comments: commentsRes.data !== null && commentsRes.data !== undefined ? comments : local.comments,
@@ -1489,4 +1503,20 @@ export function mutateSnapshotReaction(
   };
 
   return { next, finalReaction, counts, total };
+}
+
+export async function dbToggleFollow(followerId: string, followingId: string, isFollowing: boolean): Promise<void> {
+  if (!followerId || !followingId) return;
+  try {
+    if (isFollowing) {
+      await supabase.from('follows').upsert(
+        { follower_id: followerId, following_id: followingId },
+        { onConflict: 'follower_id,following_id' },
+      );
+    } else {
+      await supabase.from('follows').delete().match({ follower_id: followerId, following_id: followingId });
+    }
+  } catch (err) {
+    console.warn('Failed to sync follow state to Supabase:', err);
+  }
 }

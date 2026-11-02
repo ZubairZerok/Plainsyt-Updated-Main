@@ -45,9 +45,13 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) return;
-    const authorId = currentUser?.id || `u-${Date.now().toString(36)}`;
-    const authorName = currentUser?.name || 'Agri Researcher';
-    const authorAvatar = currentUser?.avatar || 'PS';
+    if (!currentUser?.id) {
+      alert('পোস্ট বা স্টোরি তৈরি করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
+      return;
+    }
+    const authorId = currentUser.id;
+    const authorName = currentUser.nameBn || currentUser.name || 'গবেষক';
+    const authorAvatar = currentUser.avatar || 'PS';
     const nowIso = new Date().toISOString();
 
     const reel: StoryReel = {

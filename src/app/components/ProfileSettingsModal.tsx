@@ -48,7 +48,6 @@ export function ProfileSettingsModal({
   onSaveProfile,
   onSwitchUser,
 }: Props) {
-  const [mode, setMode] = useState<'edit' | 'create' | 'switch'>('edit');
   const [name, setName] = useState('');
   const [nameBn, setNameBn] = useState('');
   const [handle, setHandle] = useState('');
@@ -66,34 +65,19 @@ export function ProfileSettingsModal({
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!open) return;
-    if (currentUser && mode === 'edit') {
-      setName(currentUser.name);
-      setNameBn(currentUser.nameBn);
-      setHandle(currentUser.handle);
-      setRole(currentUser.role);
-      setOrganization(currentUser.organization);
-      setLocation(currentUser.location);
-      setBio(currentUser.bio);
-      setFocusArea(currentUser.focusArea);
-      setWebsite(currentUser.website ?? '');
-      setAvatar(currentUser.avatar);
-      setCoverGradient(currentUser.coverGradient || COVER_GRADIENT_PRESETS[0].css);
-    } else if (!currentUser || mode === 'create') {
-      setMode('create');
-      setName('');
-      setNameBn('');
-      setHandle('');
-      setRole('');
-      setOrganization('');
-      setLocation('');
-      setBio('');
-      setFocusArea('');
-      setWebsite('');
-      setAvatar('');
-      setCoverGradient(COVER_GRADIENT_PRESETS[0].css);
-    }
-  }, [open, currentUser, mode]);
+    if (!open || !currentUser) return;
+    setName(currentUser.name);
+    setNameBn(currentUser.nameBn);
+    setHandle(currentUser.handle);
+    setRole(currentUser.role);
+    setOrganization(currentUser.organization);
+    setLocation(currentUser.location);
+    setBio(currentUser.bio);
+    setFocusArea(currentUser.focusArea);
+    setWebsite(currentUser.website ?? '');
+    setAvatar(currentUser.avatar);
+    setCoverGradient(currentUser.coverGradient || COVER_GRADIENT_PRESETS[0].css);
+  }, [open, currentUser]);
 
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
@@ -119,7 +103,7 @@ export function ProfileSettingsModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!currentUser || !name.trim()) return;
     const cleanHandle =
       handle.trim().replace(/^@/, '') ||
       name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '.') + '.' + Math.floor(Math.random() * 90 + 10);
@@ -131,41 +115,20 @@ export function ProfileSettingsModal({
       .slice(0, 2)
       .toUpperCase();
 
-    const profile: UserProfile =
-      mode === 'edit' && currentUser
-        ? {
-            ...currentUser,
-            name: name.trim(),
-            nameBn: nameBn.trim() || name.trim(),
-            handle: cleanHandle,
-            role: role.trim(),
-            organization: organization.trim(),
-            location: location.trim(),
-            bio: bio.trim(),
-            focusArea: focusArea.trim(),
-            website: website.trim(),
-            avatar: avatar.trim() || initials || 'PS',
-            coverGradient,
-          }
-        : {
-            id: `u-${Date.now().toString(36)}`,
-            name: name.trim(),
-            nameBn: nameBn.trim() || name.trim(),
-            handle: cleanHandle,
-            role: role.trim() || 'Agri-Tech Researcher',
-            organization: organization.trim() || 'Plainsyt Community',
-            location: location.trim() || 'Bangladesh',
-            bio: bio.trim(),
-            focusArea: focusArea.trim(),
-            website: website.trim(),
-            avatar: avatar.trim() || initials || 'PS',
-            coverGradient,
-            isVerified: true,
-            publicationsCount: 0,
-            followersCount: 0,
-            followingCount: 0,
-            createdAt: new Date().toISOString(),
-          };
+    const profile: UserProfile = {
+      ...currentUser,
+      name: name.trim(),
+      nameBn: nameBn.trim() || name.trim(),
+      handle: cleanHandle,
+      role: role.trim(),
+      organization: organization.trim(),
+      location: location.trim(),
+      bio: bio.trim(),
+      focusArea: focusArea.trim(),
+      website: website.trim(),
+      avatar: avatar.trim() || initials || 'PS',
+      coverGradient,
+    };
 
     onSaveProfile(profile);
     onClose();
@@ -173,6 +136,28 @@ export function ProfileSettingsModal({
 
   const inputCls =
     'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-[#00ED64] focus:ring-2 focus:ring-[#00ED64]/20 transition';
+
+  if (!currentUser) {
+    return (
+      <Modal open={open} onClose={onClose} className="max-w-[480px]" labelledBy="profile-settings-title">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas shadow-2xl p-6 text-center">
+          <h2 id="profile-settings-title" className="font-display text-[20px] font-bold text-slate-900 dark:text-white mb-2">
+            প্রোফাইল সেটিংস
+          </h2>
+          <p className="font-bangla text-sm text-slate-600 dark:text-slate-300 mb-5">
+            প্রোফাইল সেটিংস পরিবর্তন করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full bg-[#00ED64] px-6 py-2 text-sm font-bold text-[#061621] shadow hover:bg-[#00d859]"
+          >
+            বন্ধ করুন
+          </button>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal open={open} onClose={onClose} className="max-w-[680px]" labelledBy="profile-settings-title">
@@ -188,84 +173,6 @@ export function ProfileSettingsModal({
           </div>
           <CloseButton onClick={onClose} />
         </div>
-
-        {/* Mode Tabs */}
-        <div className="flex gap-1.5 border-b border-canvas-border bg-canvas-subtle px-5 py-2">
-          {currentUser && (
-            <button
-              type="button"
-              onClick={() => setMode('edit')}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition',
-                mode === 'edit' ? 'bg-pine-900 text-canvas' : 'text-pine-900/70 hover:bg-canvas-card',
-              )}
-            >
-              <UserCheck className="size-3.5" /> Edit Current Profile
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setMode('create')}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition',
-              mode === 'create' ? 'bg-pine-900 text-canvas' : 'text-pine-900/70 hover:bg-canvas-card',
-            )}
-          >
-            <Plus className="size-3.5" /> Create New Profile
-          </button>
-          {allProfiles.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setMode('switch')}
-              className={cn(
-                'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition',
-                mode === 'switch' ? 'bg-pine-900 text-canvas' : 'text-pine-900/70 hover:bg-canvas-card',
-              )}
-            >
-              <Users className="size-3.5" /> Switch Profile ({allProfiles.length})
-            </button>
-          )}
-        </div>
-
-        {mode === 'switch' ? (
-          <div className="max-h-[70vh] space-y-2.5 overflow-y-auto p-5">
-            <SectionLabel>Select Active Profile (Supabase public.profiles)</SectionLabel>
-            {allProfiles.map((p) => {
-              const active = currentUser?.id === p.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => {
-                    onSwitchUser(p.id);
-                    onClose();
-                  }}
-                  className={cn(
-                    'flex w-full items-center gap-3.5 rounded-xl border p-3 text-left transition',
-                    active
-                      ? 'border-pine-900 bg-pine-50 shadow-tactile-xs'
-                      : 'border-canvas-border bg-canvas-card hover:border-pine-900',
-                  )}
-                >
-                  <Avatar src={p.avatar} name={p.name} size="size-12" online={active} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-semibold text-pine-900">
-                      {p.name} <span className="font-bangla font-normal text-pine-900/60">({p.nameBn})</span>
-                    </p>
-                    <p className="truncate font-mono text-[11px] text-pine-600">
-                      @{p.handle} · {p.role} {p.organization ? `· ${p.organization}` : ''}
-                    </p>
-                  </div>
-                  {active && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-pine-900 px-2.5 py-1 font-mono text-[10px] font-semibold text-canvas">
-                      <Check className="size-3" /> Active
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
           <form onSubmit={handleSubmit} className="max-h-[76vh] space-y-5 overflow-y-auto p-5">
             {/* Live Cover Gradient + Avatar Preview */}
             <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-sm">
@@ -505,11 +412,10 @@ export function ProfileSettingsModal({
                 disabled={!name.trim()}
                 className="h-10 rounded-full bg-[#00ED64] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#00d859] active:scale-95 transition disabled:opacity-40"
               >
-                {mode === 'create' ? 'Create & Save' : 'Save Profile'}
+                Save Profile
               </button>
             </div>
           </form>
-        )}
 
         {cropImageSrc && (
           <AvatarCropModal

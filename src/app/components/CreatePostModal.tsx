@@ -49,8 +49,12 @@ export function CreatePostModal({
 
   const publish = () => {
     if (!ready) return;
+    if (!currentUser?.id) {
+      alert('প্রতিবেদন প্রকাশ করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
+      return;
+    }
     const c = CATS[cat];
-    const authorId = currentUser?.id || `u-${Date.now().toString(36)}`;
+    const authorId = currentUser.id;
     const nowIso = new Date().toISOString();
     onPublish({
       id: `art-${Date.now().toString(36)}`,
@@ -63,10 +67,10 @@ export function CreatePostModal({
       authorId,
       author: {
         id: authorId,
-        name: currentUser?.nameBn || currentUser?.name || 'Researcher',
-        designation: currentUser?.role || 'Agri-Tech Author',
-        organization: currentUser?.organization || 'Plainsyt',
-        avatar: currentUser?.avatar || 'PS',
+        name: currentUser.nameBn || currentUser.name || 'গবেষক',
+        designation: currentUser.role || 'লেখক',
+        organization: currentUser.organization || 'Plainsyt',
+        avatar: currentUser.avatar || 'PS',
       },
       publishedAt: new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }),
       createdAt: nowIso,
