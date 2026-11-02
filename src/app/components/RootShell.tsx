@@ -829,8 +829,9 @@ export function RootShell() {
         creator: r.creator,
         avatar: r.creatorAvatar,
         image: r.mediaUrl,
-        meta: r.duration,
+        meta: r.location ? `${r.duration} · ${r.location}` : r.duration,
         likes: r.likes,
+        videoUrl: r.videoUrl,
       })),
     [snap.reels],
   );

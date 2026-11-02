@@ -27,6 +27,21 @@ export interface PlayerItem {
   image: string;
   meta: string;
   likes?: number;
+  videoUrl?: string;
+}
+
+export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl: string; videoId: string } | null {
+  if (!url) return null;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:shorts\/|watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if (match && match[1]) {
+    const videoId = match[1];
+    return {
+      videoId,
+      embedUrl: `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&playsinline=1&modestbranding=1`,
+      directUrl: `https://www.youtube.com/shorts/${videoId}`,
+    };
+  }
+  return null;
 }
 
 interface Props {
@@ -106,6 +121,7 @@ export function ReelPlayerModal({
 
   if (!items || items.length === 0 || !items[idx]) return null;
   const it = items[idx];
+  const ytInfo = getYouTubeEmbedInfo(it.videoUrl);
   const isLiked = liked[it.id];
   const isSaved = saved[it.id];
 
@@ -200,61 +216,99 @@ export function ReelPlayerModal({
       <div className="relative flex h-full w-full items-center justify-center sm:h-[92vh] max-w-[940px] px-2 sm:px-4">
         {/* Story Video / Visual Card */}
         <div
-          onClick={togglePlayPause}
+          onClick={ytInfo ? undefined : togglePlayPause}
           className="relative h-full w-full max-w-[430px] shrink-0 overflow-hidden bg-black shadow-2xl cursor-pointer select-none sm:rounded-2xl sm:border sm:border-white/15"
         >
-          <img
-            key={it.id}
-            src={it.image}
-            alt={it.title}
+          {ytInfo ? (
+            <div className="absolute inset-0 size-full bg-black">
+              <iframe
+                key={it.id}
+                src={ytInfo.embedUrl}
+                title={it.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="size-full border-0 object-cover"
+              />
+            </div>
+          ) : (
+            <img
+              key={it.id}
+              src={it.image}
+              alt={it.title}
+              className={cn(
+                'absolute inset-0 size-full object-cover [animation:kenburns_6s_ease-out_forwards]',
+                paused && '[animation-play-state:paused]',
+              )}
+            />
+          )}
+          <div
             className={cn(
-              'absolute inset-0 size-full object-cover [animation:kenburns_6s_ease-out_forwards]',
-              paused && '[animation-play-state:paused]',
+              'absolute inset-0 pointer-events-none',
+              ytInfo
+                ? 'bg-gradient-to-b from-black/75 via-transparent to-black/85'
+                : 'bg-gradient-to-b from-black/60 via-transparent to-black/90',
             )}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 pointer-events-none" />
 
-          {/* Progress Bars */}
-          <div className="absolute inset-x-3 top-3 z-10 flex gap-1 pointer-events-none">
-            {items.map((x, i) => (
-              <span key={x.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/30">
-                {i < idx && <span className="block h-full w-full bg-white" />}
-                {i === idx && (
-                  <span
-                    key={`${x.id}-${idx}`}
-                    onAnimationEnd={next}
-                    className={cn(
-                      'block h-full w-full origin-left bg-white [animation:reel-progress_6s_linear_forwards]',
-                      paused && '[animation-play-state:paused]',
-                    )}
-                  />
-                )}
-              </span>
-            ))}
-          </div>
+          {/* Progress Bars (hidden for YouTube Shorts since YouTube provides native scrubber) */}
+          {!ytInfo && (
+            <div className="absolute inset-x-3 top-3 z-10 flex gap-1 pointer-events-none">
+              {items.map((x, i) => (
+                <span key={x.id} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/30">
+                  {i < idx && <span className="block h-full w-full bg-white" />}
+                  {i === idx && (
+                    <span
+                      key={`${x.id}-${idx}`}
+                      onAnimationEnd={next}
+                      className={cn(
+                        'block h-full w-full origin-left bg-white [animation:reel-progress_6s_linear_forwards]',
+                        paused && '[animation-play-state:paused]',
+                      )}
+                    />
+                  )}
+                </span>
+              ))}
+            </div>
+          )}
 
-          {/* Top Header: Creator info (NO location) */}
+          {/* Top Header: Creator info */}
           <div className="absolute inset-x-3 top-6 z-10 flex items-center gap-2.5 text-white">
             <Avatar src={it.avatar} name={it.creator} size="size-9" ring />
             <div className="min-w-0 flex-1">
               <p className="truncate font-bangla text-[14px] font-bold">{it.creator}</p>
               <p className="truncate font-mono text-[10.5px] text-white/70">{it.meta}</p>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                togglePlayPause();
-              }}
-              aria-label={paused ? 'Play' : 'Pause'}
-              className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition active:scale-95"
-            >
-              {paused ? <Play className="size-4 fill-white" /> : <Pause className="size-4 fill-white" />}
-            </button>
+            {ytInfo ? (
+              <a
+                href={ytInfo.directUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1.5 rounded-full bg-red-600/90 hover:bg-red-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition active:scale-95"
+                title="YouTube-এ দেখুন"
+              >
+                <svg className="size-3.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+                <span>Shorts</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlayPause();
+                }}
+                aria-label={paused ? 'Play' : 'Pause'}
+                className="flex size-9 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition active:scale-95"
+              >
+                {paused ? <Play className="size-4 fill-white" /> : <Pause className="size-4 fill-white" />}
+              </button>
+            )}
           </div>
 
           {/* Center Play/Pause Micro-Animation indicator */}
-          {showCenterIcon && (
+          {!ytInfo && showCenterIcon && (
             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/60 p-5 text-white backdrop-blur-sm animate-in zoom-in-75 fade-in duration-200">
               {paused ? <Pause className="size-8 fill-white" /> : <Play className="size-8 fill-white ml-0.5" />}
             </div>
@@ -346,13 +400,14 @@ export function ReelPlayerModal({
             </button>
           </div>
 
-          {/* Bottom Story Title (No location) */}
+          {/* Bottom Story / Reel Title */}
           <div className="absolute inset-x-4 bottom-6 z-10 pr-16 text-white pointer-events-none">
-            <p className="font-bangla text-[20px] font-bold leading-snug drop-shadow-md line-clamp-2">
+            <p className="font-bangla text-[18px] sm:text-[20px] font-bold leading-snug drop-shadow-md line-clamp-2">
               {it.title}
             </p>
-            <p className="mt-1.5 font-mono text-[10.5px] text-white/70">
-              {toBengaliNumerals(idx + 1)} / {toBengaliNumerals(count)} · ক্লিক বা স্পেসবার দিয়ে বিরতি নিন
+            <p className="mt-1.5 font-mono text-[10.5px] text-white/75">
+              {ytInfo ? 'YouTube Shorts · ' : `${toBengaliNumerals(idx + 1)} / ${toBengaliNumerals(count)} · `}
+              {it.meta}
             </p>
           </div>
         </div>

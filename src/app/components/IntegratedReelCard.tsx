@@ -65,9 +65,28 @@ export function IntegratedReelCard({
               </>
             )}
           </p>
-          <p className="flex items-center gap-1 text-[12px] text-pine-900/55">
-            <Clapperboard className="size-3" />
-            Reel · {reel.duration}
+          <p className="flex items-center gap-1.5 text-[12px] text-pine-900/60 dark:text-white/60">
+            {reel.videoUrl?.includes('youtu') ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400">
+                <svg className="size-3 fill-current" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+                YouTube Shorts
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1">
+                <Clapperboard className="size-3" />
+                Reel
+              </span>
+            )}
+            <span>·</span>
+            <span>{reel.duration}</span>
+            {reel.location && (
+              <>
+                <span>·</span>
+                <span className="truncate">{reel.location}</span>
+              </>
+            )}
           </p>
         </div>
       </header>
@@ -100,7 +119,23 @@ export function IntegratedReelCard({
             <span className="absolute left-3 top-3 rounded bg-black/50 px-1.5 py-0.5 font-mono text-[10.5px] text-white">
               {reel.duration}
             </span>
-            <Volume2 className="absolute right-3 top-3 size-5 text-white/80" />
+            {reel.videoUrl?.includes('youtu') ? (
+              <a
+                href={reel.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="absolute right-3 top-3 z-10 inline-flex items-center gap-1 rounded-full bg-red-600/90 hover:bg-red-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow transition active:scale-95"
+                title="YouTube-এ দেখুন"
+              >
+                <svg className="size-3.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+                <span>Shorts</span>
+              </a>
+            ) : (
+              <Volume2 className="absolute right-3 top-3 size-5 text-white/80" />
+            )}
             <span className="absolute bottom-4 left-3 right-16 text-left">
               <span className="block font-display text-[19px] font-semibold leading-tight text-white">
                 {reel.title}

@@ -348,7 +348,25 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
   posts: [],
   comments: [],
   reactions: [],
-  reels: [],
+  reels: [
+    {
+      id: 'reel-japan-robot-night-2026',
+      title: 'রাত ২টায় ক্ষেতে কাজ করছে রোবট কৃষক! 🤖 Plainsyt',
+      creatorId: 'usr-plainsyt-admin',
+      creator: 'PLAiNSYT',
+      creatorAvatar: '/logos/icon.png',
+      location: 'জাপান · স্মার্ট এগ্রিকালচার',
+      duration: '0:58',
+      views: 1850,
+      gradientTheme: 'from-emerald-950 via-slate-900 to-black',
+      videoType: 'greenhouse-iot',
+      mediaUrl: 'https://i.ytimg.com/vi/BKUmGkQxAUU/hqdefault.jpg',
+      videoUrl: 'https://www.youtube.com/shorts/BKUmGkQxAUU',
+      likes: 142,
+      reactionCounts: { like: 142 },
+      createdAt: '2026-11-02T10:00:00+06:00',
+    },
+  ],
   stories: [],
   events: [],
   eventRegistrations: [],
@@ -402,6 +420,13 @@ export function readSnapshot(): DatabaseSnapshot {
           mergedArticles.unshift(sa);
         }
       }
+      const existingReels = parsed.reels ?? [];
+      const mergedReels = [...existingReels];
+      for (const sr of DEFAULT_SEED_SNAPSHOT.reels) {
+        if (!mergedReels.some((r) => r.id === sr.id)) {
+          mergedReels.unshift(sr);
+        }
+      }
       // Purge removed seed items from browser cache
       const cleanPosts = (parsed.posts ?? []).filter((p) => p.id !== 'post-zubair-1');
       const cleanEvents = (parsed.events ?? []).filter(
@@ -414,6 +439,7 @@ export function readSnapshot(): DatabaseSnapshot {
         ...DEFAULT_SEED_SNAPSHOT,
         ...parsed,
         articles: mergedArticles,
+        reels: mergedReels,
         posts: cleanPosts,
         events: cleanEvents,
         stories: cleanStories,
@@ -1059,7 +1085,14 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       posts: finalPosts,
       comments: commentsRes.data !== null && commentsRes.data !== undefined ? comments : local.comments,
       reactions: reactionsRes.data !== null && reactionsRes.data !== undefined ? reactions : local.reactions,
-      reels: reels.length > 0 ? reels : local.reels,
+      reels: (() => {
+        const base = reels.length > 0 ? reels : local.reels;
+        const combined = [...base];
+        for (const sr of DEFAULT_SEED_SNAPSHOT.reels) {
+          if (!combined.some((r) => r.id === sr.id)) combined.unshift(sr);
+        }
+        return combined;
+      })(),
       stories: cleanStories,
       events: cleanEvents,
       researchPapers: researchPapers.length > 0 ? researchPapers : local.researchPapers,

@@ -105,9 +105,28 @@ export function CentralFeed(f: FeedApi) {
     );
   }
   const remainingPosts = f.posts.slice(1);
-  const maxLen = Math.max(restArticles.length, remainingPosts.length);
+  const maxLen = Math.max(restArticles.length, remainingPosts.length, f.reels.length - 1);
   for (let i = 0; i < maxLen; i++) {
     if (remainingPosts[i]) stream.push(renderPost(remainingPosts[i]));
+    if (f.reels[i + 1]) {
+      const extraReel = f.reels[i + 1];
+      const reelIdx = i + 1;
+      stream.push(
+        <IntegratedReelCard
+          key={extraReel.id}
+          reel={extraReel}
+          saved={f.savedReelIds.includes(extraReel.id)}
+          following={f.followingIds.includes(extraReel.creatorId)}
+          isOwnCreator={Boolean(f.currentUser?.id) && extraReel.creatorId === f.currentUser?.id}
+          onPlay={() => f.onPlayReel(reelIdx)}
+          onReact={(type) => f.onReact('reel', extraReel.id, type)}
+          onSave={() => f.onSaveReel(extraReel.id)}
+          onShare={() => f.onShare(extraReel.title)}
+          onFollow={() => f.onToggleFollow(extraReel.creatorId)}
+          onNavigateProfile={f.onNavigateProfile}
+        />,
+      );
+    }
     if (restArticles[i]) stream.push(renderArticle(restArticles[i], false));
   }
 
