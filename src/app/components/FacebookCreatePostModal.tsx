@@ -130,8 +130,8 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               <h2 id="upload-reel-title" className="font-display text-[19px] font-semibold">
                 Upload Video Reel / Field Story
               </h2>
-              <p className="font-mono text-[10.5px] text-slate-400">
-                Stored in Supabase · public.reels &amp; public.stories
+              <p className="text-[12px] text-slate-400">
+                কমিউনিটির সাথে ভিডিও বা ফিল্ড স্টোরি শেয়ার করুন
               </p>
             </div>
           </div>
@@ -293,7 +293,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
                 'inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-6 text-[14px] font-bold text-white shadow-md disabled:opacity-40 transition',
               )}
             >
-              <Video className="size-4" /> Publish to Supabase
+              <Video className="size-4" /> প্রকাশ করুন
             </button>
           </div>
         </form>

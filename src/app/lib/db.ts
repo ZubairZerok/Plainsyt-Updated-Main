@@ -322,12 +322,16 @@ export function readSnapshot(): DatabaseSnapshot {
 
       const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
         if (p.id === 'usr-zubair') {
+          const userAvatar =
+            p.avatar && p.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+              ? p.avatar
+              : '/images/hasan_zubair.png';
           return {
             ...p,
             name: 'Hasan Zubair',
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
-            avatar: '/images/hasan_zubair.png',
+            avatar: userAvatar,
             followersCount: 0,
             followingCount: 0,
             publicationsCount: 0,
@@ -1001,12 +1005,19 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       ...local,
       profiles: (profiles.length > 0 ? profiles : local.profiles).map((p) => {
         if (p.id === 'usr-zubair') {
+          const localZubair = local.profiles.find((lp) => lp.id === 'usr-zubair');
+          const chosenAvatar =
+            p.avatar && p.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+              ? p.avatar
+              : localZubair?.avatar && localZubair.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+                ? localZubair.avatar
+                : '/images/hasan_zubair.png';
           return {
             ...p,
             name: 'Hasan Zubair',
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
-            avatar: '/images/hasan_zubair.png',
+            avatar: chosenAvatar,
             followersCount: 0,
             followingCount: 0,
             publicationsCount: 0,

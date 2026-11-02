@@ -167,8 +167,8 @@ export function ProfileSettingsModal({
             <h2 id="profile-settings-title" className="font-display text-[21px] font-semibold text-pine-900">
               Profile &amp; Appearance Settings
             </h2>
-            <p className="font-mono text-[10.5px] text-pine-600">
-              Stored directly in Supabase · public.profiles
+            <p className="text-[12px] text-slate-500 dark:text-slate-400">
+              আপনার ব্যক্তিগত তথ্য ও প্রোফাইল কাস্টমাইজ করুন
             </p>
           </div>
           <CloseButton onClick={onClose} />

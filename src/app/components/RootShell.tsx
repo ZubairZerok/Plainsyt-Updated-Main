@@ -112,10 +112,21 @@ export function RootShell() {
         let profile: UserProfile;
 
         if (alias.isAdmin) {
-          profile = { ...ADMIN_PROFILE };
+          const existingAdmin = snap.profiles.find((pr) => pr.id === 'usr-plainsyt-admin') || getStoredAuthUser();
+          profile = {
+            ...ADMIN_PROFILE,
+            ...existingAdmin,
+            avatar: existingAdmin?.avatar || ADMIN_PROFILE.avatar,
+            email: u.email || ADMIN_PROFILE.email,
+          };
         } else if (alias.canonicalUserId === 'usr-zubair') {
+          const existingZubair = snap.profiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
           profile = {
             ...ZUBAIR_PROFILE,
+            ...existingZubair,
+            name: existingZubair?.name || 'Hasan Zubair',
+            nameBn: existingZubair?.nameBn || 'হাসান জুবায়ের',
+            avatar: existingZubair?.avatar || '/images/hasan_zubair.png',
             email: u.email || ZUBAIR_PROFILE.email,
           };
         } else {
@@ -628,10 +639,12 @@ export function RootShell() {
 
   const handleSaveProfile = useCallback(
     (profile: UserProfile) => {
+      // ULTRA HARD FIX: Persist immediately to both auth storage and database snapshot
+      setStoredAuth(profile, profile.email || null);
       commit((prev) => {
         const exists = prev.profiles.some((p) => p.id === profile.id);
         const profiles = exists
-          ? prev.profiles.map((p) => (p.id === profile.id ? profile : p))
+          ? prev.profiles.map((p) => (p.id === profile.id ? { ...p, ...profile } : p))
           : [profile, ...prev.profiles];
         // Also propagate updated author name/avatar to their authored articles & posts
         const articles = prev.articles.map((a) =>
@@ -639,6 +652,7 @@ export function RootShell() {
             ? {
                 ...a,
                 author: {
+                  ...a.author,
                   id: profile.id,
                   name: profile.nameBn || profile.name,
                   designation: profile.role,
@@ -653,6 +667,7 @@ export function RootShell() {
             ? {
                 ...po,
                 author: {
+                  ...po.author,
                   id: profile.id,
                   name: profile.name,
                   avatar: profile.avatar,
@@ -671,7 +686,7 @@ export function RootShell() {
         };
       });
       dbUpsertProfile(profile);
-      toast.success('প্রোফাইল Supabase-এ সংরক্ষিত হয়েছে', { description: profile.name });
+      toast.success('প্রোফাইল সফলভাবে আপডেট হয়েছে', { description: profile.name });
     },
     [commit],
   );
@@ -700,7 +715,7 @@ export function RootShell() {
       }));
       dbUpsertArticle(enriched);
       goNavigate('/');
-      toast.success('প্রতিবেদন Supabase-এ প্রকাশিত হয়েছে', {
+      toast.success('প্রতিবেদন সফলভাবে প্রকাশিত হয়েছে', {
         description: `${toBengaliNumerals(enriched.readTimeMinutes)} মিনিট পড়া · ${enriched.category}`,
       });
     },
@@ -729,7 +744,7 @@ export function RootShell() {
       dbUpsertReel(enrichedReel);
       if (story) dbUpsertStory({ ...story, authorId: actor.id, authorName: actor.name, authorAvatar: actor.avatar });
       if (feedPost) dbUpsertPost({ ...feedPost, authorId: actor.id });
-      toast.success('রিল ও স্টোরি Supabase-এ সংরক্ষিত হয়েছে');
+      toast.success('রিল ও স্টোরি সফলভাবে প্রকাশিত হয়েছে');
     },
     [currentUser, requestAuth, commit],
   );
@@ -961,7 +976,7 @@ export function RootShell() {
               প্রতিবেদনটি পাওয়া যায়নি
             </h1>
             <p className="mt-1 font-bangla text-[14px] text-pine-900/65">
-              এই প্রতিবেদনটি এখনো Supabase-এ যোগ করা হয়নি বা মুছে ফেলা হয়েছে।
+              এই প্রতিবেদনটি বর্তমানে পাওয়া যাচ্ছে না বা মুছে ফেলা হয়েছে।
             </p>
             <div className="mt-4 flex justify-center gap-2">
               <button
@@ -1122,7 +1137,7 @@ export function RootShell() {
                 votedIdeaIds: [...prev.votedIdeaIds, idea.id],
               }));
               dbUpsertIdea(idea);
-              toast.success('আইডিয়া Supabase-এ জমা হয়েছে');
+              toast.success('আপনার আইডিয়া সফলভাবে জমা হয়েছে');
             }}
             onToggleVote={(id) => {
               if (!currentUser) {
@@ -1511,7 +1526,7 @@ export function RootShell() {
             storeProducts: [product, ...prev.storeProducts],
           }));
           dbUpsertProduct(product);
-          toast.success('পণ্যটি Supabase Store-এ যুক্ত হয়েছে', { description: product.name });
+          toast.success('পণ্যটি সফলভাবে স্টোরে যুক্ত হয়েছে', { description: product.name });
         }}
       />
 

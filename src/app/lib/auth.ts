@@ -276,7 +276,7 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
       if (error.message.includes('not enabled') || error.message.includes('validation_failed')) {
         return {
           ok: false,
-          error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে Supabase Authentication -> Providers -> Google-এ Client ID এবং Client Secret সক্রিয় করুন।',
+          error: 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন।',
         };
       }
       return { ok: false, error: error.message };

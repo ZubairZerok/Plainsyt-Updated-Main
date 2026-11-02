@@ -243,7 +243,7 @@ export function ArticleCard({
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="মতামত লিখুন (Supabase-এ সংরক্ষিত হবে)…"
+                placeholder="আপনার গঠনমূলক মতামত লিখুন…"
                 className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/40"
               />
               <button

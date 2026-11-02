@@ -399,7 +399,7 @@ export function AuthModal({
             {/* Cloud Security Indicator */}
             <div className="pt-2 text-center text-[11px] text-slate-400">
               <span className="flex items-center justify-center gap-1">
-                <ShieldCheck className="size-3.5 text-[#00ED64]" /> Supabase সিকিউর অথেন্টিকেশন দ্বারা সুরক্ষিত
+                <ShieldCheck className="size-3.5 text-[#00ED64]" /> সম্পূর্ণ সুরক্ষিত ও এনক্রিপ্টেড সংযোগ
               </span>
             </div>
           </form>

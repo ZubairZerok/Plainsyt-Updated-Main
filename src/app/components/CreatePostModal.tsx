@@ -118,7 +118,9 @@ export function CreatePostModal({
               <PenLine className="size-5 text-emerald-600" />
               নতুন প্রতিবেদন লিখুন (Write Article)
             </h2>
-            <p className="font-mono text-[10.5px] text-slate-500 dark:text-slate-400">Stored directly in Supabase · public.articles</p>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400">
+              কৃষি ও প্রযুক্তি গবেষণা নিয়ে বিস্তারিত প্রতিবেদন প্রকাশ করুন
+            </p>
           </div>
           <CloseButton onClick={onClose} />
         </div>
@@ -295,7 +297,7 @@ export function CreatePostModal({
             disabled={!ready}
             className="h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 px-6 text-[14px] font-bold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-40 transition"
           >
-            প্রকাশ করুন (Save to Supabase)
+            প্রকাশ করুন
           </button>
         </div>
       </div>
