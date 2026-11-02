@@ -945,7 +945,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       organizerName: String(r.organizer_name ?? ''),
       description: String(r.description ?? ''),
       externalLink: String(r.external_link ?? ''),
-      isRegistered: local.eventRegistrations.includes(String(r.id)),
+      isRegistered: (local.eventRegistrations ?? []).includes(String(r.id)),
     }));
     const researchPapers: ResearchPaper[] = (papersRes.data ?? []).map((r: Record<string, unknown>) => ({
       id: String(r.id),
@@ -1003,7 +1003,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       authorAvatar: String(r.author_avatar ?? ''),
       votes: Number(r.votes ?? 1),
       tag: String(r.tag ?? 'এগ্রি-টেক'),
-      voted: local.votedIdeaIds.includes(String(r.id)),
+      voted: (local.votedIdeaIds ?? []).includes(String(r.id)),
       createdAt: String(r.created_at ?? ''),
     }));
     const notifications: NotificationItem[] = (notifsRes.data ?? []).map((r: Record<string, unknown>) => {

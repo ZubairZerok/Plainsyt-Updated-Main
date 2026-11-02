@@ -1086,7 +1086,7 @@ export function ProfileView({
               <div key={a.id} className="relative group">
                 <ArticleCard
                   article={a}
-                  bookmarked={bookmarkIds.includes(a.id)}
+                  bookmarked={(bookmarkIds ?? []).includes(a.id)}
                   currentUser={currentUser}
                   onOpenPopup={() => onOpenArticlePopup(a.id)}
                   onReact={(type) => onReact('article', a.id, type)}

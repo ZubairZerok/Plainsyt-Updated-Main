@@ -16,9 +16,9 @@ export interface FeedApi {
   posts: CommunityPost[];
   stories: TopicStory[];
   reels: StoryReel[];
-  savedReelIds: string[];
-  followingIds: string[];
-  bookmarkIds: string[];
+  savedReelIds?: string[];
+  followingIds?: string[];
+  bookmarkIds?: string[];
   onWriteArticle: () => void;
   onUploadVideo: () => void;
   onAskAI: () => void;
@@ -41,12 +41,16 @@ export interface FeedApi {
 }
 
 export function CentralFeed(f: FeedApi) {
+  const bookmarkIds = f.bookmarkIds ?? [];
+  const savedReelIds = f.savedReelIds ?? [];
+  const followingIds = f.followingIds ?? [];
+
   const renderArticle = (a: Article, lead = false) => (
     <ArticleCard
       key={a.id}
       article={a}
       lead={lead}
-      bookmarked={f.bookmarkIds.includes(a.id)}
+      bookmarked={bookmarkIds.includes(a.id)}
       currentUser={f.currentUser}
       onOpenPopup={() => f.onOpenArticlePopup(a.id)}
       onReact={(type) => f.onReact('article', a.id, type)}
@@ -92,8 +96,8 @@ export function CentralFeed(f: FeedApi) {
       <IntegratedReelCard
         key={firstReel.id}
         reel={firstReel}
-        saved={f.savedReelIds.includes(firstReel.id)}
-        following={f.followingIds.includes(firstReel.creatorId)}
+        saved={savedReelIds.includes(firstReel.id)}
+        following={followingIds.includes(firstReel.creatorId)}
         isOwnCreator={Boolean(f.currentUser?.id) && firstReel.creatorId === f.currentUser?.id}
         onPlay={() => f.onPlayReel(0)}
         onReact={(type) => f.onReact('reel', firstReel.id, type)}
@@ -115,8 +119,8 @@ export function CentralFeed(f: FeedApi) {
         <IntegratedReelCard
           key={extraReel.id}
           reel={extraReel}
-          saved={f.savedReelIds.includes(extraReel.id)}
-          following={f.followingIds.includes(extraReel.creatorId)}
+          saved={savedReelIds.includes(extraReel.id)}
+          following={followingIds.includes(extraReel.creatorId)}
           isOwnCreator={Boolean(f.currentUser?.id) && extraReel.creatorId === f.currentUser?.id}
           onPlay={() => f.onPlayReel(reelIdx)}
           onReact={(type) => f.onReact('reel', extraReel.id, type)}

@@ -169,6 +169,10 @@ assert(!rootShellSource.includes('if (snap.profiles && snap.profiles.length > 0)
 const primitivesSource = fs.readFileSync(path.join(rootDir, 'src/app/components/Primitives.tsx'), 'utf-8');
 assert(primitivesSource.includes('const initials ='), 'Primitives.tsx defines initials before rendering');
 
+const centralFeedSource = fs.readFileSync(path.join(rootDir, 'src/app/components/CentralFeed.tsx'), 'utf-8');
+assert(centralFeedSource.includes('const bookmarkIds = f.bookmarkIds ?? [];'), 'CentralFeed.tsx safeguards bookmarkIds against undefined');
+assert(rootShellSource.includes('bookmarkIds={snap.bookmarkedArticleIds ?? []}'), 'RootShell.tsx passes bookmarkIds prop to CentralFeed');
+
 // ----------------------------------------------------
 // SUITE 6: VITE PRODUCTION BUILD VERIFICATION
 // ----------------------------------------------------

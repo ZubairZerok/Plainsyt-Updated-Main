@@ -92,10 +92,11 @@ export const formatBengaliNumberCompact = (num: number | undefined | null): stri
   return toBengaliNumerals(n);
 };
 
-export const toggleBookmarkId = (existingIds: string[], targetId: string): string[] => {
-  return existingIds.includes(targetId)
-    ? existingIds.filter((id) => id !== targetId)
-    : [...existingIds, targetId];
+export const toggleBookmarkId = (existingIds: string[] = [], targetId: string): string[] => {
+  const ids = existingIds ?? [];
+  return ids.includes(targetId)
+    ? ids.filter((id) => id !== targetId)
+    : [...ids, targetId];
 };
 
 export const setArticleLinkedInReaction = (

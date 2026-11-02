@@ -260,7 +260,7 @@ export function RightSidebar(p: Props) {
               <p className="font-mono text-[9.5px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">গবেষক ও লেখক</p>
               <ul className="divide-y divide-slate-100 dark:divide-white/5">
                 {otherProfiles.map((s) => {
-                  const isFollowing = p.followingIds.includes(s.id);
+                  const isFollowing = (p.followingIds ?? []).includes(s.id);
                   return (
                     <li key={s.id} className="flex items-center gap-2 py-2">
                       <button

@@ -306,7 +306,7 @@ export function RootShell() {
         });
         return;
       }
-      const was = snap.bookmarkedArticleIds.includes(articleId);
+      const was = (snap.bookmarkedArticleIds ?? []).includes(articleId);
       commit((prev) => ({
         ...prev,
         bookmarkedArticleIds: toggleBookmarkId(prev.bookmarkedArticleIds, articleId),
@@ -732,7 +732,7 @@ export function RootShell() {
         toast.error('আপনি নিজেকে অনুসরণ করতে পারবেন না');
         return;
       }
-      const was = snap.followingIds.includes(targetUserId);
+      const was = (snap.followingIds ?? []).includes(targetUserId);
       const nextFollowingIds = toggleBookmarkId(snap.followingIds, targetUserId);
       commit((prev) => ({
         ...prev,
@@ -851,7 +851,7 @@ export function RootShell() {
   );
 
   const savedArticles = useMemo(
-    () => snap.articles.filter((a) => snap.bookmarkedArticleIds.includes(a.id)),
+    () => (snap.articles ?? []).filter((a) => (snap.bookmarkedArticleIds ?? []).includes(a.id)),
     [snap.articles, snap.bookmarkedArticleIds],
   );
   const savedPosts = useMemo(() => snap.posts.filter((p) => p.userSaved), [snap.posts]);
@@ -988,7 +988,7 @@ export function RootShell() {
           </div>
           <ArticleReaderContent
             article={standaloneArticle}
-            bookmarked={snap.bookmarkedArticleIds.includes(standaloneArticle.id)}
+            bookmarked={(snap.bookmarkedArticleIds ?? []).includes(standaloneArticle.id)}
             currentUser={currentUser}
             isStandalonePage
             onClose={() => goNavigate('/')}
@@ -1114,9 +1114,9 @@ export function RootShell() {
                 return;
               }
               commit((prev) => {
-                const voted = prev.votedIdeaIds.includes(id);
+                const voted = (prev.votedIdeaIds ?? []).includes(id);
                 const nextVoted = toggleBookmarkId(prev.votedIdeaIds, id);
-                const nextIdeas = prev.ideas.map((i) => {
+                const nextIdeas = (prev.ideas ?? []).map((i) => {
                   if (i.id !== id) return i;
                   const updated = { ...i, voted: !voted, votes: Math.max(0, i.votes + (voted ? -1 : 1)) };
                   dbUpsertIdea(updated);
@@ -1143,15 +1143,15 @@ export function RootShell() {
       case 'profile': {
         const isOwn = !params.userId || params.userId === currentUser?.id;
         const targetId = viewedProfile?.id || '';
-        const authorArticles = snap.articles.filter((a) => a.authorId === targetId);
-        const authorPosts = snap.posts.filter((p) => p.authorId === targetId);
-        const authorStories = snap.stories.filter((s) => s.authorId === targetId);
-        const userOrders = snap.orders.filter((o) => !currentUser || o.buyerId === currentUser.id);
+        const authorArticles = (snap.articles ?? []).filter((a) => a.authorId === targetId);
+        const authorPosts = (snap.posts ?? []).filter((p) => p.authorId === targetId);
+        const authorStories = (snap.stories ?? []).filter((s) => s.authorId === targetId);
+        const userOrders = (snap.orders ?? []).filter((o) => !currentUser || o.buyerId === currentUser.id);
         return (
           <ProfileView
             profile={viewedProfile}
             isOwnProfile={isOwn}
-            isFollowing={snap.followingIds.includes(targetId)}
+            isFollowing={(snap.followingIds ?? []).includes(targetId)}
             currentUser={currentUser}
             authorArticles={authorArticles}
             authorPosts={authorPosts}
@@ -1209,12 +1209,13 @@ export function RootShell() {
         return (
           <CentralFeed
             currentUser={currentUser}
-            articles={snap.articles}
-            posts={snap.posts}
-            stories={snap.stories}
-            reels={snap.reels}
-            savedReelIds={savedReelIds}
-            followingIds={snap.followingIds}
+            articles={snap.articles ?? []}
+            posts={snap.posts ?? []}
+            stories={snap.stories ?? []}
+            reels={snap.reels ?? []}
+            savedReelIds={savedReelIds ?? []}
+            followingIds={snap.followingIds ?? []}
+            bookmarkIds={snap.bookmarkedArticleIds ?? []}
             onWriteArticle={() => {
               if (!currentUser) {
                 requestAuth('প্রতিবেদন লিখতে দয়া করে অ্যাকাউন্টে লগইন করুন।', () => setWriteOpen(true));
@@ -1428,7 +1429,7 @@ export function RootShell() {
 
       <ArticleReaderModal
         article={readerArticle}
-        bookmarked={!!readerArticle && snap.bookmarkedArticleIds.includes(readerArticle.id)}
+        bookmarked={!!readerArticle && (snap.bookmarkedArticleIds ?? []).includes(readerArticle.id)}
         currentUser={currentUser}
         onClose={() => setReaderId(null)}
         onReact={(type) => readerArticle && handleReact('article', readerArticle.id, type)}
