@@ -512,18 +512,22 @@ insert into public.profiles (
   id, name, name_bn, handle, role, organization, location, bio, avatar, is_verified, email, publications_count
 ) values (
   'usr-zubair',
-  'Zubair Hasan',
-  'জুবায়ের হাসান',
-  'zubair',
+  'Hasan Zubair',
+  'হাসান জুবায়ের',
+  'hasanzubair',
   'Research Fellow',
   'Bangladesh Agricultural University (BAU)',
   'ময়মনসিংহ, বাংলাদেশ',
   'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
+  '/images/hasan_zubair.png',
   true,
   'z65gt9@gmail.com',
   0
-) on conflict (id) do nothing;
+) on conflict (id) do update set
+  name = excluded.name,
+  name_bn = excluded.name_bn,
+  handle = excluded.handle,
+  avatar = excluded.avatar;
 
 insert into public.articles (
   id,

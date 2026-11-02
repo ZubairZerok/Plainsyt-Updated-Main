@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getStoredAuthUser, logoutUser } from '../lib/auth';
+import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, ADMIN_PROFILE, ZUBAIR_PROFILE } from '../lib/auth';
 import {
   readSnapshot, writeSnapshot, fetchFromSupabase, syncLocalToSupabase, mutateSnapshotReaction,
   DEFAULT_SEED_SNAPSHOT,
@@ -108,23 +108,38 @@ export function RootShell() {
     const { data: authSub } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const u = session.user;
-        const profile: UserProfile = {
-          id: u.id,
-          name: u.user_metadata?.full_name || u.email?.split('@')[0] || 'PLAiNSYT Member',
-          nameBn: u.user_metadata?.full_name || u.email?.split('@')[0] || 'সদস্য',
-          handle: (u.email?.split('@')[0] || 'user').toLowerCase().replace(/[^a-z0-9_]/g, '_'),
-          role: 'সদস্য',
-          organization: 'PLAiNSYT Platform',
-          location: 'বাংলাদেশ',
-          bio: 'PLAiNSYT কমিউনিটি সদস্য।',
-          avatar: u.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.id}`,
-          coverGradient: 'linear-gradient(135deg, #061621 0%, #00ED64 100%)',
-          isVerified: false,
-          focusArea: 'কৃষি ও প্রযুক্তি',
-          publicationsCount: 0,
-          followersCount: 0,
-          followingCount: 0,
-        };
+        const alias = resolveEmailAlias(u.email || '');
+        let profile: UserProfile;
+
+        if (alias.isAdmin) {
+          profile = { ...ADMIN_PROFILE };
+        } else if (alias.canonicalUserId === 'usr-zubair') {
+          profile = {
+            ...ZUBAIR_PROFILE,
+            email: u.email || ZUBAIR_PROFILE.email,
+          };
+        } else {
+          profile = {
+            id: u.id,
+            name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'PLAiNSYT Member',
+            nameBn: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'সদস্য',
+            handle: (u.email?.split('@')[0] || 'user').toLowerCase().replace(/[^a-z0-9_]/g, '_'),
+            role: 'সদস্য',
+            organization: 'PLAiNSYT Platform',
+            location: 'বাংলাদেশ',
+            bio: 'PLAiNSYT কমিউনিটি সদস্য।',
+            avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.id}`,
+            coverGradient: 'linear-gradient(135deg, #061621 0%, #00ED64 100%)',
+            isVerified: false,
+            focusArea: 'কৃষি ও প্রযুক্তি',
+            email: u.email || '',
+            publicationsCount: 0,
+            followersCount: 0,
+            followingCount: 0,
+          };
+        }
+
+        setStoredAuth(profile, u.email || null);
         commit((prev) => {
           const exists = prev.profiles.some((p) => p.id === profile.id);
           const profiles = exists

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -12,8 +12,14 @@ const TONES = ['bg-pine-100 text-pine-800', 'bg-[#f6e7c8] text-[#6b4a12]', 'bg-[
 export function Avatar({
   src, name, size = 'size-10', online, ring, className,
 }: { src?: string; name?: string; size?: string; online?: boolean; ring?: boolean; className?: string }) {
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [src]);
+
   const s = src || '';
-  const isUrl = s.startsWith('http') || s.startsWith('blob:') || s.startsWith('/') || s.startsWith('data:');
+  const isUrl = Boolean(s && (s.startsWith('http') || s.startsWith('blob:') || s.startsWith('/') || s.startsWith('data:')));
   const code0 = s.charCodeAt(0) || 65;
   const code1 = s.charCodeAt(1) || 66;
   const tone = TONES[(code0 + code1) % TONES.length];
@@ -36,24 +42,16 @@ export function Avatar({
         className={cn(
           'relative flex size-full items-center justify-center overflow-hidden rounded-full font-semibold text-[0.7em] leading-none select-none',
           ring ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card' : 'border border-slate-200/60 dark:border-white/10',
-          isPlainsytAvatar ? 'bg-[#00ED64]' : (!isUrl && tone),
+          isPlainsytAvatar ? 'bg-[#00ED64]' : ((!isUrl || loadFailed) && tone),
         )}
       >
-        {isUrl ? (
-          <>
-            <span className="absolute inset-0 flex items-center justify-center text-[12px] font-bold">{initials}</span>
-            <img
-              src={s}
-              alt={name ?? ''}
-              onError={(e) => {
-                (e.currentTarget as HTMLElement).style.display = 'none';
-                if (e.currentTarget.parentElement) {
-                  e.currentTarget.parentElement.classList.add(tone);
-                }
-              }}
-              className={cn('relative z-[1] size-full text-transparent', isPlainsytAvatar ? 'object-contain p-1' : 'object-cover')}
-            />
-          </>
+        {isUrl && !loadFailed ? (
+          <img
+            src={s}
+            alt={name ?? ''}
+            onError={() => setLoadFailed(true)}
+            className={cn('size-full text-transparent', isPlainsytAvatar ? 'object-contain p-1' : 'object-cover')}
+          />
         ) : (
           <span className="text-[12px] font-bold">{initials}</span>
         )}

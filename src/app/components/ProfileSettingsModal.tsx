@@ -328,7 +328,7 @@ export function ProfileSettingsModal({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Zubair Hasan"
+                  placeholder="e.g. Hasan Zubair"
                   className={inputCls}
                 />
               </div>
@@ -337,7 +337,7 @@ export function ProfileSettingsModal({
                 <input
                   value={nameBn}
                   onChange={(e) => setNameBn(e.target.value)}
-                  placeholder="যেমন: জুবায়ের হাসান"
+                  placeholder="যেমন: হাসান জুবায়ের"
                   className={cn(inputCls, 'font-bangla')}
                 />
               </div>

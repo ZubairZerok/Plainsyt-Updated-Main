@@ -62,7 +62,7 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
           className="relative flex items-center justify-center"
         >
           <div
-            className="h-16 sm:h-20 w-72 sm:w-80 bg-[#00ED64]"
+            className="h-24 sm:h-32 w-80 sm:w-[460px] max-w-[92vw] bg-[#00ED64]"
             style={{
               maskImage: 'url(/logos/English.png)',
               WebkitMaskImage: 'url(/logos/English.png)',
@@ -81,13 +81,13 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
         {/* Subtitle tag */}
         <p
           ref={subTextRef}
-          className="mt-3.5 font-mono text-[11px] font-semibold tracking-[0.24em] text-slate-500 uppercase"
+          className="mt-4 font-mono text-[12px] sm:text-[13px] font-semibold tracking-[0.24em] text-slate-500 uppercase"
         >
           Agri-Tech Platform · Bangladesh
         </p>
 
         {/* Thicker, modern loading bar with clean styling and no glow */}
-        <div className="mt-6 h-2 w-48 sm:w-56 overflow-hidden rounded-full bg-slate-200/90 border border-slate-300/60 p-0.5">
+        <div className="mt-7 h-2.5 w-56 sm:w-72 overflow-hidden rounded-full bg-slate-200/90 border border-slate-300/60 p-0.5">
           <div
             ref={barRef}
             className="h-full w-full rounded-full bg-[#00ED64] origin-left"

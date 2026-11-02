@@ -56,14 +56,14 @@ export const ADMIN_PROFILE: UserProfile = {
 
 export const ZUBAIR_PROFILE: UserProfile = {
   id: 'usr-zubair',
-  name: 'Zubair Hasan',
-  nameBn: 'জুবায়ের হাসান',
-  handle: 'zubair',
+  name: 'Hasan Zubair',
+  nameBn: 'হাসান জুবায়ের',
+  handle: 'hasanzubair',
   role: 'Research Fellow',
   organization: 'Bangladesh Agricultural University (BAU)',
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
+  avatar: '/images/hasan_zubair.png',
   coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #00ED64 100%)',
   isVerified: true,
   focusArea: 'Precision Ag & IoT',
@@ -193,157 +193,6 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
   currentUserId: '',
   articles: [
     JAPAN_ROBOT_ARTICLE,
-    BINA_ARTICLE,
-    {
-      id: 'art-brri-dhan102-2026',
-      slug: 'brri-dhan102-zinc-enriched-boro-rice-haor-revolution',
-      title: 'হাওরের আগাম বন্যা ও ব্রি-১০২: জিংকসমৃদ্ধ ধানের নতুন বিপ্লব',
-      subtitle: 'আগাম ঢলের আগেই ঘরে উঠছে ফসল — আর প্রতি কেজি চালে মিলছে ২৫.৫ মিলিগ্রাম জিংক। কীভাবে বদলে যাচ্ছে সুনামগঞ্জের কৃষকের হিসাব।',
-      category: 'শস্য ও কৃষিবিজ্ঞান',
-      categoryEn: 'Crops & Agronomy',
-      imageType: 'floating',
-      coverImageUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&h=675&fit=crop',
-      imageCaption: 'সুনামগঞ্জের দেখার হাওরে আগাম বোরো ধান কাটা ও মাড়াইয়ের দৃশ্য।',
-      authorId: 'usr-plainsyt-admin',
-      author: {
-        id: 'usr-plainsyt-admin',
-        name: 'PLAiNSYT Research Desk',
-        nameBn: 'প্লেইনসাইট গবেষণা ডেস্ক',
-        designation: 'শস্যবিজ্ঞান ও পুষ্টি বিভাগ',
-        organization: 'PLAiNSYT',
-        avatar: '/logos/icon.png',
-        isVerified: true,
-      },
-      publishedAt: '৩০ অক্টোবর ২০২৬, ১০:০০',
-      createdAt: '2026-10-30T10:00:00+06:00',
-      readTimeMinutes: 7,
-      featured: false,
-      content: [
-        'প্রতি বছর এপ্রিলের শুরুতে মেঘালয়ের পাহাড়ি ঢল যখন হাওরে নামে, তখন সুনামগঞ্জ, নেত্রকোনা আর কিশোরগঞ্জের লাখো কৃষকের বোরো ধান থাকে মাঠে — কাটার অপেক্ষায়। মাত্র সাত থেকে দশ দিনের ব্যবধানে পুরো মৌসুমের পরিশ্রম পানির নিচে চলে যায়।',
-        'বাংলাদেশ ধান গবেষণা ইনস্টিটিউট (ব্রি) উদ্ভাবিত ব্রি ধান১০২ এই সমীকরণটাই উল্টে দিচ্ছে। জাতটির জীবনকাল ১৪৮–১৫০ দিন, যা প্রচলিত ব্রি ধান২৯-এর চেয়ে প্রায় এক সপ্তাহ কম। ফলে আগাম ঢলের আগেই ফসল কাটা সম্ভব হচ্ছে।',
-        'তবে আসল চমক পুষ্টিতে। ব্রি ধান১০২-এর প্রতি কেজি চালে জিংকের পরিমাণ ২৫.৫ মিলিগ্রাম — বাংলাদেশে শিশুদের খর্বাকৃতি ও রোগপ্রতিরোধ ক্ষমতা হ্রাসের অন্যতম কারণ যে জিংক ঘাটতি, তার বিরুদ্ধে এটি একটি নীরব প্রতিরোধ।',
-      ],
-      takeaways: [
-        'জীবনকাল ১৪৮–১৫০ দিন — আগাম ঢলের আগেই কাটা সম্ভব',
-        'প্রতি কেজি চালে ২৫.৫ মি.গ্রা. জিংক, শিশুপুষ্টিতে সরাসরি প্রভাব',
-        'হেক্টরপ্রতি গড় ফলন ৭.৫–৮.০ টন',
-      ],
-      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
-      reactionCounts: {},
-      comments: [],
-    },
-    {
-      id: 'art-drone-sensing-2026',
-      slug: 'drone-multispectral-sensing-nitrogen-optimization-dinajpur',
-      title: 'মাটির পুষ্টি ও ড্রোন সেন্সিং: নাইট্রোজেনের অপচয় রোধে ১৮% সাশ্রয়',
-      subtitle: 'মাল্টিস্পেকট্রাল ড্রোন দিয়ে পাতার রং পড়ে ইউরিয়া প্রয়োগ — দিনাজপুরের তিন মৌসুমের মাঠ পরীক্ষার ফলাফল।',
-      category: 'এগ্রি-টেক ও ড্রোন',
-      categoryEn: 'Agri-Tech & Drones',
-      imageType: 'drone',
-      coverImageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=1200&h=675&fit=crop',
-      imageCaption: 'দিনাজপুরের বিরল উপজেলায় মাল্টিস্পেকট্রাল ড্রোন সেন্সরে প্লটভিত্তিক এনডেক্সিং জরিপ।',
-      authorId: 'usr-zubair',
-      author: {
-        id: 'usr-zubair',
-        name: 'Zubair Hasan',
-        nameBn: 'জুবায়ের হাসান',
-        designation: 'Research Fellow',
-        organization: 'BAU, ময়মনসিংহ',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-        isVerified: true,
-      },
-      publishedAt: '২৯ অক্টোবর ২০২৬, ১৫:৪৫',
-      createdAt: '2026-10-29T15:45:00+06:00',
-      readTimeMinutes: 6,
-      featured: false,
-      content: [
-        'বাংলাদেশের কৃষক গড়ে প্রয়োজনের চেয়ে ২০–৩০ শতাংশ বেশি ইউরিয়া প্রয়োগ করেন। এর একটি বড় অংশ গ্যাস হয়ে বাতাসে মেশে বা চুইয়ে ভূগর্ভস্থ পানিতে যায়।',
-        'দিনাজপুরের বিরল উপজেলায় তিন মৌসুম ধরে চালানো পরীক্ষায় মাল্টিস্পেকট্রাল ড্রোন দিয়ে NDVI ও NDRE সূচক মেপে প্লটভিত্তিক ইউরিয়া প্রয়োগ করা হয়েছে। ফলাফল: ফলন অপরিবর্তিত রেখে নাইট্রোজেন ব্যবহার কমেছে ১৮ শতাংশ।',
-        'একটি ড্রোন দিনে ৪০ হেক্টর পর্যন্ত জরিপ করতে পারে। সেবা-ভিত্তিক মডেলে বিঘাপ্রতি খরচ পড়ছে ১২০ টাকা — যা সাশ্রয় হওয়া সারের দামের চেয়ে অনেক কম।',
-      ],
-      takeaways: [
-        'ইউরিয়া ব্যবহার ১৮% কম, ফলন অপরিবর্তিত',
-        'বিঘাপ্রতি জরিপ খরচ মাত্র ১২০ টাকা',
-        'লিফ কালার চার্টের সাথে ৯২% মিল',
-      ],
-      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
-      reactionCounts: {},
-      comments: [],
-    },
-    {
-      id: 'art-solar-cold-room-2026',
-      slug: 'solar-cold-storage-onion-farmers-pabna-revolution',
-      title: 'সৌরচালিত কোল্ড চেম্বার: পাবনার পেঁয়াজ চাষিদের বিপ্লব',
-      subtitle: 'গ্রিডবিহীন এলাকায় কম খরচে বাষ্পীভবন শীতলীকরণ চেম্বারে পেঁয়াজ ও সবজি সংরক্ষণ।',
-      category: 'খাদ্য ও কোল্ড চেইন',
-      categoryEn: 'Food Cold Chain',
-      imageType: 'solar',
-      coverImageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=1200&h=675&fit=crop',
-      imageCaption: 'পাবনার সাঁথিয়া উপজেলায় সৌরচালিত বাষ্পীভবন কোল্ড চেম্বারে সংরক্ষিত গ্রীষ্মকালীন পেঁয়াজ।',
-      authorId: 'usr-plainsyt-admin',
-      author: {
-        id: 'usr-plainsyt-admin',
-        name: 'PLAiNSYT Research',
-        nameBn: 'প্লেইনসাইট রিসার্চ',
-        designation: 'পোস্ট-হারভেস্ট গবেষক দল',
-        organization: 'PLAiNSYT',
-        avatar: '/logos/icon.png',
-        isVerified: true,
-      },
-      publishedAt: '২৮ অক্টোবর ২০২৬, ০৯:২০',
-      createdAt: '2026-10-28T09:20:00+06:00',
-      readTimeMinutes: 5,
-      featured: false,
-      content: [
-        'দেশে প্রতিবছর উৎপাদিত পেঁয়াজের প্রায় ৩০ শতাংশই সংগ্রহোত্তর পচনে নষ্ট হয়ে যায়। পাবনা ও ফরিদপুরের কৃষকেরা উপযুক্ত বিদ্যুৎ সুবিধার অভাবে সাধারণ গুদামে পেঁয়াজ রাখতে বাধ্য হন।',
-        'সৌরচালিত বাষ্পীভবন কুলিং চেম্বারে তাপমাত্রা ১৬-১৮ ডিগ্রি সেলসিয়াস এবং আর্দ্রতা ৬৫-৭০ শতাংশে নিয়ন্ত্রিত রাখা হয়। এতে ৬ মাস পর্যন্ত পেঁয়াজের কোনো অঙ্কুরোদগম বা ওজন হ্রাস ঘটে না।',
-      ],
-      takeaways: [
-        'সংগ্রহোত্তর ক্ষতি ৩৫% থেকে কমে মাত্র ৮%',
-        'বিদ্যুৎ গ্রিড ছাড়াই সম্পূর্ণ সৌরশক্তিতে পরিচালিত',
-        'স্থানীয় কৃষকদের সমবায় ভিত্তিক বিনিয়োগ মডেল',
-      ],
-      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
-      reactionCounts: {},
-      comments: [],
-    },
-    {
-      id: 'art-coastal-aquaculture-2026',
-      slug: 'coastal-salinity-integrated-crab-tilapia-aquaculture',
-      title: 'লবণাক্ত উপকূলে কাঁকড়া ও তেলাপিয়া সমন্বিত চাষ',
-      subtitle: 'জলবায়ু পরিবর্তনের কারণে সৃষ্ট লবণাক্ততা কীভাবে বিকল্প লাভজনক মৎস্য চাষে রূপান্তরিত হচ্ছে।',
-      category: 'মৎস্য ও প্রাণিসম্পদ',
-      categoryEn: 'Fisheries & Aquaculture',
-      imageType: 'fisheries',
-      coverImageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&h=675&fit=crop',
-      imageCaption: 'সাতক্ষীরার শ্যামনগরে লবণাক্ত ঘেরে পরিবেশবান্ধব নরম খোলসের কাঁকড়া ও তেলাপিয়া চাষ।',
-      authorId: 'usr-plainsyt-admin',
-      author: {
-        id: 'usr-plainsyt-admin',
-        name: 'নিজস্ব প্রতিবেদক',
-        nameBn: 'নিজস্ব প্রতিবেদক',
-        designation: 'উপকূলীয় পরিবেশ ডেস্ক',
-        organization: 'PLAiNSYT',
-        avatar: '/logos/icon.png',
-        isVerified: true,
-      },
-      publishedAt: '২৭ অক্টোবর ২০২৬, ১১:৪০',
-      createdAt: '2026-10-27T11:40:00+06:00',
-      readTimeMinutes: 6,
-      featured: false,
-      content: [
-        'দক্ষিণ-পশ্চিমাঞ্চলের সাতক্ষীরা ও খুলনার বিস্তীর্ণ জমিতে নদীর পানি প্রবেশের ফলে লবণাক্ততা আশঙ্কাজনকভাবে বেড়েছে। প্রচলিত আমন ধান চাষ সেখানে প্রায় অসম্ভব হয়ে পড়েছে।',
-        'শেরেবাংলা কৃষি বিশ্ববিদ্যালয় ও স্থানীয় চাষিদের উদ্যোগে লবণাক্ত ঘেরে কাঁকড়া ও লবণ-সহনশীল তেলাপিয়া মাছের মিশ্র চাষ শুরু হয়েছে। কাঁকড়ার উচ্ছিষ্ট খাদ্য ও মল মাছের প্রাকৃতিক খাদ্য তৈরি করে, যা পানির গুণগত মান রক্ষা করে।',
-      ],
-      takeaways: [
-        'হেক্টরপ্রতি নিট আয় সাধারণ চাষের চেয়ে প্রায় দ্বিগুণ',
-        'মাটির লবণাক্ততাকে সংকট না ভেবে সম্পদে রূপান্তর',
-        'আমেরিকান ও ইউরোপীয় বাজারে নরম খোলস কাঁকড়ার বিপুল চাহিদা',
-      ],
-      stats: { views: 0, likes: 0, commentsCount: 0, shares: 0 },
-      reactionCounts: {},
-      comments: [],
-    },
   ],
   posts: [],
   comments: [],
@@ -381,71 +230,6 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
       authorAvatar: '/logos/icon.png',
       articleId: 'art-japan-cucumber-robot-2026',
       createdAt: '2026-11-02T10:00:00+06:00',
-    },
-    {
-      id: 'story-bina-gamma',
-      title: 'গামা ইরেডিয়েশন সেন্টারে কৃষিপণ্য সংরক্ষণ',
-      category: 'কৃষি ও বায়োটেক',
-      imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&fit=crop',
-      iconName: 'seedling',
-      readsCount: '০',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-bina-gamma-2026',
-      createdAt: '2026-11-01T08:00:00+06:00',
-    },
-    {
-      id: 'story-brri-dhan102',
-      title: 'হাওরে ব্রি-১০২ এর মাঠ দিবস ও আগাম ফসল',
-      category: 'শস্য ও কৃষিবিজ্ঞান',
-      imageUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&fit=crop',
-      iconName: 'food',
-      readsCount: '০',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT Research',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-brri-dhan102-2026',
-      createdAt: '2026-10-30T10:00:00+06:00',
-    },
-    {
-      id: 'story-drone-spray',
-      title: 'ড্রোনে বালাইনাশক ও সার প্রয়োগের সাশ্রয়ী নিয়ম',
-      category: 'এগ্রি-টেক ও ড্রোন',
-      imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=600&fit=crop',
-      iconName: 'drone',
-      readsCount: '০',
-      authorId: 'usr-zubair',
-      authorName: 'Zubair Hasan',
-      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-      articleId: 'art-drone-sensing-2026',
-      createdAt: '2026-10-29T15:45:00+06:00',
-    },
-    {
-      id: 'story-solar-cold-room',
-      title: 'সৌরচালিত কোল্ড চেম্বারে পেঁয়াজ সংরক্ষণ বিপ্লব',
-      category: 'খাদ্য ও কোল্ড চেইন',
-      imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&fit=crop',
-      iconName: 'climate',
-      readsCount: '০',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-solar-cold-room-2026',
-      createdAt: '2026-10-28T09:20:00+06:00',
-    },
-    {
-      id: 'story-coastal-crab-tilapia',
-      title: 'লবণাক্ত উপকূলে কাঁকড়া ও তেলাপিয়ার সমন্বিত চাষ',
-      category: 'মৎস্য ও প্রাণিসম্পদ',
-      imageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&fit=crop',
-      iconName: 'rural',
-      readsCount: '০',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-coastal-aquaculture-2026',
-      createdAt: '2026-10-27T11:40:00+06:00',
     },
   ],
   events: [],
@@ -491,15 +275,21 @@ export function readSnapshot(): DatabaseSnapshot {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<DatabaseSnapshot>;
+      const removedArticleIds = new Set([
+        'art-bina-gamma-2026',
+        'art-brri-dhan102-2026',
+        'art-drone-sensing-2026',
+        'art-solar-cold-room-2026',
+        'art-coastal-aquaculture-2026',
+        'art-floating-hydroponics-2026',
+      ]);
       const existingArticles = (parsed.articles ?? []).filter(
-        (a) => a.id !== 'art-floating-hydroponics-2026',
+        (a) => a.id === 'art-japan-cucumber-robot-2026' || (!removedArticleIds.has(a.id) && !a.id.startsWith('art-')),
       );
-      const mergedArticles = [...existingArticles];
-      for (const sa of DEFAULT_SEED_SNAPSHOT.articles) {
-        if (!mergedArticles.some((a) => a.id === sa.id)) {
-          mergedArticles.unshift(sa);
-        }
-      }
+      const mergedArticles = existingArticles.some((a) => a.id === 'art-japan-cucumber-robot-2026')
+        ? existingArticles
+        : [JAPAN_ROBOT_ARTICLE, ...existingArticles];
+
       const existingReels = parsed.reels ?? [];
       const mergedReels = [...existingReels];
       for (const sr of DEFAULT_SEED_SNAPSHOT.reels) {
@@ -527,17 +317,23 @@ export function readSnapshot(): DatabaseSnapshot {
       const cleanEvents = (parsed.events ?? []).filter(
         (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
       );
-      const cleanStories = (parsed.stories ?? []).filter(
-        (s) => s.id !== 'story-bina-1' && s.id !== 'story-bau-iot',
-      );
-      const mergedStories = [...cleanStories];
-      for (const ss of DEFAULT_SEED_SNAPSHOT.stories) {
-        if (!mergedStories.some((s) => s.id === ss.id)) {
-          mergedStories.push(ss);
-        }
-      }
+      // Keep only YouTube video reel story
+      const mergedStories = [DEFAULT_SEED_SNAPSHOT.stories[0]];
+
       const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
-        if (p.id === 'usr-plainsyt-admin' || p.id === 'usr-zubair') {
+        if (p.id === 'usr-zubair') {
+          return {
+            ...p,
+            name: 'Hasan Zubair',
+            nameBn: 'হাসান জুবায়ের',
+            handle: 'hasanzubair',
+            avatar: '/images/hasan_zubair.png',
+            followersCount: 0,
+            followingCount: 0,
+            publicationsCount: 0,
+          };
+        }
+        if (p.id === 'usr-plainsyt-admin') {
           return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
         }
         return p;
@@ -1151,16 +947,27 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       return { status: 'connected', snapshot: local };
     }
 
-    // Merge remote articles with seed and local articles so newly added articles in code
-    // never get wiped out if remote database is only partially populated
+    // Prune articles: keep only Japan robot article and any non-dummy custom articles
+    const removedArticleIds = new Set([
+      'art-bina-gamma-2026',
+      'art-brri-dhan102-2026',
+      'art-drone-sensing-2026',
+      'art-solar-cold-room-2026',
+      'art-coastal-aquaculture-2026',
+      'art-floating-hydroponics-2026',
+    ]);
     const remoteArticleIds = new Set(articles.map((a) => a.id));
     const localOnlyArticles = (local.articles || []).filter((a) => !remoteArticleIds.has(a.id));
     const seedOnlyArticles = DEFAULT_SEED_SNAPSHOT.articles.filter(
       (sa) => !remoteArticleIds.has(sa.id) && !localOnlyArticles.some((a) => a.id === sa.id),
     );
-    const finalArticles = [...seedOnlyArticles, ...articles, ...localOnlyArticles].filter(
-      (a) => a.id !== 'art-floating-hydroponics-2026',
+    const candidateArticles = [...seedOnlyArticles, ...articles, ...localOnlyArticles].filter(
+      (a) => a.id === 'art-japan-cucumber-robot-2026' || (!removedArticleIds.has(a.id) && !a.id.startsWith('art-')),
     );
+    const finalArticles = candidateArticles.some((a) => a.id === 'art-japan-cucumber-robot-2026')
+      ? candidateArticles
+      : [JAPAN_ROBOT_ARTICLE, ...candidateArticles];
+
     const dummyViews = [1420, 1840, 1240, 980, 820, 760];
     const sanitizedArticles = finalArticles.map((a) => {
       if (a.stats && dummyViews.includes(a.stats.views)) {
@@ -1174,15 +981,8 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     const cleanEvents = (events.length > 0 ? events : local.events).filter(
       (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
     );
-    const cleanStories = (stories.length > 0 ? stories : local.stories).filter(
-      (s) => s.id !== 'story-bina-1' && s.id !== 'story-bau-iot',
-    );
-    const mergedStories = [...cleanStories];
-    for (const ss of DEFAULT_SEED_SNAPSHOT.stories) {
-      if (!mergedStories.some((s) => s.id === ss.id)) {
-        mergedStories.push(ss);
-      }
-    }
+    // Keep only the YouTube reel video story
+    const mergedStories = [DEFAULT_SEED_SNAPSHOT.stories[0]];
 
     let userFollows = local.followingIds || [];
     if (currentUserId) {
@@ -1200,7 +1000,19 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     const merged: DatabaseSnapshot = {
       ...local,
       profiles: (profiles.length > 0 ? profiles : local.profiles).map((p) => {
-        if (p.id === 'usr-plainsyt-admin' || p.id === 'usr-zubair') {
+        if (p.id === 'usr-zubair') {
+          return {
+            ...p,
+            name: 'Hasan Zubair',
+            nameBn: 'হাসান জুবায়ের',
+            handle: 'hasanzubair',
+            avatar: '/images/hasan_zubair.png',
+            followersCount: 0,
+            followingCount: 0,
+            publicationsCount: 0,
+          };
+        }
+        if (p.id === 'usr-plainsyt-admin') {
           return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
         }
         return p;

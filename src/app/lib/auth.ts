@@ -28,14 +28,14 @@ export const ADMIN_PROFILE: UserProfile = {
 
 export const ZUBAIR_PROFILE: UserProfile = {
   id: ZUBAIR_ID,
-  name: 'Zubair Hasan',
-  nameBn: 'জুবায়ের হাসান',
-  handle: 'zubair',
+  name: 'Hasan Zubair',
+  nameBn: 'হাসান জুবায়ের',
+  handle: 'hasanzubair',
   role: 'Research Fellow',
   organization: 'Bangladesh Agricultural University (BAU)',
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
+  avatar: '/images/hasan_zubair.png',
   coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #00ED64 100%)',
   isVerified: true,
   focusArea: 'Agri-Tech & Agronomy',
@@ -265,11 +265,10 @@ export async function signupWithEmail(email: string, pass: string, name: string)
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
-        skipBrowserRedirect: true,
+        redirectTo: `${window.location.origin}/`,
       },
     });
 
@@ -277,31 +276,10 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
       if (error.message.includes('not enabled') || error.message.includes('validation_failed')) {
         return {
           ok: false,
-          error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে লগইন/সাইনআপ করুন অথবা Supabase Console থেকে Google OAuth চালু করুন।',
+          error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে Supabase Authentication -> Providers -> Google-এ Client ID এবং Client Secret সক্রিয় করুন।',
         };
       }
       return { ok: false, error: error.message };
-    }
-
-    if (data?.url) {
-      // Test if Supabase returns 400 (disabled provider) before navigating the browser tab
-      try {
-        const probe = await fetch(data.url, { method: 'GET' });
-        if (!probe.ok) {
-          const body = await probe.json().catch(() => null);
-          if (body?.msg?.includes('not enabled') || body?.error_code === 'validation_failed') {
-            return {
-              ok: false,
-              error: 'Supabase-এ Google Provider সক্রিয় (Enabled) করা নেই। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে সাইনআপ বা লগইন করুন।',
-            };
-          }
-        }
-      } catch {
-        // Network/CORS typically means redirect to Google OAuth is active and ready
-      }
-
-      window.location.assign(data.url);
-      return { ok: true };
     }
 
     return { ok: true };
