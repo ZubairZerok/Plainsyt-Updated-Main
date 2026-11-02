@@ -23,8 +23,8 @@ export function Avatar({
     (s.toLowerCase().includes('plainsyt') && isUrl)
   );
 
-  const initials = (name || s || 'PS')
-    .trim()
+  const fallbackText = typeof name === 'string' && name.trim() ? name.trim() : (typeof s === 'string' && s.trim() && !isUrl ? s.trim() : 'PS');
+  const initials = fallbackText
     .split(/\s+/)
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() || '')
@@ -34,23 +34,26 @@ export function Avatar({
     <span className={cn('relative inline-flex shrink-0', size, className)}>
       <span
         className={cn(
-          'flex size-full items-center justify-center overflow-hidden rounded-full font-semibold text-[0.7em] leading-none select-none',
+          'relative flex size-full items-center justify-center overflow-hidden rounded-full font-semibold text-[0.7em] leading-none select-none',
           ring ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card' : 'border border-slate-200/60 dark:border-white/10',
           isPlainsytAvatar ? 'bg-[#00ED64]' : (!isUrl && tone),
         )}
       >
         {isUrl ? (
-          <img
-            src={s}
-            alt={name ?? ''}
-            onError={(e) => {
-              (e.currentTarget as HTMLElement).style.display = 'none';
-              if (e.currentTarget.parentElement) {
-                e.currentTarget.parentElement.classList.add(tone);
-              }
-            }}
-            className={cn('size-full text-transparent', isPlainsytAvatar ? 'object-contain p-1' : 'object-cover')}
-          />
+          <>
+            <span className="absolute inset-0 flex items-center justify-center text-[12px] font-bold">{initials}</span>
+            <img
+              src={s}
+              alt={name ?? ''}
+              onError={(e) => {
+                (e.currentTarget as HTMLElement).style.display = 'none';
+                if (e.currentTarget.parentElement) {
+                  e.currentTarget.parentElement.classList.add(tone);
+                }
+              }}
+              className={cn('relative z-[1] size-full text-transparent', isPlainsytAvatar ? 'object-contain p-1' : 'object-cover')}
+            />
+          </>
         ) : (
           <span className="text-[12px] font-bold">{initials}</span>
         )}
