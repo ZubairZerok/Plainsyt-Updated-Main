@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import {
   ArrowBigUp, ShoppingBag, Lightbulb, Plus, Bell, Settings, ExternalLink, MapPin, Globe2,
   UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard,
-  CheckCheck, Clock, ArrowRight, MessageSquare, AlertTriangle, Filter, LogIn, LogOut,
+  CheckCheck, Clock, ArrowRight, ArrowUpRight, MessageSquare, AlertTriangle, Filter, LogIn, LogOut,
 } from 'lucide-react';
 import type {
   Article, BkashOrder, CartItem, CommunityIdea, CommunityPost, LinkedInReactionType,
@@ -169,9 +169,12 @@ export function ExploreView({
                   href={`/article/${a.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-mono text-[10px] font-medium text-slate-700 hover:bg-slate-100"
+                  title="নতুন ট্যাবে নিবন্ধটি পড়ুন"
+                  aria-label="Open article in new tab"
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-800/90 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 font-mono text-[10.5px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00ED64] hover:border-emerald-300 dark:hover:border-emerald-500/30 shadow-2xs transition-all group/tab"
                 >
-                  New Tab <ExternalLink className="inline size-3" />
+                  <span className="hidden sm:inline">নতুন ট্যাব</span>
+                  <ArrowUpRight className="size-3.5 text-slate-400 group-hover/tab:text-emerald-600 dark:group-hover/tab:text-[#00ED64] transition-transform group-hover/tab:-translate-y-0.5 group-hover/tab:translate-x-0.5" />
                 </a>
               </li>
             ))}

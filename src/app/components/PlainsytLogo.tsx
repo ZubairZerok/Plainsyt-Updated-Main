@@ -73,9 +73,9 @@ export function PlainsytLogo({
         <PlainsytWordmark lang="en" className="h-7 w-auto select-none" />
       </div>
 
-      {/* Desktop view ONLY: Plainsyt Bangla Logo, NO background, single logo */}
+      {/* Desktop view: Plainsyt English Logo */}
       <div className="hidden md:flex items-center">
-        <PlainsytWordmark lang="bn" className="h-8 lg:h-9" />
+        <PlainsytWordmark lang="en" className="h-8 lg:h-9 select-none" />
       </div>
     </a>
   );

@@ -34,7 +34,7 @@ export function LeftSidebar(p: Props) {
       label: 'নিউজফিড',
       icon: Newspaper,
       onClick: () => p.onNavigate('/'),
-      badge: p.articles.length ? toBengaliNumerals(p.articles.length) : null,
+      badge: null,
       tone: 'bg-emerald-50 text-emerald-700',
     },
     {
@@ -48,7 +48,7 @@ export function LeftSidebar(p: Props) {
       label: 'AI সহকারী',
       icon: Bot,
       onClick: p.onOpenAI,
-      badge: '24/7',
+      badge: null,
       tone: 'bg-amber-50 text-amber-700',
     },
   ];

@@ -31,6 +31,10 @@ import { ReelPlayerModal, type PlayerItem } from './ReelPlayerModal';
 import { SavedArticlesModal } from './SavedArticlesModal';
 import { CreatePostModal } from './CreatePostModal';
 import { ExploreView, EventsView, StoreView, IdeasView, NotificationsView, ProfileView } from './Views';
+import {
+  PublicationsStudioView, ResearcherAnalyticsView, ReadingHistoryView,
+  AccountSecurityView, EditorialHelpView,
+} from './ResearcherViews';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
 import { BkashCheckoutModal, CreateProductModal } from './BkashCheckoutModal';
@@ -224,6 +228,11 @@ export function RootShell() {
     if (p.startsWith('/ideas')) return 'ideas';
     if (p.startsWith('/notifications')) return 'notifications';
     if (p.startsWith('/profile')) return 'profile';
+    if (p.startsWith('/me/publications')) return 'publications';
+    if (p.startsWith('/me/analytics')) return 'analytics';
+    if (p.startsWith('/me/reading-history')) return 'reading-history';
+    if (p.startsWith('/me/security')) return 'security';
+    if (p.startsWith('/help')) return 'help';
     return 'home';
   }, [location.pathname]);
 
@@ -1236,6 +1245,51 @@ export function RootShell() {
           />
         );
       }
+      case 'publications':
+        return (
+          <PublicationsStudioView
+            currentUser={currentUser}
+            articles={snap.articles ?? []}
+            onOpenWriteArticle={() => {
+              if (!currentUser) {
+                requestAuth('গবেষণা নিবন্ধ লিখতে দয়া করে অ্যাকাউন্টে লগইন করুন।', () => setWriteOpen(true));
+              } else {
+                setWriteOpen(true);
+              }
+            }}
+            onOpenArticlePopup={handleOpenArticlePopup}
+            onNavigate={goNavigate}
+            onNavigateProfile={navigateToProfile}
+          />
+        );
+      case 'analytics':
+        return (
+          <ResearcherAnalyticsView
+            currentUser={currentUser}
+          />
+        );
+      case 'reading-history':
+        return (
+          <ReadingHistoryView
+            articles={snap.articles ?? []}
+            onOpenArticlePopup={handleOpenArticlePopup}
+            onNavigate={goNavigate}
+          />
+        );
+      case 'security':
+        return (
+          <AccountSecurityView
+            currentUser={currentUser}
+            onLogout={handleLogout}
+            onOpenProfileSettings={() => setProfileSettingsOpen(true)}
+          />
+        );
+      case 'help':
+        return (
+          <EditorialHelpView
+            onNavigate={goNavigate}
+          />
+        );
       default:
         return (
           <CentralFeed

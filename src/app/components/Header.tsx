@@ -2,13 +2,25 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, Store, Lightbulb,
   Clapperboard, Sparkles, FileText, ArrowUpRight, ShoppingBag, Trash2, LogIn, User, LogOut,
-  Settings, Check,
+  Settings, Check, BarChart3, History, ShieldCheck, HelpCircle, CheckCircle2,
 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, UserProfile } from '../types';
 import { PlainsytLogo } from './PlainsytLogo';
 import { Avatar, cn } from './Primitives';
 
-export type View = 'home' | 'explore' | 'events' | 'store' | 'ideas' | 'notifications' | 'profile';
+export type View =
+  | 'home'
+  | 'explore'
+  | 'events'
+  | 'store'
+  | 'ideas'
+  | 'notifications'
+  | 'profile'
+  | 'publications'
+  | 'analytics'
+  | 'reading-history'
+  | 'security'
+  | 'help';
 
 export const LAYOUT_GRID = 'lg:grid-cols-[13rem_minmax(0,1fr)_14rem] xl:grid-cols-[14rem_minmax(0,1fr)_15rem]';
 export const FEED_WIDTH = 'mx-auto w-full max-w-[760px] flex-1';
@@ -583,7 +595,7 @@ export function Header(p: Props) {
             </div>
 
             <div className="space-y-1">
-              {/* 1. View My Profile */}
+              {/* 1. View My Public Profile */}
               <button
                 type="button"
                 onClick={() => {
@@ -596,12 +608,109 @@ export function Header(p: Props) {
                   <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                     <User className="size-4" />
                   </span>
-                  <span className="truncate">আমার প্রোফাইল দেখুন</span>
+                  <span className="truncate">আমার পাবলিক প্রোফাইল</span>
                 </div>
                 <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
               </button>
 
-              {/* 2. Profile Settings & Edit */}
+              {/* 2. Publications & Drafts Studio */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/me/publications');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
+                    <FileText className="size-4" />
+                  </span>
+                  <span className="truncate">প্রকাশনা ও গবেষণা স্টুডিও</span>
+                </div>
+                <span className="rounded-md bg-teal-100 dark:bg-teal-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-800 dark:text-teal-300">
+                  Studio
+                </span>
+              </button>
+
+              {/* 3. Researcher Analytics & Impact */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/me/analytics');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                    <BarChart3 className="size-4" />
+                  </span>
+                  <span className="truncate">গবেষক অ্যানালিটিক্স ও রিচ</span>
+                </div>
+                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#00ED64]">
+                  +১৮%
+                </span>
+              </button>
+
+              {/* 4. Reading History & Citations */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/me/reading-history');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                    <History className="size-4" />
+                  </span>
+                  <span className="truncate">পড়ার ইতিহাস ও রেফারেন্স</span>
+                </div>
+              </button>
+
+              {/* 5. Account Security & Devices */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/me/security');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                    <ShieldCheck className="size-4" />
+                  </span>
+                  <span className="truncate">সিকিউরিটি ও ডিভাইস</span>
+                </div>
+                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                  Verified
+                </span>
+              </button>
+
+              {/* 6. Editorial Standards & Guidelines */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/help');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                    <HelpCircle className="size-4" />
+                  </span>
+                  <span className="truncate">সম্পাদকীয় গাইডলাইন ও হেল্প</span>
+                </div>
+              </button>
+
+              {/* Divider */}
+              <div className="my-1 border-t border-slate-100 dark:border-white/10" />
+
+              {/* 7. Profile Settings & Edit */}
               <button
                 type="button"
                 onClick={() => {
@@ -620,89 +729,6 @@ export function Header(p: Props) {
                   </span>
                   <span className="truncate">প্রোফাইল সেটিংস ও এডিট</span>
                 </div>
-              </button>
-
-              {/* 3. Saved Posts & Articles */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onOpenSaved();
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                    <Bookmark className="size-4" />
-                  </span>
-                  <span className="truncate">সংরক্ষিত তালিকা</span>
-                </div>
-                {p.savedCount > 0 ? (
-                  <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 font-mono text-[10.5px] font-bold text-emerald-800 dark:text-emerald-300">
-                    {p.savedCount} টি
-                  </span>
-                ) : (
-                  <span className="font-mono text-[10px] text-slate-400">০</span>
-                )}
-              </button>
-
-              {/* 4. Plainsyt AI Assistant */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onOpenAI();
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00ED64]/20 to-emerald-500/20 text-[#008f3c] dark:text-[#00ED64]">
-                    <Sparkles className="size-4" />
-                  </span>
-                  <span className="truncate">Plainsyt AI সহকারী</span>
-                </div>
-                <span className="rounded-md bg-[#00ED64]/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#008f3c] dark:text-[#00ED64]">
-                  AI
-                </span>
-              </button>
-
-              {/* 5. Orders & Cart */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onOpenCart();
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
-                    <ShoppingBag className="size-4" />
-                  </span>
-                  <span className="truncate">আমার অর্ডার ও কার্ট</span>
-                </div>
-                {p.cartCount > 0 && (
-                  <span className="rounded-full bg-[#061621] px-2 py-0.5 font-mono text-[10.5px] font-bold text-[#00ED64]">
-                    {p.cartCount}
-                  </span>
-                )}
-              </button>
-
-              {/* 6. Dark / Light Mode Switch */}
-              <button
-                type="button"
-                onClick={p.onToggleDark}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                    {p.dark ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4" />}
-                  </span>
-                  <span className="truncate">{p.dark ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}</span>
-                </div>
-                <span className="font-mono text-[10.5px] text-slate-400">
-                  {p.dark ? 'Dark' : 'Light'}
-                </span>
               </button>
             </div>
 
