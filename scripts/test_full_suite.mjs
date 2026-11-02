@@ -35,7 +35,12 @@ function resolveEmailAlias(rawEmail) {
       isAdmin: true,
     };
   }
-  if (normalized === 'z65gt9@gmail.com') {
+  if (
+    normalized === 'z65gt9@gmail.com' ||
+    normalized === 'zubair2001!' ||
+    normalized === 'zubair2001' ||
+    normalized === 'zubair2001@gmail.com'
+  ) {
     return {
       normalizedEmail: normalized,
       canonicalEmail: 'z65gt9@gmail.com',
@@ -56,6 +61,7 @@ const alias2 = resolveEmailAlias('pl@insyt.bd');
 const aliasMixed = resolveEmailAlias('  PLAIINSYT@Gmail.COM ');
 const singleIAlias = resolveEmailAlias('plainsyt@gmail.com');
 const aliasZubair = resolveEmailAlias('z65gt9@gmail.com');
+const aliasZubairNew = resolveEmailAlias('Zubair2001!');
 const regularMember = resolveEmailAlias('farmer.karim@gmail.com');
 
 assert(alias1.isAdmin === true && alias1.canonicalUserId === 'usr-plainsyt-admin', 'Primary admin email resolves to admin role and canonical ID');
@@ -63,6 +69,7 @@ assert(alias2.isAdmin === true && alias2.canonicalUserId === 'usr-plainsyt-admin
 assert(aliasMixed.isAdmin === true && aliasMixed.canonicalUserId === 'usr-plainsyt-admin', 'Whitespace & uppercase variants normalize correctly to admin');
 assert(singleIAlias.isAdmin === false, 'Typo/impersonation variant plainsyt@gmail.com (single i) is rejected from admin');
 assert(aliasZubair.isAdmin === false && aliasZubair.canonicalUserId === 'usr-zubair', 'Zubair email remains distinct member with no admin privileges');
+assert(aliasZubairNew.isAdmin === false && aliasZubairNew.canonicalUserId === 'usr-zubair', 'Zubair2001! alias resolves correctly to Zubair member');
 assert(regularMember.isAdmin === false && regularMember.canonicalUserId === null, 'Regular visitor email is not granted admin privileges');
 
 // Verify auth.ts code does not contain unauthenticated bypass

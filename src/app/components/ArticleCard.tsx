@@ -165,25 +165,30 @@ export function ArticleCard({
       </div>
 
       {/* Action Bar with LinkedIn Reaction Picker */}
-      <div className="flex items-center gap-1 border-t border-canvas-border px-2 py-1 sm:px-3">
+      <div className="grid grid-cols-4 items-center gap-1 border-t border-canvas-border px-1.5 py-1 sm:px-3">
         <LinkedInReactionPickerButton
           userReaction={a.userReaction}
           onSelect={onReact}
           countLabel={reactionTotal > 0 ? formatBengaliNumberCompact(reactionTotal) : undefined}
+          className="w-full justify-center"
         />
         <button
           type="button"
           onClick={() => setShowComments((s) => !s)}
-          className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[13px] font-semibold text-pine-900/70 transition hover:bg-canvas-subtle"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <MessageCircle className="size-[18px]" /> Comment ({toBengaliNumerals(a.stats.commentsCount)})
+          <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
+          <span className="truncate">
+            <span className="hidden xs:inline">Comment</span> ({toBengaliNumerals(a.stats.commentsCount)})
+          </span>
         </button>
         <button
           type="button"
           onClick={onShare}
-          className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[13px] font-semibold text-pine-900/70 transition hover:bg-canvas-subtle"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <Share2 className="size-[18px]" /> Share
+          <Share2 className="size-4 sm:size-[18px] shrink-0" />
+          <span className="truncate">Share</span>
         </button>
         <button
           type="button"
@@ -191,11 +196,12 @@ export function ArticleCard({
           aria-pressed={bookmarked}
           aria-label="Bookmark"
           className={cn(
-            'ml-auto flex size-9 items-center justify-center rounded-lg transition hover:bg-canvas-subtle',
-            bookmarked ? 'text-pine-600' : 'text-pine-900/70',
+            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            bookmarked ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-pine-900/70 dark:text-slate-200',
           )}
         >
-          <Bookmark className={cn('size-[18px]', bookmarked && 'fill-current')} />
+          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', bookmarked && 'fill-current')} />
+          <span className="truncate">{bookmarked ? 'Saved' : 'Save'}</span>
         </button>
       </div>
 

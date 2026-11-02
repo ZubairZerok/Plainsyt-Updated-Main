@@ -160,7 +160,7 @@ export function ProfileSettingsModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="max-w-[680px]" labelledBy="profile-settings-title">
+    <Modal open={open} onClose={onClose} className="max-w-[680px]" labelledBy="profile-settings-title" centerOnMobile>
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas shadow-2xl sm:rounded-3xl">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 bg-canvas-card px-5 py-4">
           <div>

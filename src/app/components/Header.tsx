@@ -53,8 +53,30 @@ export function Header(p: Props) {
   const [bellOpen, setBellOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+  const [navVisible, setNavVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const unread = p.notifications.filter((n) => n.unread).length;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > 60) {
+        if (currentY > lastScrollY.current + 8) {
+          // Scrolling down -> hide mobile nav
+          setNavVisible(false);
+        } else if (currentY < lastScrollY.current - 6) {
+          // Scrolling up -> reveal mobile nav
+          setNavVisible(true);
+        }
+      } else {
+        setNavVisible(true);
+      }
+      lastScrollY.current = currentY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -349,7 +371,12 @@ export function Header(p: Props) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-[#061621]/15 bg-[#00ED64] text-[#061621] shadow-sm backdrop-blur-sm">
+      <header
+        className={cn(
+          'sticky top-0 z-40 border-b border-[#061621]/15 bg-[#00ED64] text-[#061621] shadow-sm backdrop-blur-sm transition-transform duration-300 ease-in-out',
+          !navVisible && '-translate-y-full md:translate-y-0',
+        )}
+      >
         <div className="relative mx-auto flex h-13 max-w-[1440px] items-center justify-between gap-3 px-3 md:h-16 md:px-6">
           {/* Left: Brand Logo (Desktop: Bangla logo NO background; Mobile: Green BD icon) */}
           <div className="flex items-center gap-3">
@@ -405,14 +432,6 @@ export function Header(p: Props) {
 
           {/* Right Action Cluster */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2">
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="flex size-9 items-center justify-center rounded-full bg-[#061621]/10 text-[#061621] hover:bg-[#061621]/20 active:scale-90 lg:hidden"
-            >
-              <Search className="size-[18px]" />
-            </button>
             {/* AI, Cart, Saved, and Notification icons: ONLY shown when logged in */}
             {p.currentUser && (
               <>
@@ -469,14 +488,25 @@ export function Header(p: Props) {
               </>
             )}
 
-            {/* Theme Toggle (Desktop only in topnav; available in dropdown for mobile) */}
+            {/* Dark mode / Light mode toggle button: always visible in mobile view at right */}
             <button
               type="button"
               onClick={p.onToggleDark}
               aria-label="Toggle theme"
-              className={cn(iconBtn, 'hidden sm:flex')}
+              title={p.dark ? 'লাইট মোড অন করুন' : 'ডার্ক মোড অন করুন'}
+              className={iconBtn}
             >
               {p.dark ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />}
+            </button>
+
+            {/* Search Button (Mobile): placed right next to theme button */}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search"
+              className="flex size-9 items-center justify-center rounded-full bg-[#061621]/10 text-[#061621] hover:bg-[#061621]/20 active:scale-90 lg:hidden"
+            >
+              <Search className="size-[18px]" />
             </button>
 
             {p.currentUser ? (

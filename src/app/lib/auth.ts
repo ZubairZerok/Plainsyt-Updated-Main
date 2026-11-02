@@ -4,7 +4,8 @@ import type { UserProfile } from '../types';
 export const ADMIN_CANONICAL_ID = 'usr-plainsyt-admin';
 export const ADMIN_ALIASES = ['plaiinsyt@gmail.com', 'pl@insyt.bd'] as const;
 export const ZUBAIR_ID = 'usr-zubair';
-export const ZUBAIR_EMAIL = 'z65gt9@gmail.com';
+export const ZUBAIR_EMAIL = 'Zubair2001!';
+export const ZUBAIR_ALIASES = ['zubair2001!', 'zubair2001', 'z65gt9@gmail.com', 'zubair2001@gmail.com', 'hasanzubair'] as const;
 
 export const ADMIN_PROFILE: UserProfile = {
   id: ADMIN_CANONICAL_ID,
@@ -42,7 +43,7 @@ export const ZUBAIR_PROFILE: UserProfile = {
   publicationsCount: 0,
   followersCount: 0,
   followingCount: 0,
-  email: ZUBAIR_EMAIL,
+  email: 'Zubair2001!',
   createdAt: '2026-02-01T00:00:00.000Z',
 };
 
@@ -63,10 +64,16 @@ export function resolveEmailAlias(rawEmail: string): {
       isAdmin: true,
     };
   }
-  if (normalized === ZUBAIR_EMAIL.toLowerCase()) {
+  if (
+    normalized === 'zubair2001!' ||
+    normalized === 'zubair2001' ||
+    normalized === 'z65gt9@gmail.com' ||
+    normalized === 'zubair2001@gmail.com' ||
+    normalized === 'hasanzubair'
+  ) {
     return {
       normalizedEmail: normalized,
-      canonicalEmail: ZUBAIR_EMAIL,
+      canonicalEmail: normalized.includes('@') ? normalized : 'z65gt9@gmail.com',
       canonicalUserId: ZUBAIR_ID,
       isAdmin: false,
     };

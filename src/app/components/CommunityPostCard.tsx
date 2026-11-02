@@ -234,26 +234,30 @@ export function CommunityPostCard({
       </div>
 
       {/* LinkedIn Action Bar */}
-      <div className="mx-3 grid grid-cols-[1fr_1fr_1fr_auto] border-t border-canvas-border py-1 sm:mx-4">
+      <div className="mx-1.5 grid grid-cols-4 sm:mx-4 border-t border-canvas-border py-1 gap-1 items-center">
         <LinkedInReactionPickerButton
           userReaction={post.userReaction}
           onSelect={onReact}
           countLabel={reactionTotal > 0 ? toBengaliNumerals(reactionTotal) : undefined}
-          className="w-full"
+          className="w-full justify-center"
         />
         <button
           type="button"
-          onClick={() => setShowComments(true)}
-          className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-[14px] font-semibold text-pine-900/65 transition hover:bg-canvas-subtle"
+          onClick={() => setShowComments((s) => !s)}
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <MessageCircle className="size-[19px]" /> Comment
+          <MessageCircle className="size-4 sm:size-[19px] shrink-0" />
+          <span className="truncate">
+            <span className="hidden xs:inline">Comment</span> ({toBengaliNumerals(post.comments.length)})
+          </span>
         </button>
         <button
           type="button"
           onClick={onShare}
-          className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-[14px] font-semibold text-pine-900/65 transition hover:bg-canvas-subtle"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <Share2 className="size-[19px]" /> Share
+          <Share2 className="size-4 sm:size-[19px] shrink-0" />
+          <span className="truncate">Share</span>
         </button>
         <button
           type="button"
@@ -261,11 +265,12 @@ export function CommunityPostCard({
           aria-pressed={post.userSaved}
           aria-label="Save post"
           className={cn(
-            'flex w-10 items-center justify-center rounded-lg transition hover:bg-canvas-subtle',
-            post.userSaved ? 'text-pine-600' : 'text-pine-900/50',
+            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            post.userSaved ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-pine-900/60 dark:text-slate-300',
           )}
         >
-          <Bookmark className={cn('size-[18px]', post.userSaved && 'fill-current')} />
+          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', post.userSaved && 'fill-current')} />
+          <span className="truncate">{post.userSaved ? 'Saved' : 'Save'}</span>
         </button>
       </div>
 

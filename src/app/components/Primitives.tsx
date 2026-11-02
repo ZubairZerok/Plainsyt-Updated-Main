@@ -73,8 +73,8 @@ export function VerifiedBadge() {
 }
 
 export function Modal({
-  open, onClose, children, className, labelledBy,
-}: { open: boolean; onClose: () => void; children: ReactNode; className?: string; labelledBy?: string }) {
+  open, onClose, children, className, labelledBy, centerOnMobile = false,
+}: { open: boolean; onClose: () => void; children: ReactNode; className?: string; labelledBy?: string; centerOnMobile?: boolean }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -88,9 +88,17 @@ export function Modal({
   }, [open, onClose]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-      <button aria-label="Close" className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={onClose} />
-      <div className={cn('relative max-h-[100dvh] w-full overflow-y-auto sm:max-h-[92vh]', className)}>{children}</div>
+    <div
+      className={cn(
+        'fixed inset-0 z-[80] flex justify-center',
+        centerOnMobile ? 'items-center p-3 sm:p-4' : 'items-end sm:items-center sm:p-4',
+      )}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={labelledBy}
+    >
+      <button aria-label="Close" className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className={cn('relative max-h-[92dvh] w-full overflow-y-auto', className)}>{children}</div>
     </div>
   );
 }

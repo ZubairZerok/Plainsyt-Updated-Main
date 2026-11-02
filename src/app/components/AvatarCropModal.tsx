@@ -125,8 +125,19 @@ export function AvatarCropModal({
   if (!open) return null;
 
   return (
-    <Modal open={open} onClose={onClose} labelledById="crop-modal-title">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0b1e15] shadow-2xl transition-all">
+    <div
+      className="fixed inset-0 z-[95] flex items-center justify-center p-3 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="crop-modal-title"
+    >
+      <button
+        type="button"
+        aria-label="Close modal"
+        className="absolute inset-0 bg-black/75 backdrop-blur-md transition-opacity"
+        onClick={onClose}
+      />
+      <div className="relative z-10 w-full max-w-md my-auto overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0b1e15] shadow-2xl transition-all">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 px-5 py-3.5">
           <div>
@@ -265,6 +276,6 @@ export function AvatarCropModal({
           </div>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 }

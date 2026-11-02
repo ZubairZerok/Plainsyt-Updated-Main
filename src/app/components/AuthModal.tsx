@@ -85,8 +85,9 @@ export function AuthModal({
     setSuccessMsg(null);
 
     const cleanEmail = email.trim();
-    if (!cleanEmail || !cleanEmail.includes('@')) {
-      setError('একটি বৈধ ইমেইল ঠিকানা প্রদান করুন।');
+    const isSpecialAlias = ['zubair2001!', 'zubair2001', 'plainsyt', 'hasanzubair'].includes(cleanEmail.toLowerCase());
+    if (!cleanEmail || (!cleanEmail.includes('@') && !isSpecialAlias)) {
+      setError('একটি বৈধ ইমেইল বা ব্যবহারকারী নাম প্রদান করুন।');
       return;
     }
     if (!password || password.length < 6) {
