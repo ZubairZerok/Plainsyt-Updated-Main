@@ -773,6 +773,7 @@ export function ProfileView({
   onOpenPhoto: (images: string[], index: number, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
 }) {
   const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'saved' | 'orders'>('articles');
+  const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile.id);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: 'post' | 'story' | 'article';
     id: string;
@@ -842,11 +843,11 @@ export function ProfileView({
                   src={profile.avatar}
                   name={profile.name}
                   size="size-20 sm:size-24"
-                  online={isOwnProfile}
+                  online={isSelf}
                   className="rounded-full border-4 border-white shadow-sm"
                 />
               </button>
-              {isOwnProfile && (
+              {isSelf && (
                 <button
                   type="button"
                   onClick={onOpenProfileSettings}
@@ -859,7 +860,7 @@ export function ProfileView({
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              {isOwnProfile ? (
+              {isSelf ? (
                 <>
                   <button
                     type="button"
@@ -943,8 +944,8 @@ export function ProfileView({
             )}
           </div>
 
-          {/* Compact Modern Single-line Stats */}
-          <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
+          {/* Compact Modern Single-line Stats: hidden on mobile */}
+          <div className="mt-3.5 hidden sm:flex flex-wrap items-center gap-2 sm:gap-2.5">
             {[
               ['প্রতিবেদন', authorArticles.length],
               ['পোস্ট', authorPosts.length],
@@ -973,7 +974,7 @@ export function ProfileView({
               { key: 'articles', label: `প্রতিবেদন (${authorArticles.length})` },
               { key: 'posts', label: `পোস্ট (${authorPosts.length})` },
               { key: 'stories', label: `স্টোরি (${authorStories.length})` },
-              ...(isOwnProfile
+              ...(isSelf
                 ? [
                     { key: 'saved', label: `সংরক্ষিত (${savedArticles.length + savedPosts.length})` },
                     { key: 'orders', label: `অর্ডারসমূহ (${orders.length})` },
@@ -1000,7 +1001,7 @@ export function ProfileView({
       </section>
 
       {/* Profile Content Management Options for Authenticated Author */}
-      {isOwnProfile && (
+      {isSelf && (
         <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
             <div>

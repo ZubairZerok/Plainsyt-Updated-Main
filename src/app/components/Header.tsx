@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, Store, Lightbulb,
   Clapperboard, Sparkles, FileText, ArrowUpRight, ShoppingBag, Trash2, LogIn, User, LogOut,
+  Settings, Check,
 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, UserProfile } from '../types';
 import { PlainsytLogo } from './PlainsytLogo';
@@ -35,6 +36,7 @@ interface Props {
   onOpenAI: () => void;
   onOpenAuth?: () => void;
   onLogout?: () => void;
+  onOpenProfileSettings?: () => void;
   notifications: NotificationItem[];
   onReadNotifications: () => void;
   onToggleNotificationRead?: (id: string, isRead: boolean) => void;
@@ -419,7 +421,7 @@ export function Header(p: Props) {
                   onClick={p.onOpenAI}
                   aria-label="Ask AI Assistant"
                   title="Plainsyt AI সহকারী"
-                  className={iconBtn}
+                  className={cn(iconBtn, 'hidden sm:flex')}
                 >
                   <Sparkles className="size-[18px]" />
                 </button>
@@ -455,7 +457,7 @@ export function Header(p: Props) {
                   type="button"
                   onClick={() => setBellOpen((b) => !b)}
                   aria-label="Notifications"
-                  className={iconBtn}
+                  className={cn(iconBtn, 'hidden sm:flex')}
                 >
                   <Bell className="size-[18px]" />
                   {unread > 0 && (
@@ -467,7 +469,7 @@ export function Header(p: Props) {
               </>
             )}
 
-            {/* Theme Toggle (Available for all) */}
+            {/* Theme Toggle (Desktop only in topnav; available in dropdown for mobile) */}
             <button
               type="button"
               onClick={p.onToggleDark}
@@ -478,13 +480,16 @@ export function Header(p: Props) {
             </button>
 
             {p.currentUser ? (
-              <div className="relative">
+              <div className="relative hidden sm:block">
                 <button
                   type="button"
                   onClick={() => setUserMenuOpen((s) => !s)}
                   aria-label="User Menu"
                   title={`${p.currentUser.name} · অ্যাকাউন্ট`}
-                  className="flex items-center rounded-full ring-2 ring-[#061621]/20 p-0.5 transition hover:ring-[#061621] active:scale-95 bg-white/10"
+                  className={cn(
+                    'flex items-center rounded-full ring-2 p-0.5 transition active:scale-95 bg-white/10',
+                    userMenuOpen ? 'ring-[#061621]' : 'ring-[#061621]/20 hover:ring-[#061621]',
+                  )}
                 >
                   <Avatar
                     src={p.currentUser?.avatar || 'PS'}
@@ -493,67 +498,13 @@ export function Header(p: Props) {
                     online
                   />
                 </button>
-
-                {userMenuOpen && (
-                  <div
-                    className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#071f2d] p-2 shadow-2xl z-50 font-bangla"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex items-center gap-2.5 p-2.5 border-b border-slate-100 dark:border-white/10">
-                      <Avatar src={p.currentUser.avatar} name={p.currentUser.name} size="size-10" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-sans text-sm font-bold text-slate-900 dark:text-white truncate">
-                          {p.currentUser.name}
-                        </p>
-                        <p className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 truncate">
-                          @{p.currentUser.handle || 'user'} · {p.currentUser.role || 'Member'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="py-1 space-y-0.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          p.onNavigate(`/profile/${p.currentUser?.id}`);
-                        }}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                      >
-                        <User className="size-4 text-emerald-600" /> আমার প্রোফাইল দেখুন
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          if (p.onOpenAuth) p.onOpenAuth();
-                        }}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                      >
-                        <LogIn className="size-4 text-emerald-600" /> লগইন / অন্য অ্যাকাউন্ট
-                      </button>
-                      {p.onLogout && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setUserMenuOpen(false);
-                            p.onLogout?.();
-                          }}
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
-                        >
-                          <LogOut className="size-4" /> সাইন আউট (Log Out)
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => (p.onOpenAuth ? p.onOpenAuth() : p.onNavigate('/profile'))}
                 aria-label="Login"
-                className="inline-flex h-8 sm:h-9 items-center gap-1.5 rounded-full bg-[#061621] px-4 sm:px-5 text-[12px] sm:text-[13px] font-bold text-white shadow-sm hover:bg-[#061621]/80 transition active:scale-95"
+                className="hidden sm:inline-flex h-8 sm:h-9 items-center gap-1.5 rounded-full bg-[#061621] px-4 sm:px-5 text-[12px] sm:text-[13px] font-bold text-white shadow-sm hover:bg-[#061621]/80 transition active:scale-95"
               >
                 <LogIn className="size-3.5 text-white" />
                 <span>লগইন</span>
@@ -566,23 +517,197 @@ export function Header(p: Props) {
         </div>
       </header>
 
-      {/* Mobile Fixed Bottom Ergonomic Navigation Bar */}
+      {/* Ultra-Sleek Modern User Profile Dropdown (Shared for Mobile Bottom Nav & Desktop Top Nav) */}
+      {userMenuOpen && p.currentUser && (
+        <>
+          <button
+            type="button"
+            aria-label="Close user menu"
+            className="fixed inset-0 z-40 cursor-default bg-black/40 backdrop-blur-xs md:bg-transparent md:backdrop-blur-none"
+            onClick={() => setUserMenuOpen(false)}
+          />
+          <div
+            className={cn(
+              'z-50 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#071f2d]/95 backdrop-blur-xl p-3 shadow-2xl font-bangla transition-all duration-150',
+              // Mobile: anchored right above bottom nav bar
+              'fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+8px)] left-2.5 right-2.5 sm:left-auto sm:right-3 sm:w-82 max-h-[calc(100vh-5rem)] overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-2',
+              // Desktop: positioned right below top avatar
+              'md:fixed md:top-16 md:bottom-auto md:right-6 md:left-auto md:w-82 md:animate-in md:fade-in md:zoom-in-95',
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* User Profile Header Card */}
+            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 mb-2">
+              <Avatar src={p.currentUser.avatar} name={p.currentUser.name} size="size-11" online />
+              <div className="min-w-0 flex-1">
+                <p className="font-sans text-sm font-bold text-slate-900 dark:text-white truncate">
+                  {p.currentUser.name}
+                </p>
+                <p className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 truncate">
+                  @{p.currentUser.handle || 'user'}
+                </p>
+                <span className="inline-block mt-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 font-sans text-[10px] font-semibold text-emerald-800 dark:text-emerald-300">
+                  {p.currentUser.role || 'গবেষক'}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              {/* 1. View My Profile */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigateProfile(p.currentUser!.id);
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                    <User className="size-4" />
+                  </span>
+                  <span className="truncate">আমার প্রোফাইল দেখুন</span>
+                </div>
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+              </button>
+
+              {/* 2. Profile Settings & Edit */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  if (p.onOpenProfileSettings) {
+                    p.onOpenProfileSettings();
+                  } else {
+                    p.onNavigateProfile(p.currentUser!.id);
+                  }
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                    <Settings className="size-4" />
+                  </span>
+                  <span className="truncate">প্রোফাইল সেটিংস ও এডিট</span>
+                </div>
+              </button>
+
+              {/* 3. Saved Posts & Articles */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onOpenSaved();
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                    <Bookmark className="size-4" />
+                  </span>
+                  <span className="truncate">সংরক্ষিত তালিকা</span>
+                </div>
+                {p.savedCount > 0 ? (
+                  <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 font-mono text-[10.5px] font-bold text-emerald-800 dark:text-emerald-300">
+                    {p.savedCount} টি
+                  </span>
+                ) : (
+                  <span className="font-mono text-[10px] text-slate-400">০</span>
+                )}
+              </button>
+
+              {/* 4. Plainsyt AI Assistant */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onOpenAI();
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#00ED64]/20 to-emerald-500/20 text-[#008f3c] dark:text-[#00ED64]">
+                    <Sparkles className="size-4" />
+                  </span>
+                  <span className="truncate">Plainsyt AI সহকারী</span>
+                </div>
+                <span className="rounded-md bg-[#00ED64]/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#008f3c] dark:text-[#00ED64]">
+                  AI
+                </span>
+              </button>
+
+              {/* 5. Orders & Cart */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onOpenCart();
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                    <ShoppingBag className="size-4" />
+                  </span>
+                  <span className="truncate">আমার অর্ডার ও কার্ট</span>
+                </div>
+                {p.cartCount > 0 && (
+                  <span className="rounded-full bg-[#061621] px-2 py-0.5 font-mono text-[10.5px] font-bold text-[#00ED64]">
+                    {p.cartCount}
+                  </span>
+                )}
+              </button>
+
+              {/* 6. Dark / Light Mode Switch */}
+              <button
+                type="button"
+                onClick={p.onToggleDark}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                    {p.dark ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4" />}
+                  </span>
+                  <span className="truncate">{p.dark ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}</span>
+                </div>
+                <span className="font-mono text-[10.5px] text-slate-400">
+                  {p.dark ? 'Dark' : 'Light'}
+                </span>
+              </button>
+            </div>
+
+            {/* 7. Sign Out */}
+            {p.onLogout && (
+              <div className="mt-1.5 pt-1.5 border-t border-slate-100 dark:border-white/10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    p.onLogout?.();
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                >
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+                    <LogOut className="size-4" />
+                  </span>
+                  <span>সাইন আউট (Log Out)</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Mobile Fixed Bottom Ergonomic Navigation Bar (5 clean tabs, reels removed, notification icon, profile dropdown trigger) */}
       <nav
         className="fixed bottom-0 inset-x-0 z-50 border-t border-[#061621]/15 bg-[#00ED64]/95 backdrop-blur-md shadow-[0_-4px_24px_rgba(0,0,0,0.08)] md:hidden pb-[max(0.4rem,env(safe-area-inset-bottom))]"
         aria-label="Mobile Bottom Navigation"
       >
-        <ul className="grid grid-cols-6 h-13 items-center px-1">
+        <ul className="grid grid-cols-5 h-13 items-center px-1">
           {(
             [
               { key: 'home', path: '/', label: 'হোম', icon: Home },
               { key: 'explore', path: '/explore', label: 'এক্সপ্লোর', icon: Compass },
-              {
-                key: 'reels',
-                path: '#reels',
-                label: 'রিলস',
-                icon: Clapperboard,
-                badge: p.reelsCount ? String(p.reelsCount) : '',
-              },
               { key: 'events', path: '/events', label: 'ইভেন্ট', icon: CalendarDays },
               {
                 key: 'notifications',
@@ -591,34 +716,26 @@ export function Header(p: Props) {
                 icon: Bell,
                 badge: unread ? String(unread) : '',
               },
-              { key: 'profile', path: '/profile', label: 'প্রোফাইল', icon: null },
             ] as const
           ).map((t) => {
-            const active = t.key !== 'reels' && p.activeView === t.key;
+            const active = p.activeView === t.key && !userMenuOpen;
             return (
               <li key={t.key} className="flex justify-center">
                 <button
                   type="button"
                   aria-label={t.label}
-                  onClick={() => (t.key === 'reels' ? p.onOpenReels() : p.onNavigate(t.path))}
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    p.onNavigate(t.path);
+                  }}
                   className={cn(
                     'relative flex size-10 items-center justify-center rounded-xl transition duration-150 active:scale-85',
                     active ? 'bg-[#061621] text-white shadow-md nav-active' : 'text-[#061621] hover:bg-[#061621]/10',
                   )}
                 >
                   <span className="relative flex items-center justify-center">
-                    {t.icon ? (
-                      <t.icon className={cn('size-5', active ? 'text-white' : 'text-[#061621]')} strokeWidth={active ? 2.5 : 2} />
-                    ) : (
-                      <Avatar
-                        src={p.currentUser?.avatar || 'PS'}
-                        name={p.currentUser?.name || ''}
-                        size="size-6"
-                        online
-                        ring={active}
-                      />
-                    )}
-                    {'badge' in t && t.badge && (
+                    <t.icon className={cn('size-5', active ? 'text-white' : 'text-[#061621]')} strokeWidth={active ? 2.5 : 2} />
+                    {t.badge && (
                       <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e41e3f] px-1 font-mono text-[9px] font-bold text-white shadow-xs">
                         {t.badge}
                       </span>
@@ -628,6 +745,40 @@ export function Header(p: Props) {
               </li>
             );
           })}
+
+          {/* 5th Tab: Profile Avatar / Dropdown Trigger on Mobile */}
+          <li className="flex justify-center">
+            {p.currentUser ? (
+              <button
+                type="button"
+                aria-label="Profile Menu"
+                onClick={() => setUserMenuOpen((s) => !s)}
+                className={cn(
+                  'relative flex size-10 items-center justify-center rounded-xl transition duration-150 active:scale-85',
+                  userMenuOpen || p.activeView === 'profile'
+                    ? 'bg-[#061621] text-white shadow-md ring-2 ring-[#061621]'
+                    : 'text-[#061621] hover:bg-[#061621]/10',
+                )}
+              >
+                <Avatar
+                  src={p.currentUser.avatar || 'PS'}
+                  name={p.currentUser.name}
+                  size="size-7"
+                  online
+                  ring={userMenuOpen || p.activeView === 'profile'}
+                />
+              </button>
+            ) : (
+              <button
+                type="button"
+                aria-label="লগইন"
+                onClick={() => (p.onOpenAuth ? p.onOpenAuth() : p.onNavigate('/profile'))}
+                className="relative flex size-10 items-center justify-center rounded-xl text-[#061621] hover:bg-[#061621]/10 transition active:scale-85"
+              >
+                <LogIn className="size-5" />
+              </button>
+            )}
+          </li>
         </ul>
       </nav>
     </>

@@ -8,6 +8,7 @@ interface Props {
   reel: StoryReel;
   saved: boolean;
   following: boolean;
+  isOwnCreator?: boolean;
   onPlay: () => void;
   onReact: (type: LinkedInReactionType) => void;
   onSave: () => void;
@@ -21,6 +22,7 @@ export function IntegratedReelCard({
   reel,
   saved,
   following,
+  isOwnCreator,
   onPlay,
   onReact,
   onSave,
@@ -47,17 +49,21 @@ export function IntegratedReelCard({
               {reel.creator}
             </button>
             <VerifiedBadge />
-            <span className="text-pine-900/40">·</span>
-            <button
-              type="button"
-              onClick={onFollow}
-              className={cn(
-                'text-[13.5px] font-semibold',
-                following ? 'text-pine-900/50' : 'text-pine-600 hover:underline',
-              )}
-            >
-              {following ? 'Following' : 'Follow'}
-            </button>
+            {!isOwnCreator && (
+              <>
+                <span className="text-pine-900/40">·</span>
+                <button
+                  type="button"
+                  onClick={onFollow}
+                  className={cn(
+                    'text-[13.5px] font-semibold',
+                    following ? 'text-pine-900/50' : 'text-pine-600 hover:underline',
+                  )}
+                >
+                  {following ? 'Following' : 'Follow'}
+                </button>
+              </>
+            )}
           </p>
           <p className="flex items-center gap-1 text-[12px] text-pine-900/55">
             <Clapperboard className="size-3" />

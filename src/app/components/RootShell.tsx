@@ -1315,6 +1315,7 @@ export function RootShell() {
         onDeleteNotification={handleDeleteNotification}
         onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
         onLogout={handleLogout}
+        onOpenProfileSettings={() => setProfileSettingsOpen(true)}
         articles={snap.articles}
         posts={snap.posts}
         onOpenArticle={handleOpenArticlePopup}

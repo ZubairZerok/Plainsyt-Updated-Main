@@ -75,7 +75,7 @@ export function ArticleCard({
 
       <div className="px-4 pb-3 pt-4 sm:px-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-[#00ED64]/30 bg-[#00ED64]/10 dark:bg-[#00ED64]/15 px-3 py-0.5 font-bangla text-[12px] font-semibold text-[#008f3c] dark:text-[#00ED64]">
+          <span className="rounded-full border border-slate-200/90 dark:border-white/10 bg-slate-100 dark:bg-white/10 px-3 py-0.5 font-bangla text-[12px] font-semibold text-slate-700 dark:text-slate-300">
             {a.category}
           </span>
           <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
@@ -91,9 +91,11 @@ export function ArticleCard({
             href={`/article/${a.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-auto inline-flex items-center gap-1 font-bangla text-[11px] text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#00ED64] hover:underline"
+            title="নতুন ট্যাবে পড়ুন"
+            aria-label="নতুন ট্যাবে পড়ুন"
+            className="ml-auto inline-flex size-7.5 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#00ED64] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
           >
-            নতুন ট্যাব <ExternalLink className="size-3" />
+            <ExternalLink className="size-4" />
           </a>
         </div>
 

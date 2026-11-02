@@ -94,6 +94,7 @@ export function CentralFeed(f: FeedApi) {
         reel={firstReel}
         saved={f.savedReelIds.includes(firstReel.id)}
         following={f.followingIds.includes(firstReel.creatorId)}
+        isOwnCreator={Boolean(f.currentUser?.id) && firstReel.creatorId === f.currentUser?.id}
         onPlay={() => f.onPlayReel(0)}
         onReact={(type) => f.onReact('reel', firstReel.id, type)}
         onSave={() => f.onSaveReel(firstReel.id)}

@@ -80,10 +80,11 @@ export function TrendingList({
               href={`/article/${a.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              title="নতুন ট্যাবে খুলুন"
-              className="inline-flex items-center gap-0.5 rounded border border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[9px] font-medium text-slate-600 hover:bg-slate-100"
+              title="নতুন ট্যাবে পড়ুন"
+              aria-label="নতুন ট্যাবে পড়ুন"
+              className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#00ED64] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
             >
-              Tab <ExternalLink className="size-2" />
+              <ExternalLink className="size-3.5" />
             </a>
           </div>
         </li>
@@ -204,52 +205,103 @@ export function RightSidebar(p: Props) {
           </section>
         )}
 
-        {otherProfiles.length > 0 && (
-          <section className={cn(CARD, 'p-3')}>
-            <h3 className="font-bangla text-[15px] font-bold text-black dark:text-white mb-2">অনুসরণ করুন</h3>
-            <ul className="divide-y divide-slate-100">
-              {otherProfiles.map((s) => {
-                const isFollowing = p.followingIds.includes(s.id);
-                return (
-                  <li key={s.id} className="flex items-center gap-2 py-2">
-                    <button
-                      type="button"
-                      onClick={() => p.onNavigateProfile(s.id)}
-                      className="shrink-0"
-                    >
-                      <Avatar src={s.avatar || 'PS'} name={s.name} size="size-7" />
-                    </button>
-                    <span className="min-w-0 flex-1">
+        <section className={cn(CARD, 'p-3')}>
+          <h3 className="font-bangla text-[15px] font-bold text-black dark:text-white mb-2.5">অনুসরণ করুন</h3>
+
+          {/* Official Plainsyt Facebook Page Card */}
+          <div className="mb-2.5 rounded-xl border border-blue-200/80 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20 p-2.5 transition">
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://www.facebook.com/profile.php?id=61563107955120"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative shrink-0 group"
+                title="PLAiNSYT Facebook Page"
+              >
+                <img
+                  src="https://scontent.fdac181-1.fna.fbcdn.net/v/t39.30808-6/868869490_122115169682436931_6504382327291511656_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeGyFWAf6sNLe-0gQyPSceASMNxdebSY-u4w3F15tJj67lo6571TJcvvKbUYKo02FW6fr-aTcub2GPDiS2H_GU1n&_nc_ohc=NHKvXJuoNL8Q7kNvwEo6mYW&_nc_oc=AdpUqiVQ1_ksWUoIL1PsToHbR6vvmCkW6dInyT0jnGuPJ7tD5S9as2xr81h48Jq_2cU&_nc_zt=23&_nc_ht=scontent.fdac181-1.fna&_nc_gid=YzL8dL2FWkyI6zcoEygoGg&_nc_ss=7b2a8&oh=00_AQRL-c7zWElbtAHUl8yM6pbw-NdAenccSqpRb0PNo2R14w&oe=6AEE126F"
+                  alt="PLAiNSYT"
+                  className="size-9 rounded-full object-cover ring-2 ring-[#1877F2]/40 group-hover:ring-[#1877F2] transition"
+                />
+                <span className="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-[#1877F2] text-white ring-1 ring-white dark:ring-[#061621]">
+                  <svg className="size-2.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </span>
+              </a>
+              <div className="min-w-0 flex-1">
+                <a
+                  href="https://www.facebook.com/profile.php?id=61563107955120"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block truncate text-xs font-bold text-slate-900 dark:text-white hover:text-[#1877F2] transition"
+                >
+                  PLAiNSYT
+                </a>
+                <span className="inline-flex items-center gap-1 font-bangla text-[10.5px] font-medium text-[#1877F2] dark:text-blue-400">
+                  <span>অফিসিয়াল ফেসবুক পেজ</span>
+                </span>
+              </div>
+              <a
+                href="https://www.facebook.com/profile.php?id=61563107955120"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="ফেসবুকে ফলো করুন"
+                className="h-6.5 shrink-0 inline-flex items-center gap-1 rounded-full px-3 text-[11px] font-bold bg-[#1877F2] text-white hover:bg-[#166fe5] shadow-xs active:scale-95 transition"
+              >
+                ফলো
+              </a>
+            </div>
+          </div>
+
+          {/* User Profiles to follow */}
+          {otherProfiles.length > 0 && (
+            <div className="pt-2 border-t border-slate-100 dark:border-white/5">
+              <p className="font-mono text-[9.5px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">গবেষক ও লেখক</p>
+              <ul className="divide-y divide-slate-100 dark:divide-white/5">
+                {otherProfiles.map((s) => {
+                  const isFollowing = p.followingIds.includes(s.id);
+                  return (
+                    <li key={s.id} className="flex items-center gap-2 py-2">
                       <button
                         type="button"
                         onClick={() => p.onNavigateProfile(s.id)}
-                        className="block truncate text-left text-xs font-semibold text-slate-900 hover:underline"
+                        className="shrink-0"
                       >
-                        {s.name}
+                        <Avatar src={s.avatar || 'PS'} name={s.name} size="size-7" />
                       </button>
-                      <span className="block truncate text-[10px] text-slate-400">
-                        {s.focusArea || s.role || 'লেখক'}
+                      <span className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() => p.onNavigateProfile(s.id)}
+                          className="block truncate text-left text-xs font-semibold text-slate-900 dark:text-white hover:underline"
+                        >
+                          {s.name}
+                        </button>
+                        <span className="block truncate text-[10px] text-slate-400">
+                          {s.focusArea || s.role || 'লেখক'}
+                        </span>
                       </span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => p.onToggleFollow(s.id)}
-                      aria-pressed={isFollowing}
-                      className={cn(
-                        'h-6 shrink-0 rounded-full px-2.5 text-[10px] font-semibold transition',
-                        isFollowing
-                          ? 'bg-slate-100 text-slate-600'
-                          : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
-                      )}
-                    >
-                      {isFollowing ? 'যুক্ত' : 'ফলো'}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
+                      <button
+                        type="button"
+                        onClick={() => p.onToggleFollow(s.id)}
+                        aria-pressed={isFollowing}
+                        className={cn(
+                          'h-6 shrink-0 rounded-full px-2.5 text-[10px] font-semibold transition',
+                          isFollowing
+                            ? 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                            : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                        )}
+                      >
+                        {isFollowing ? 'যুক্ত' : 'ফলো'}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </section>
       </div>
     </aside>
   );

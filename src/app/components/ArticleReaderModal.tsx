@@ -41,20 +41,18 @@ export function ArticleReaderContent({
 
   return (
     <article className="rounded-t-3xl border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden">
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md px-5 py-3">
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400 font-semibold">
-          Plainsyt · {a.categoryEn}
-        </span>
-        <div className="flex items-center gap-1.5">
+      <div className="sticky top-0 z-10 flex items-center justify-end border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md px-4 sm:px-5 py-2.5">
+        <div className="flex items-center gap-2">
           {!isStandalonePage && (
             <a
               href={`/article/${a.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-3 font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition"
-              title="Open in separate browser tab"
+              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-[#00ED64] transition shadow-2xs hover:scale-105 active:scale-95"
+              title="নতুন ট্যাবে পড়ুন (Open in new tab)"
+              aria-label="নতুন ট্যাবে পড়ুন"
             >
-              Open in New Tab <ExternalLink className="size-3.5" />
+              <ExternalLink className="size-4.5" />
             </a>
           )}
           <button
@@ -62,12 +60,13 @@ export function ArticleReaderContent({
             onClick={onBookmark}
             aria-pressed={bookmarked}
             aria-label="Bookmark"
+            title="সংরক্ষণ করুন"
             className={cn(
-              'flex size-9 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition',
-              bookmarked ? 'text-emerald-600' : 'text-slate-600 dark:text-slate-200',
+              'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95',
+              bookmarked ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-slate-600 dark:text-slate-200',
             )}
           >
-            <Bookmark className={cn('size-[18px]', bookmarked && 'fill-current')} />
+            <Bookmark className={cn('size-4.5', bookmarked && 'fill-current')} />
           </button>
           {!isStandalonePage && <CloseButton onClick={onClose} />}
         </div>
