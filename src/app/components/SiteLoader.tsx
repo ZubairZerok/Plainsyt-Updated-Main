@@ -56,13 +56,13 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
       style={{ touchAction: 'none' }}
     >
       <div className="relative flex flex-col items-center px-4">
-        {/* English Logo turned website lime green (#00ED64) via CSS mask */}
+        {/* English Logo turned website lime green (#03EF62) via CSS mask */}
         <div
           ref={logoRef}
           className="relative flex items-center justify-center"
         >
           <div
-            className="h-24 sm:h-32 w-80 sm:w-[460px] max-w-[92vw] bg-[#00ED64]"
+            className="h-24 sm:h-32 w-80 sm:w-[460px] max-w-[92vw] bg-[#03EF62]"
             style={{
               maskImage: 'url(/logos/English.png)',
               WebkitMaskImage: 'url(/logos/English.png)',
@@ -90,7 +90,7 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
         <div className="mt-7 h-2.5 w-56 sm:w-72 overflow-hidden rounded-full bg-slate-200/90 border border-slate-300/60 p-0.5">
           <div
             ref={barRef}
-            className="h-full w-full rounded-full bg-[#00ED64] origin-left"
+            className="h-full w-full rounded-full bg-[#03EF62] origin-left"
           />
         </div>
       </div>

@@ -266,7 +266,7 @@ export function CommunityPostCard({
           aria-label="Save post"
           className={cn(
             'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
-            post.userSaved ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-pine-900/60 dark:text-slate-300',
+            post.userSaved ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/60 dark:text-slate-300',
           )}
         >
           <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', post.userSaved && 'fill-current')} />

@@ -48,7 +48,7 @@ export function ArticleReaderContent({
               href={`/article/${a.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-[#00ED64] transition shadow-2xs hover:scale-105 active:scale-95"
+              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-[#03EF62] transition shadow-2xs hover:scale-105 active:scale-95"
               title="নতুন ট্যাবে পড়ুন (Open in new tab)"
               aria-label="নতুন ট্যাবে পড়ুন"
             >
@@ -63,7 +63,7 @@ export function ArticleReaderContent({
             title="সংরক্ষণ করুন"
             className={cn(
               'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95',
-              bookmarked ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-slate-600 dark:text-slate-200',
+              bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-slate-600 dark:text-slate-200',
             )}
           >
             <Bookmark className={cn('size-4.5', bookmarked && 'fill-current')} />
@@ -130,11 +130,11 @@ export function ArticleReaderContent({
           </div>
           <span className="ml-auto flex items-center gap-3 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1">
-              <Calendar className="size-3 text-[#00ED64]" />
+              <Calendar className="size-3 text-[#03EF62]" />
               {a.publishedAt}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="size-3 text-[#00ED64]" />
+              <Clock className="size-3 text-[#03EF62]" />
               {toBengaliNumerals(a.readTimeMinutes)} মিনিট
             </span>
           </span>

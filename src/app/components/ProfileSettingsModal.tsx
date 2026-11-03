@@ -135,7 +135,7 @@ export function ProfileSettingsModal({
   };
 
   const inputCls =
-    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-[#00ED64] focus:ring-2 focus:ring-[#00ED64]/20 transition';
+    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/20 transition';
 
   if (!currentUser) {
     return (
@@ -150,7 +150,7 @@ export function ProfileSettingsModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-[#00ED64] px-6 py-2 text-sm font-bold text-[#061621] shadow hover:bg-[#00d859]"
+            className="rounded-full bg-[#03EF62] px-6 py-2 text-sm font-bold text-[#061621] shadow hover:bg-[#02d955]"
           >
             বন্ধ করুন
           </button>
@@ -197,7 +197,7 @@ export function ProfileSettingsModal({
                       type="button"
                       onClick={() => fileRef.current?.click()}
                       aria-label="Upload profile picture"
-                      className="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-white dark:border-[#0b1e15] bg-[#00ED64] text-[#061621] shadow hover:bg-[#00d859] transition active:scale-95"
+                      className="absolute bottom-0 right-0 flex size-8 items-center justify-center rounded-full border-2 border-white dark:border-[#0b1e15] bg-[#03EF62] text-[#061621] shadow hover:bg-[#02d955] transition active:scale-95"
                     >
                       <Camera className="size-4" />
                     </button>
@@ -229,7 +229,7 @@ export function ProfileSettingsModal({
                       }}
                       className="inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200/90 dark:border-white/10 bg-white dark:bg-white/5 px-3 text-[12px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/10 transition shadow-xs"
                     >
-                      <Crop className="size-3.5 text-emerald-600 dark:text-[#00ED64]" /> ক্রপ ও জুম
+                      <Crop className="size-3.5 text-emerald-600 dark:text-[#03EF62]" /> ক্রপ ও জুম
                     </button>
                   )}
                   <button
@@ -237,7 +237,7 @@ export function ProfileSettingsModal({
                     onClick={() => fileRef.current?.click()}
                     className="inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200/90 dark:border-white/10 bg-white dark:bg-white/5 px-3.5 text-[12px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/10 transition shadow-xs"
                   >
-                    <Camera className="size-3.5 text-emerald-600 dark:text-[#00ED64]" /> ছবি আপলোড
+                    <Camera className="size-3.5 text-emerald-600 dark:text-[#03EF62]" /> ছবি আপলোড
                   </button>
                 </div>
               </div>
@@ -410,7 +410,7 @@ export function ProfileSettingsModal({
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="h-10 rounded-full bg-[#00ED64] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#00d859] active:scale-95 transition disabled:opacity-40"
+                className="h-10 rounded-full bg-[#03EF62] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition disabled:opacity-40"
               >
                 Save Profile
               </button>

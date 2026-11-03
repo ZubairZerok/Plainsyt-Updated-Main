@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { LinkedInReactionType, ReactionCounts, ReactionRecord } from '../types';
 import { LINKEDIN_REACTIONS, getReactionMeta, topReactionTypes, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
 import { Avatar, CloseButton, Modal, cn } from './Primitives';
@@ -18,38 +18,38 @@ export function LinkedInReactionBadge({
       title={meta.label}
       style={{ backgroundColor: meta.bg }}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full text-white select-none shadow-xs transition-transform duration-150',
+        'inline-flex shrink-0 items-center justify-center rounded-full text-white select-none shadow-sm',
         size,
         className,
       )}
     >
       {type === 'like' && (
-        <svg viewBox="0 0 16 16" className="size-[60%] fill-current drop-shadow-xs">
+        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
           <path d="M9.5 2.5c0-.8-.7-1.5-1.5-1.5-.6 0-1.1.3-1.4.9L4.8 6H2.5C1.7 6 1 6.7 1 7.5v5c0 .8.7 1.5 1.5 1.5h8.8c.7 0 1.3-.5 1.5-1.2l1.1-4.5c.2-.9-.5-1.8-1.5-1.8H9.5V2.5z" />
         </svg>
       )}
       {type === 'celebrate' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
-          <path d="M5.2 2.2 6.4 1l4.8 4.8-1.2 1.2L5.2 2.2zm-2.4 2.4L4 3.4l4.8 4.8-1.2 1.2-4.8-4.8zm.5 4.9 2.3-2.3 3.9 3.9c.8.8.8 2 0 2.8-.8.8-2 .8-2.8 0L3.3 9.5zm8.9-6.5 1.2-1.2 1.4 1.4-1.2 1.2-1.4-1.4z" />
+        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
+          <path d="M8 1.2 9.2 4.6 12.8 5l-2.6 2.4.8 3.6L8 9.4 4.9 11l.8-3.6L3.2 5l3.6-.4L8 1.2z" />
         </svg>
       )}
       {type === 'support' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
-          <path d="M8 2.4c1.3-1.4 3.5-1.4 4.8 0 1.3 1.3 1.3 3.5 0 4.8L8 12 3.2 7.2c-1.3-1.3-1.3-3.5 0-4.8 1.3-1.4 3.5-1.4 4.8 0z" />
+        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
+          <path d="M3.2 7.2c0-1.4 1-2.5 2.3-2.5.6 0 1.1.2 1.5.6.4-.4.9-.6 1.5-.6 1.3 0 2.3 1.1 2.3 2.5 0 .4-.1.8-.3 1.1L8 12.2 3.5 8.3c-.2-.3-.3-.7-.3-1.1zm8.6-.2c.7.1 1.2.7 1.2 1.5v1.8c0 1.7-1.4 3.1-3.1 3.1H8.4c-.4 0-.8-.2-1-.5l-.8-1.1c-.2-.3-.1-.7.2-.9.3-.2.7-.1.9.2l.5.7h1.7c.9 0 1.6-.7 1.6-1.5V8.5c0-.2-.1-.3-.3-.3h-.4c-.4 0-.7-.3-.7-.7s.3-.7.7-.7h.4c.4 0 .7.1 1 .2z" />
         </svg>
       )}
       {type === 'love' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
+        <svg viewBox="0 0 16 16" className="size-[64%] fill-current drop-shadow-xs">
           <path d="M8 13.7 2.5 8.3C1 6.8 1 4.3 2.5 2.8c1.5-1.5 3.9-1.5 5.5 0 1.6-1.5 4-1.5 5.5 0 1.5 1.5 1.5 4 0 5.5L8 13.7z" />
         </svg>
       )}
       {type === 'insightful' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
+        <svg viewBox="0 0 16 16" className="size-[62%] fill-current">
           <path d="M8 1.5a4.5 4.5 0 0 0-2.6 8.2c.4.3.6.7.6 1.2v.6h4v-.6c0-.5.2-.9.6-1.2A4.5 4.5 0 0 0 8 1.5zM6.5 13h3v1.2h-3V13z" />
         </svg>
       )}
       {type === 'curious' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current drop-shadow-xs">
+        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
           <path d="M8 2a4 4 0 0 0-3.8 2.8l1.7.6A2.2 2.2 0 0 1 8 3.8c1.2 0 2.1.8 2.1 1.8 0 .8-.5 1.3-1.3 1.7-.9.5-1.6 1.1-1.6 2.4v.3h1.8v-.2c0-.7.4-1.1 1.2-1.5 1-.5 1.8-1.3 1.8-2.7C12 3.5 10.2 2 8 2zm-.9 9.8v2h2v-2h-2z" />
         </svg>
       )}
@@ -111,26 +111,43 @@ export function LinkedInReactionSummary({
   );
 }
 
+/**
+ * Facebook-style press-and-hold reaction picker.
+ * Quick tap = like (or toggle active). Hold ~350ms = tray pops with bounce.
+ */
 export function LinkedInReactionPickerButton({
   userReaction,
   onSelect,
   countLabel,
   compact,
+  iconOnly,
+  floating,
   className,
 }: {
   userReaction?: LinkedInReactionType | null;
   onSelect: (type: LinkedInReactionType) => void;
   countLabel?: string;
   compact?: boolean;
+  /** Icon-only trigger (reel side stack) */
+  iconOnly?: boolean;
+  /** Open tray upward over dark video chrome */
+  floating?: boolean;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<LinkedInReactionType | null>(null);
+  const [burst, setBurst] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const holdTimer = useRef<number>();
   const closeTimer = useRef<number>();
+  const didLongPress = useRef(false);
+  const pointerId = useRef<number | null>(null);
 
   const openMenu = () => {
     window.clearTimeout(closeTimer.current);
     setOpen(true);
+    setBurst(true);
+    window.setTimeout(() => setBurst(false), 420);
   };
 
   const scheduleClose = () => {
@@ -138,79 +155,194 @@ export function LinkedInReactionPickerButton({
     closeTimer.current = window.setTimeout(() => {
       setOpen(false);
       setHovered(null);
-    }, 220);
+    }, 180);
+  };
+
+  const cancelHold = () => {
+    window.clearTimeout(holdTimer.current);
+  };
+
+  const select = (type: LinkedInReactionType) => {
+    onSelect(type);
+    setOpen(false);
+    setHovered(null);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+        setHovered(null);
+      }
+    };
+    document.addEventListener('pointerdown', onDoc);
+    return () => document.removeEventListener('pointerdown', onDoc);
+  }, [open]);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    didLongPress.current = false;
+    pointerId.current = e.pointerId;
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    holdTimer.current = window.setTimeout(() => {
+      didLongPress.current = true;
+      openMenu();
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate?.(12);
+        } catch {
+          /* ignore */
+        }
+      }
+    }, 350);
+  };
+
+  const pickFromPoint = (clientX: number, clientY: number) => {
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    const btn = el?.closest('[data-reaction-type]') as HTMLElement | null;
+    const type = btn?.dataset.reactionType as LinkedInReactionType | undefined;
+    if (type) setHovered(type);
+    return type;
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!didLongPress.current || !open) return;
+    pickFromPoint(e.clientX, e.clientY);
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    cancelHold();
+    if (pointerId.current !== null) {
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture?.(pointerId.current);
+      } catch {
+        /* ignore */
+      }
+      pointerId.current = null;
+    }
+    if (didLongPress.current) {
+      const picked = pickFromPoint(e.clientX, e.clientY) || hovered;
+      if (picked) select(picked);
+      e.preventDefault();
+      return;
+    }
+  };
+
+  const onPointerCancel = () => {
+    cancelHold();
+    pointerId.current = null;
+  };
+
+  const onClick = (e: React.MouseEvent) => {
+    if (didLongPress.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      didLongPress.current = false;
+      return;
+    }
+    onSelect(userReaction ?? 'like');
   };
 
   const activeMeta = userReaction ? getReactionMeta(userReaction) : null;
 
-  const touchTimer = useRef<number>();
+  const tray = open && (
+    <div
+      role="toolbar"
+      aria-label="Reactions"
+      onMouseEnter={() => {
+        window.clearTimeout(closeTimer.current);
+        setOpen(true);
+      }}
+      onMouseLeave={scheduleClose}
+      className={cn(
+        'absolute z-50 flex items-end gap-0.5 rounded-full border border-white/20 bg-white px-2 py-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] dark:bg-[#0b1a14] dark:border-white/10',
+        floating
+          ? 'bottom-[calc(100%+10px)] right-0 origin-bottom-right'
+          : 'bottom-[calc(100%+10px)] left-0 origin-bottom-left',
+        burst ? 'fb-reaction-tray-in' : '',
+      )}
+    >
+      {LINKEDIN_REACTIONS.map((r, i) => {
+        const isHot = hovered === r.type || userReaction === r.type;
+        return (
+          <button
+            key={r.type}
+            type="button"
+            data-reaction-type={r.type}
+            style={{ animationDelay: `${i * 35}ms` }}
+            onPointerEnter={() => setHovered(r.type)}
+            onPointerLeave={() => setHovered(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              select(r.type);
+            }}
+            className={cn(
+              'fb-reaction-emoji relative flex size-10 items-center justify-center rounded-full transition-transform duration-150 ease-out will-change-transform',
+              isHot ? 'scale-[1.45] -translate-y-3 z-10' : 'scale-100 translate-y-0',
+            )}
+            aria-label={`${r.label} (${r.labelBn})`}
+          >
+            {isHot && (
+              <span className="pointer-events-none absolute -top-7 whitespace-nowrap rounded-full bg-[#061621] px-2 py-0.5 font-bangla text-[10px] font-semibold text-white shadow-md">
+                {r.labelBn}
+              </span>
+            )}
+            <LinkedInReactionBadge type={r.type} size="size-9" className="shadow-md ring-2 ring-white/90" />
+          </button>
+        );
+      })}
+    </div>
+  );
 
-  const handleTouchStart = () => {
-    touchTimer.current = window.setTimeout(() => {
-      openMenu();
-    }, 280);
-  };
-
-  const handleTouchEnd = () => {
-    window.clearTimeout(touchTimer.current);
-  };
+  if (iconOnly) {
+    return (
+      <div ref={rootRef} className="relative inline-flex" onMouseLeave={scheduleClose}>
+        {tray}
+        <button
+          type="button"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onClick={onClick}
+          onContextMenu={(e) => e.preventDefault()}
+          aria-pressed={!!userReaction}
+          className={cn(className)}
+        >
+          <LinkedInReactionBadge type={userReaction ?? 'like'} size="size-5" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
+      ref={rootRef}
       className="relative inline-flex"
-      onMouseEnter={openMenu}
+      onMouseEnter={() => {
+        /* desktop: hover opens like FB desktop after a beat */
+      }}
       onMouseLeave={scheduleClose}
     >
-      {/* Super Ultra Thin Floating Pill Reaction Bar */}
-      {open && (
-        <div
-          onMouseEnter={openMenu}
-          onMouseLeave={scheduleClose}
-          className="absolute bottom-[calc(100%+8px)] left-0 z-40 flex items-center gap-1 sm:gap-1.5 rounded-full border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#071f2d]/95 backdrop-blur-xl px-1.5 py-1 shadow-[0_8px_30px_rgb(0,0,0,0.12)] ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-150"
-          role="toolbar"
-          aria-label="LinkedIn Reactions"
-        >
-          {LINKEDIN_REACTIONS.map((r) => {
-            const isCurrent = userReaction === r.type;
-            return (
-              <button
-                key={r.type}
-                type="button"
-                onMouseEnter={() => setHovered(r.type)}
-                onMouseLeave={() => setHovered(null)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelect(r.type);
-                  setOpen(false);
-                }}
-                className={cn(
-                  'group relative flex flex-col items-center p-1 transition-all duration-200 hover:scale-130 hover:-translate-y-2 focus:outline-none rounded-full',
-                  isCurrent && 'ring-2 ring-emerald-500/80',
-                )}
-                aria-label={`${r.label} (${r.labelBn})`}
-              >
-                {hovered === r.type && (
-                  <span className="pointer-events-none absolute -top-8 whitespace-nowrap rounded-full bg-[#061621] px-2.5 py-0.5 font-bangla text-[10.5px] font-semibold text-white shadow-lg animate-in fade-in zoom-in-90 duration-100 z-50">
-                    {r.labelBn} · {r.label}
-                  </span>
-                )}
-                <LinkedInReactionBadge type={r.type} size="size-7 sm:size-8" />
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {tray}
 
       <button
         type="button"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-        onClick={() => onSelect(userReaction ?? 'like')}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onClick={onClick}
+        onContextMenu={(e) => e.preventDefault()}
+        onMouseEnter={() => {
+          window.clearTimeout(holdTimer.current);
+          holdTimer.current = window.setTimeout(openMenu, 480);
+        }}
         aria-pressed={!!userReaction}
         style={activeMeta ? { color: activeMeta.color } : undefined}
         className={cn(
-          'flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 font-sans font-semibold transition-all hover:bg-slate-100 dark:hover:bg-white/5 active:scale-95 select-none',
+          'flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 font-sans font-semibold transition-all hover:bg-slate-100 dark:hover:bg-white/5 active:scale-95 select-none touch-manipulation',
           compact ? 'text-[11.5px] px-2 py-0.5' : 'text-[13px]',
           !activeMeta && 'text-slate-600 dark:text-slate-300',
           className,

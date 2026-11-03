@@ -37,7 +37,7 @@ export const ZUBAIR_PROFILE: UserProfile = {
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
   avatar: '/images/hasan_zubair.png',
-  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #00ED64 100%)',
+  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
   isVerified: true,
   focusArea: 'Agri-Tech & Agronomy',
   publicationsCount: 0,

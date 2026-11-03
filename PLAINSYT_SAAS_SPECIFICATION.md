@@ -78,9 +78,9 @@ The visual theme relies on high-contrast, eco-scientific tones anchored by the s
 
 | Token Name | Hex Code | RGB / HSL | Usage & Placement |
 | :--- | :--- | :--- | :--- |
-| **Plainsyt Lime Green (Primary)** | `#00ED64` | `rgb(0, 237, 100)` | Primary buttons, active nav icons, brand pills, focus rings, progress bars |
-| **Lime Green Hover** | `#00d859` | `rgb(0, 216, 89)` | Hover states for primary buttons, interaction micro-states |
-| **Lime Green Light Wash** | `rgba(0, 237, 100, 0.12)` | `#00ED641F` | Subtle badge backgrounds, highlight pills, active state cards |
+| **Plainsyt Lime Green (Primary)** | `#03EF62` | `rgb(0, 237, 100)` | Primary buttons, active nav icons, brand pills, focus rings, progress bars |
+| **Lime Green Hover** | `#02d955` | `rgb(0, 216, 89)` | Hover states for primary buttons, interaction micro-states |
+| **Lime Green Light Wash** | `rgba(0, 237, 100, 0.12)` | `#03EF621F` | Subtle badge backgrounds, highlight pills, active state cards |
 | **Midnight Obsidian (Canvas Dark)**| `#061621` | `rgb(6, 22, 33)` | Dark mode body background, desktop nav headers, dark buttons |
 | **Deep Pine Green** | `#041d13` | `rgb(4, 29, 19)` | Modal headers, gradient stops, premium banner covers |
 | **Card Surface (Dark Mode)** | `#071f2d` | `rgb(7, 31, 45)` | Dark mode modal body, popover menus, reaction picker containers |
@@ -148,7 +148,7 @@ On desktop screens (`>= 1024px`), the shell employs a three-column layout:
 
 ### 4.2 Header (Top Navigation) Specifications
 - **Height**: 52px on mobile (`< 768px`), 64px on tablet and desktop (`>= 768px`).
-- **Background**: High-visibility `#00ED64` (Lime Green) with subtle bottom border `rgba(6, 22, 33, 0.15)`.
+- **Background**: High-visibility `#03EF62` (Lime Green) with subtle bottom border `rgba(6, 22, 33, 0.15)`.
 - **Brand Mark**: Responsive `PlainsytLogo`:
   - Desktop: Full white/dark wordmark `প্লেইনসাইট / PLAiNSYT`.
   - Mobile: Clean circular logo icon with zero awkward borders.
@@ -340,7 +340,7 @@ Replacing traditional generic alert triangles (`!`), the error screen features a
 - **Chromatic Aberration & Jitter**: Layered offset clones animated with `@keyframes red-glitch-anim` and `@keyframes red-glitch-jitter`.
 - **Clean Silhouette**: No square border box, no horizontal scanlines, and no distracting footer labels.
 - **Dimensions**: Large, prominent 112px–128px center emblem with soft ambient red pulse glow.
-- **Primary Recovery Action**: Prominent button in brand **Lime Green** (`bg-[#00ED64] hover:bg-[#00d859] text-[#061621] font-bold`) titled **"রিফ্রেশ করুন"**, alongside a secondary **"মূল পাতা"** navigation button.
+- **Primary Recovery Action**: Prominent button in brand **Lime Green** (`bg-[#03EF62] hover:bg-[#02d955] text-[#061621] font-bold`) titled **"রিফ্রেশ করুন"**, alongside a secondary **"মূল পাতা"** navigation button.
 
 ---
 

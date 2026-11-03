@@ -1,17 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Bookmark, Share2, Clapperboard, MapPin, Volume2, VolumeX } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Play,
+  Pause,
+  Bookmark,
+  Share2,
+  MessageCircle,
+  Volume2,
+  VolumeX,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 import type { LinkedInReactionType, StoryReel } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, cn } from './Primitives';
-import { LinkedInReactionBadge, LinkedInReactionPickerButton } from './LinkedInReactionBar';
+import { LinkedInReactionPickerButton } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, totalReactions } from '../utils/pureLogic';
 import { getYouTubeEmbedInfo } from './ReelPlayerModal';
+import {
+  YouTubeMark,
+  buildYouTubeEmbedSrc,
+  ytPostCommand,
+  parseDurationLabel,
+} from './YouTubeMark';
 
 interface Props {
   reel: StoryReel;
   saved: boolean;
   following: boolean;
   isOwnCreator?: boolean;
+  hasPrev?: boolean;
+  hasNext?: boolean;
   onPlay: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
   onReact: (type: LinkedInReactionType) => void;
   onSave: () => void;
   onShare: () => void;
@@ -25,7 +45,11 @@ export function IntegratedReelCard({
   saved,
   following,
   isOwnCreator,
+  hasPrev,
+  hasNext,
   onPlay,
+  onPrev,
+  onNext,
   onReact,
   onSave,
   onShare,
@@ -35,88 +59,151 @@ export function IntegratedReelCard({
   const photo = reel.mediaUrl;
   const rxTotal = totalReactions(reel.reactionCounts, reel.likes);
   const ytInfo = reel.videoUrl ? getYouTubeEmbedInfo(reel.videoUrl) : null;
+  const durationSec = parseDurationLabel(reel.duration);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showDetails, setShowDetails] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [showChrome, setShowChrome] = useState(true);
+  const [centerFlash, setCenterFlash] = useState<'play' | 'pause' | null>(null);
 
   const cardRef = useRef<HTMLElement | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const chromeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startedAt = useRef<number>(0);
+  const accumulated = useRef<number>(0);
 
-  // Autoplay when > 50% of the reel card is visible in the news feed; pause when < 50%
+  const bumpChrome = useCallback(() => {
+    setShowChrome(true);
+    if (chromeTimer.current) clearTimeout(chromeTimer.current);
+    chromeTimer.current = setTimeout(() => setShowChrome(false), 2800);
+  }, []);
+
+  // Autoplay when ≥50% visible
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
             setIsPlaying(true);
+            bumpChrome();
           } else {
             setIsPlaying(false);
-            setShowDetails(true);
+            setShowChrome(true);
           }
         }
       },
       { threshold: [0, 0.5, 1.0] },
     );
-
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [bumpChrome]);
 
-  // Auto-hide top header and bottom title/details after 3 seconds of watching
+  // Fake / synced timeline for YT (postMessage) and native video
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
+    if (progressTimer.current) clearInterval(progressTimer.current);
 
-    if (isPlaying) {
-      setShowDetails(true);
-      timerRef.current = setTimeout(() => {
-        setShowDetails(false);
-      }, 3000);
-    } else {
-      setShowDetails(true);
+    if (!isPlaying) {
+      accumulated.current += startedAt.current ? (Date.now() - startedAt.current) / 1000 : 0;
+      startedAt.current = 0;
+      return;
     }
 
+    startedAt.current = Date.now();
+    progressTimer.current = setInterval(() => {
+      const native = videoRef.current;
+      if (native && !Number.isNaN(native.duration) && native.duration > 0) {
+        setProgress(Math.min(1, native.currentTime / native.duration));
+        return;
+      }
+      const elapsed = accumulated.current + (Date.now() - startedAt.current) / 1000;
+      const p = (elapsed % durationSec) / durationSec;
+      setProgress(p);
+    }, 120);
+
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (progressTimer.current) clearInterval(progressTimer.current);
     };
+  }, [isPlaying, durationSec]);
+
+  // Drive YT iframe play/pause/mute without ever showing YT chrome
+  useEffect(() => {
+    if (!ytInfo) return;
+    ytPostCommand(iframeRef.current, isPlaying ? 'playVideo' : 'pauseVideo');
+  }, [isPlaying, ytInfo]);
+
+  useEffect(() => {
+    if (!ytInfo) return;
+    ytPostCommand(iframeRef.current, isMuted ? 'mute' : 'unMute');
+  }, [isMuted, ytInfo]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (isPlaying) void v.play().catch(() => undefined);
+    else v.pause();
   }, [isPlaying]);
 
-  const handleToggleDetails = () => {
-    setShowDetails((prev) => {
-      const next = !prev;
-      if (next && isPlaying) {
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => {
-          setShowDetails(false);
-        }, 3000);
-      }
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) v.muted = isMuted;
+  }, [isMuted]);
+
+  const flashCenter = (kind: 'play' | 'pause') => {
+    setCenterFlash(kind);
+    window.setTimeout(() => setCenterFlash(null), 650);
+  };
+
+  const togglePlay = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIsPlaying((p) => {
+      const next = !p;
+      flashCenter(next ? 'play' : 'pause');
       return next;
     });
+    bumpChrome();
   };
 
   const handleToggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsMuted((m) => !m);
-    // Bring details back briefly when user interacts
-    setShowDetails(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setShowDetails(false);
-    }, 3000);
+    bumpChrome();
   };
+
+  const seekTo = (ratio: number) => {
+    const clamped = Math.max(0, Math.min(1, ratio));
+    setProgress(clamped);
+    accumulated.current = clamped * durationSec;
+    startedAt.current = isPlaying ? Date.now() : 0;
+    const native = videoRef.current;
+    if (native && native.duration) {
+      native.currentTime = clamped * native.duration;
+    }
+    if (ytInfo) {
+      ytPostCommand(iframeRef.current, 'seekTo', [clamped * durationSec, true]);
+    }
+  };
+
+  const onScrub = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    seekTo((e.clientX - rect.left) / rect.width);
+    bumpChrome();
+  };
+
+  const actionBtn =
+    'flex flex-col items-center gap-0.5 text-white select-none active:scale-90 transition';
+  const actionIcon =
+    'flex size-9 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 transition hover:bg-black/70';
 
   return (
     <article ref={cardRef} className={cn(FEED_CARD, 'overflow-hidden')}>
-      {/* Top Header: Creator details & YouTube shorts tag (Disappears smoothly after 3s of watching) */}
-      <header
-        className={cn(
-          'relative z-20 flex items-center gap-3 px-3.5 py-3 sm:px-4 bg-white dark:bg-[#071f2d] border-b border-slate-200/90 dark:border-white/10 shadow-xs transition-all duration-500 ease-in-out',
-          !showDetails && isPlaying ? 'opacity-0 -translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0',
-        )}
-      >
+      {/* Header: account + follow only */}
+      <header className="relative z-20 flex items-center gap-3 px-3.5 py-3 sm:px-4 bg-white dark:bg-[#071f2d] border-b border-slate-200/90 dark:border-white/10">
         <button type="button" onClick={() => onNavigateProfile(reel.creatorId)} className="shrink-0">
           <Avatar src={reel.creatorAvatar} name={reel.creator} size="size-10" ring online />
         </button>
@@ -138,7 +225,9 @@ export function IntegratedReelCard({
                   onClick={onFollow}
                   className={cn(
                     'text-[13px] font-bold transition-colors',
-                    following ? 'text-slate-400 dark:text-slate-500' : 'text-emerald-600 dark:text-[#00ED64] hover:text-emerald-700 dark:hover:text-[#33ff88] hover:underline',
+                    following
+                      ? 'text-slate-400 dark:text-slate-500'
+                      : 'text-emerald-600 dark:text-[#03EF62] hover:underline',
                   )}
                 >
                   {following ? 'Following' : 'Follow'}
@@ -146,34 +235,11 @@ export function IntegratedReelCard({
               </>
             )}
           </p>
-          <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-slate-700 dark:text-slate-200 mt-1">
-            {reel.videoUrl?.includes('youtu') ? (
-              <span className="inline-flex items-center gap-1.5 font-bold text-[#e60023] dark:text-[#ff3b4e]">
-                <svg className="size-3.5 fill-[#e60023] dark:fill-[#ff3b4e] shrink-0" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-                <span>YouTube Shorts</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 font-semibold text-slate-800 dark:text-slate-200">
-                <Clapperboard className="size-3.5 text-emerald-600 dark:text-[#00ED64]" />
-                Reel
-              </span>
-            )}
-            <span className="text-slate-400 dark:text-slate-500 font-bold">·</span>
-            <span className="font-mono text-[11.5px] font-bold text-slate-800 dark:text-slate-200">{reel.duration}</span>
-            {reel.location && (
-              <>
-                <span className="text-slate-400 dark:text-slate-500 font-bold">·</span>
-                <span className="truncate text-slate-700 dark:text-slate-300 font-bangla font-medium">{reel.location}</span>
-              </>
-            )}
-          </p>
         </div>
       </header>
 
       {/* Main Video Viewport */}
-      <div className="relative bg-[#021a11]" onClick={handleToggleDetails}>
+      <div className="relative bg-[#021a11]" onClick={togglePlay}>
         {photo && (
           <img
             src={photo}
@@ -183,22 +249,29 @@ export function IntegratedReelCard({
           />
         )}
         <div className="relative mx-auto aspect-[9/16] max-h-[600px] w-full max-w-[330px] overflow-hidden bg-black">
-          {isPlaying && ytInfo ? (
+          {ytInfo ? (
             <iframe
-              src={`https://www.youtube.com/embed/${ytInfo.videoId}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ytInfo.videoId}&controls=0&modestbranding=1&playsinline=1&rel=0`}
+              ref={iframeRef}
+              key={ytInfo.videoId}
+              src={buildYouTubeEmbedSrc(ytInfo.videoId, {
+                autoplay: true,
+                muted: isMuted,
+                loop: true,
+              })}
               title={reel.title}
               className="size-full border-0 pointer-events-none"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
             />
-          ) : isPlaying && (reel.videoUrl || reel.mediaUrl?.endsWith('.mp4')) ? (
+          ) : isPlaying || reel.videoUrl || reel.mediaUrl?.endsWith('.mp4') ? (
             <video
+              ref={videoRef}
               src={reel.videoUrl || reel.mediaUrl}
-              autoPlay
+              poster={photo}
+              autoPlay={isPlaying}
               muted={isMuted}
               loop
               playsInline
-              className="size-full object-cover"
+              className="size-full object-cover pointer-events-none"
             />
           ) : (
             <div className="relative size-full">
@@ -207,136 +280,178 @@ export function IntegratedReelCard({
               ) : (
                 <div className="size-full bg-gradient-to-br from-pine-900 via-pine-700 to-pine-500" />
               )}
-              <span className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/85" />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsPlaying(true);
-                }}
-                className="absolute left-1/2 top-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/40 text-white backdrop-blur-sm transition hover:scale-110"
-                aria-label="Play video"
-              >
-                <Play className="ml-1 size-7 fill-white" />
-              </button>
             </div>
           )}
 
-          {/* Top Overlays: Duration badge & Shorts / Sound button */}
-          <div
-            className={cn(
-              'absolute inset-x-3 top-3 z-30 flex items-center justify-between transition-all duration-500 ease-in-out',
-              !showDetails && isPlaying ? 'opacity-0 -translate-y-3 pointer-events-none' : 'opacity-100 translate-y-0',
-            )}
-          >
-            <span className="rounded-md bg-black/80 px-2 py-0.5 font-mono text-[11px] font-bold text-white shadow-md backdrop-blur-xs border border-white/20">
-              {reel.duration}
-            </span>
-            <div className="flex items-center gap-1.5">
-              {isPlaying && (
-                <button
-                  type="button"
-                  onClick={handleToggleMute}
-                  aria-label={isMuted ? 'শব্দ শুনুন (Unmute)' : 'শব্দ বন্ধ করুন (Mute)'}
-                  title={isMuted ? 'Unmute' : 'Mute'}
-                  className="flex size-7 items-center justify-center rounded-full bg-black/60 text-white border border-white/20 backdrop-blur-sm hover:bg-black/80 transition"
-                >
-                  {isMuted ? <VolumeX className="size-3.5 text-white" /> : <Volume2 className="size-3.5 text-[#00ED64]" />}
-                </button>
+          {/* Gradient for readability */}
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/70" />
+
+          {/* Center play/pause flash */}
+          {centerFlash && (
+            <div className="pointer-events-none absolute left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/55 p-4 text-white backdrop-blur-sm animate-in zoom-in-75 fade-in duration-150">
+              {centerFlash === 'pause' ? (
+                <Pause className="size-7 fill-white" />
+              ) : (
+                <Play className="ml-0.5 size-7 fill-white" />
               )}
-              {reel.videoUrl?.includes('youtu') ? (
-                <a
-                  href={reel.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#ff0033] hover:bg-red-700 px-3 py-1 text-[11.5px] font-bold text-white shadow-lg transition active:scale-95 ring-1 ring-white/30"
-                  title="YouTube-এ দেখুন"
-                >
-                  <svg className="size-3.5 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                  </svg>
-                  <span>Shorts</span>
-                </a>
-              ) : null}
             </div>
-          </div>
+          )}
 
-          {/* Bottom Title & Description: Disappears after 3s of watching */}
-          <div
-            className={cn(
-              'absolute bottom-4 left-3.5 right-16 z-30 text-left transition-all duration-500 ease-in-out',
-              !showDetails && isPlaying ? 'opacity-0 translate-y-3 pointer-events-none' : 'opacity-100 translate-y-0',
-            )}
-          >
-            <span className="block font-bangla text-[17px] sm:text-[18px] font-bold leading-snug text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-              {reel.title}
-            </span>
-            {reel.location && (
-              <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 font-mono text-[11px] font-bold text-white/90 backdrop-blur-xs">
-                <MapPin className="size-3 text-[#00ED64]" /> {reel.location}
-              </span>
-            )}
-          </div>
-
-          {/* Right Action Icons (Reactions, Save, Share) */}
-          <div className="absolute bottom-4 right-2 z-30 flex flex-col items-center gap-3.5" onClick={(e) => e.stopPropagation()}>
+          {!isPlaying && !centerFlash && (
             <button
               type="button"
-              onClick={() => onReact(reel.userReaction ?? 'like')}
-              className="flex flex-col items-center gap-0.5 text-white"
+              onClick={togglePlay}
+              className="absolute left-1/2 top-1/2 z-30 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-black/45 text-white backdrop-blur-sm"
+              aria-label="Play"
             >
-              <span className="flex size-11 items-center justify-center rounded-full bg-black/45 backdrop-blur-sm transition hover:bg-black/65">
-                <LinkedInReactionBadge type={reel.userReaction ?? 'like'} size="size-6" />
-              </span>
-              <span className="font-mono text-[10.5px] font-medium">
+              <Play className="ml-0.5 size-6 fill-white" />
+            </button>
+          )}
+
+          {/* YouTube logo + Shorts (not a red pill) */}
+          {ytInfo && (
+            <div
+              className={cn(
+                'absolute left-3 top-3 z-30 transition-opacity duration-300',
+                showChrome || !isPlaying ? 'opacity-100' : 'opacity-0',
+              )}
+            >
+              <YouTubeMark className="rounded-md bg-black/45 px-2 py-1 backdrop-blur-sm" />
+            </div>
+          )}
+
+          {/* Prev / Next reel nav */}
+          <div
+            className={cn(
+              'absolute right-2 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-2 transition-opacity duration-300',
+              showChrome || !isPlaying ? 'opacity-100' : 'opacity-0',
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              disabled={!hasPrev}
+              onClick={() => onPrev?.()}
+              aria-label="Previous reel"
+              className="flex size-8 items-center justify-center rounded-full bg-black/55 text-white border border-white/20 disabled:opacity-25"
+            >
+              <ChevronUp className="size-4" />
+            </button>
+            <button
+              type="button"
+              disabled={!hasNext}
+              onClick={() => onNext?.()}
+              aria-label="Next reel"
+              className="flex size-8 items-center justify-center rounded-full bg-black/55 text-white border border-white/20 disabled:opacity-25"
+            >
+              <ChevronDown className="size-4" />
+            </button>
+          </div>
+
+          {/* Right action stack: Like → Comment → Share → Save → Mute */}
+          <div
+            className="absolute bottom-10 right-1.5 z-30 flex flex-col items-center gap-1.5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={actionBtn}>
+              <LinkedInReactionPickerButton
+                userReaction={reel.userReaction}
+                onSelect={onReact}
+                iconOnly
+                floating
+                className={actionIcon}
+              />
+              <span className="font-mono text-[10px] font-medium drop-shadow">
                 {formatBengaliNumberCompact(rxTotal)}
               </span>
+            </div>
+
+            <button type="button" onClick={onPlay} className={actionBtn} aria-label="Comment">
+              <span className={actionIcon}>
+                <MessageCircle className="size-[18px]" />
+              </span>
+              <span className="font-mono text-[10px] font-medium drop-shadow">Comment</span>
+            </button>
+
+            <button type="button" onClick={onShare} className={actionBtn} aria-label="Share">
+              <span className={actionIcon}>
+                <Share2 className="size-[18px]" />
+              </span>
+              <span className="font-mono text-[10px] font-medium drop-shadow">Share</span>
+            </button>
+
+            <button type="button" onClick={onSave} className={actionBtn} aria-label="Save">
+              <span className={actionIcon}>
+                <Bookmark className={cn('size-[18px]', saved && 'fill-current text-[#03EF62]')} />
+              </span>
+              <span className="font-mono text-[10px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
             </button>
 
             <button
               type="button"
-              onClick={onSave}
-              className="flex flex-col items-center gap-0.5 text-white"
+              onClick={handleToggleMute}
+              className={actionBtn}
+              aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
-              <span className="flex size-11 items-center justify-center rounded-full bg-black/35 backdrop-blur-sm transition hover:bg-black/55">
-                <Bookmark className={cn('size-[22px]', saved && 'fill-current text-[#bbf0d8]')} />
+              <span className={actionIcon}>
+                {isMuted ? (
+                  <VolumeX className="size-[17px]" />
+                ) : (
+                  <Volume2 className="size-[17px] text-[#03EF62]" />
+                )}
               </span>
-              <span className="font-mono text-[10.5px] font-medium">{saved ? 'Saved' : 'Save'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onShare}
-              className="flex flex-col items-center gap-0.5 text-white"
-            >
-              <span className="flex size-11 items-center justify-center rounded-full bg-black/35 backdrop-blur-sm transition hover:bg-black/55">
-                <Share2 className="size-[22px]" />
-              </span>
-              <span className="font-mono text-[10.5px] font-medium">Share</span>
             </button>
           </div>
 
-          <div className="absolute inset-x-0 bottom-0 h-[3px] bg-white/20">
-            <div className={cn('h-full bg-[#00ED64] transition-all duration-300', isPlaying ? 'w-full' : 'w-1/3')} />
+          {/* Custom timeline + pause chip */}
+          <div
+            className={cn(
+              'absolute inset-x-0 bottom-0 z-30 px-2.5 pb-2 pt-6 bg-gradient-to-t from-black/70 to-transparent transition-opacity duration-300',
+              showChrome || !isPlaying ? 'opacity-100' : 'opacity-70',
+            )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-1.5 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={togglePlay}
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? <Pause className="size-3.5 fill-white" /> : <Play className="ml-0.5 size-3.5 fill-white" />}
+              </button>
+              <div
+                role="slider"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(progress * 100)}
+                tabIndex={0}
+                onClick={onScrub}
+                className="group relative h-5 flex-1 cursor-pointer"
+              >
+                <span className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 overflow-hidden rounded-full bg-white/25">
+                  <span
+                    className="block h-full rounded-full bg-[#03EF62] transition-[width] duration-100"
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </span>
+                <span
+                  className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-white shadow opacity-0 transition group-hover:opacity-100"
+                  style={{ left: `calc(${progress * 100}% - 5px)` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t border-slate-200/80 dark:border-white/10 px-3 py-2 sm:px-4">
+      {/* Bottom reaction row only — no বিরতি দিন */}
+      <div className="flex items-center border-t border-slate-200/80 dark:border-white/10 px-3 py-2 sm:px-4">
         <LinkedInReactionPickerButton
           userReaction={reel.userReaction}
           onSelect={onReact}
           countLabel={rxTotal > 0 ? formatBengaliNumberCompact(rxTotal) : undefined}
         />
-        <button
-          type="button"
-          onClick={() => setIsPlaying((p) => !p)}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00ED64] transition"
-        >
-          {isPlaying ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-          <span>{isPlaying ? 'বিরতি দিন' : 'চালান'}</span>
-        </button>
       </div>
     </article>
   );

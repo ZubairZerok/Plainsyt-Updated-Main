@@ -68,7 +68,7 @@ export function EventRegistrationModal({
 
       <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#061621] bg-canvas shadow-tactile-lg z-10">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#061621]/15 bg-[#00ED64] px-5 py-4 text-[#061621]">
+        <div className="flex items-center justify-between border-b border-[#061621]/15 bg-[#03EF62] px-5 py-4 text-[#061621]">
           <div className="flex items-center gap-2.5">
             <Ticket className="size-5" />
             <div>
@@ -92,7 +92,7 @@ export function EventRegistrationModal({
 
         {submitted ? (
           <div className="p-6 text-center">
-            <CheckCircle2 className="mx-auto size-14 text-[#00ED64]" />
+            <CheckCircle2 className="mx-auto size-14 text-[#03EF62]" />
             <h3 className="mt-3 font-bangla text-[20px] font-bold text-pine-950">
               রেজিস্ট্রেশন সফল হয়েছে!
             </h3>
@@ -118,7 +118,7 @@ export function EventRegistrationModal({
             <button
               type="button"
               onClick={handleFinish}
-              className="mt-5 w-full rounded-xl border border-[#061621] bg-[#00ED64] py-2.5 font-bangla text-[14px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
+              className="mt-5 w-full rounded-xl border border-[#061621] bg-[#03EF62] py-2.5 font-bangla text-[14px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
             >
               ঠিক আছে
             </button>
@@ -146,7 +146,7 @@ export function EventRegistrationModal({
               <label className="mb-1 block font-bangla text-[13px] font-semibold text-pine-900">
                 আপনার পুরো নাম *
               </label>
-              <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#00ED64]">
+              <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
                 <User className="size-4 text-pine-600" />
                 <input
                   required
@@ -163,7 +163,7 @@ export function EventRegistrationModal({
                 <label className="mb-1 block font-bangla text-[13px] font-semibold text-pine-900">
                   মোবাইল নম্বর *
                 </label>
-                <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#00ED64]">
+                <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
                   <Phone className="size-4 text-pine-600" />
                   <input
                     required
@@ -179,7 +179,7 @@ export function EventRegistrationModal({
                 <label className="mb-1 block font-bangla text-[13px] font-semibold text-pine-900">
                   ইমেইল অ্যাড্রেস *
                 </label>
-                <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#00ED64]">
+                <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
                   <Mail className="size-4 text-pine-600" />
                   <input
                     required
@@ -197,7 +197,7 @@ export function EventRegistrationModal({
               <label className="mb-1 block font-bangla text-[13px] font-semibold text-pine-900">
                 প্রতিষ্ঠান / বিশ্ববিদ্যালয় (Institution)
               </label>
-              <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#00ED64]">
+              <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
                 <Building2 className="size-4 text-pine-600" />
                 <input
                   value={organization}
@@ -219,7 +219,7 @@ export function EventRegistrationModal({
                   className={cn(
                     'rounded-xl border p-2.5 text-center font-bangla text-[13px] font-medium transition',
                     passType === 'in-person'
-                      ? 'border-[#061621] bg-[#00ED64] text-[#061621] font-bold shadow-tactile-xs'
+                      ? 'border-[#061621] bg-[#03EF62] text-[#061621] font-bold shadow-tactile-xs'
                       : 'border-canvas-border bg-canvas-card text-pine-900 hover:bg-canvas-subtle',
                   )}
                 >
@@ -231,7 +231,7 @@ export function EventRegistrationModal({
                   className={cn(
                     'rounded-xl border p-2.5 text-center font-bangla text-[13px] font-medium transition',
                     passType === 'virtual'
-                      ? 'border-[#061621] bg-[#00ED64] text-[#061621] font-bold shadow-tactile-xs'
+                      ? 'border-[#061621] bg-[#03EF62] text-[#061621] font-bold shadow-tactile-xs'
                       : 'border-canvas-border bg-canvas-card text-pine-900 hover:bg-canvas-subtle',
                   )}
                 >
@@ -249,7 +249,7 @@ export function EventRegistrationModal({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="আপনার মন্তব্য লিখুন…"
-                className="w-full rounded-xl border border-pine-900/20 bg-canvas-card p-3 font-bangla text-[13.5px] text-pine-900 outline-none focus:border-[#00ED64]"
+                className="w-full rounded-xl border border-pine-900/20 bg-canvas-card p-3 font-bangla text-[13.5px] text-pine-900 outline-none focus:border-[#03EF62]"
               />
             </div>
 
@@ -263,7 +263,7 @@ export function EventRegistrationModal({
               </button>
               <button
                 type="submit"
-                className="h-10 rounded-xl border border-[#061621] bg-[#00ED64] px-5 font-bangla text-[14px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
+                className="h-10 rounded-xl border border-[#061621] bg-[#03EF62] px-5 font-bangla text-[14px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
               >
                 রেজিস্ট্রেশন নিশ্চিত করুন
               </button>

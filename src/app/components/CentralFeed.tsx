@@ -99,7 +99,11 @@ export function CentralFeed(f: FeedApi) {
         saved={savedReelIds.includes(firstReel.id)}
         following={followingIds.includes(firstReel.creatorId)}
         isOwnCreator={Boolean(f.currentUser?.id) && firstReel.creatorId === f.currentUser?.id}
+        hasPrev={false}
+        hasNext={f.reels.length > 1}
         onPlay={() => f.onPlayReel(0)}
+        onPrev={() => f.onPlayReel(0)}
+        onNext={() => f.onPlayReel(1)}
         onReact={(type) => f.onReact('reel', firstReel.id, type)}
         onSave={() => f.onSaveReel(firstReel.id)}
         onShare={() => f.onShare(firstReel.title)}
@@ -122,7 +126,11 @@ export function CentralFeed(f: FeedApi) {
           saved={savedReelIds.includes(extraReel.id)}
           following={followingIds.includes(extraReel.creatorId)}
           isOwnCreator={Boolean(f.currentUser?.id) && extraReel.creatorId === f.currentUser?.id}
+          hasPrev={reelIdx > 0}
+          hasNext={reelIdx < f.reels.length - 1}
           onPlay={() => f.onPlayReel(reelIdx)}
+          onPrev={() => f.onPlayReel(Math.max(0, reelIdx - 1))}
+          onNext={() => f.onPlayReel(Math.min(f.reels.length - 1, reelIdx + 1))}
           onReact={(type) => f.onReact('reel', extraReel.id, type)}
           onSave={() => f.onSaveReel(extraReel.id)}
           onShare={() => f.onShare(extraReel.title)}
@@ -150,7 +158,7 @@ export function CentralFeed(f: FeedApi) {
 
       {isEmpty ? (
         <section className={cn(FEED_CARD, 'p-6 text-center sm:p-10')}>
-          <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#00ED64]/15 text-[#061621] border border-[#00ED64]/30">
+          <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#03EF62]/15 text-[#061621] border border-[#03EF62]/30">
             <FileText className="size-6 text-[#061621]" />
           </span>
           <h2 className="mt-4 font-sans text-xl font-bold text-slate-900">
@@ -164,7 +172,7 @@ export function CentralFeed(f: FeedApi) {
               <button
                 type="button"
                 onClick={f.onOpenProfileSettings}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#00ED64] px-4 text-xs font-bold text-[#061621] hover:bg-[#00d859] transition shadow-xs"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955] transition shadow-xs"
               >
                 <UserPlus className="size-3.5" /> প্রোফাইল তৈরি করুন
               </button>

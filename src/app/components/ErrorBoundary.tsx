@@ -223,7 +223,7 @@ function ErrorScreenView({
     <div className="min-h-screen bg-[#f4f6f8] dark:bg-[#061621] text-slate-800 dark:text-slate-100 flex items-center justify-center p-4 font-bangla transition-colors">
       <div className="max-w-md w-full bg-white dark:bg-[#0b2433] rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80 dark:border-white/10 text-center relative overflow-hidden">
         {/* Subtle decorative top border in brand lime green */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#00ED64] via-emerald-400 to-[#00ED64]" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#03EF62] via-emerald-400 to-[#03EF62]" />
 
         {/* Big Red Glitch Platform Logo (replaces former exclamation mark) */}
         <RedGlitchPlainsytIcon />
@@ -247,7 +247,7 @@ function ErrorScreenView({
           <button
             type="button"
             onClick={onReload}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-[#00ED64] hover:bg-[#00d859] text-[#061621] font-bold shadow-tactile-xs active:scale-95 transition text-sm"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-[#03EF62] hover:bg-[#02d955] text-[#061621] font-bold shadow-tactile-xs active:scale-95 transition text-sm"
           >
             <RefreshCw className="size-4 text-[#061621]" />
             {pageContext.label}
@@ -255,7 +255,7 @@ function ErrorScreenView({
           <button
             type="button"
             onClick={onGoHome}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 text-slate-800 dark:text-white font-semibold hover:border-[#00ED64] hover:text-[#00ED64] active:scale-95 transition text-sm shadow-xs"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl border border-slate-300 dark:border-white/15 bg-white dark:bg-white/5 text-slate-800 dark:text-white font-semibold hover:border-[#03EF62] hover:text-[#03EF62] active:scale-95 transition text-sm shadow-xs"
           >
             <Home className="size-4" />
             মূল পাতা

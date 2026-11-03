@@ -114,7 +114,7 @@ export function EventDetailPage({
         {/* Banner with Sleek Dark Forest Gradient */}
         <div className="relative bg-gradient-to-r from-[#061621] via-[#092215] to-[#041a10] p-6 text-white sm:p-10 border-b border-[#061621]">
           <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
-            <span className="rounded-md bg-[#00ED64] px-2.5 py-1 font-bold text-[#061621]">
+            <span className="rounded-md bg-[#03EF62] px-2.5 py-1 font-bold text-[#061621]">
               {activeEvent.dateMonth} {activeEvent.dateDay}, 2026
             </span>
             <span className="rounded-md bg-white/10 px-2.5 py-1 text-white/90">
@@ -136,17 +136,17 @@ export function EventDetailPage({
 
           <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-white/15 pt-5 text-[13px] text-white/90">
             <span className="flex items-center gap-1.5">
-              <CalendarDays className="size-4 text-[#00ED64]" /> {activeEvent.dateMonth}{' '}
+              <CalendarDays className="size-4 text-[#03EF62]" /> {activeEvent.dateMonth}{' '}
               {activeEvent.dateDay}, ২০২৬
             </span>
             <span className="flex items-center gap-1.5">
-              <Clock className="size-4 text-[#00ED64]" /> সকাল ০৯:৩০ — বিকাল ০৫:০০
+              <Clock className="size-4 text-[#03EF62]" /> সকাল ০৯:৩০ — বিকাল ০৫:০০
             </span>
             <span className="flex items-center gap-1.5">
-              <MapPin className="size-4 text-[#00ED64]" /> {activeEvent.location}
+              <MapPin className="size-4 text-[#03EF62]" /> {activeEvent.location}
             </span>
             <span className="flex items-center gap-1.5 font-mono text-[11.5px]">
-              <Users className="size-4 text-[#00ED64]" /> {activeEvent.attendeesCount} জন নিবন্ধিত
+              <Users className="size-4 text-[#03EF62]" /> {activeEvent.attendeesCount} জন নিবন্ধিত
             </span>
           </div>
         </div>
@@ -154,7 +154,7 @@ export function EventDetailPage({
         {/* Content body */}
         <div className="p-6 sm:p-8 space-y-8">
           {/* Registration Status & CTA */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#061621] bg-[#00ED64]/10 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[#061621] bg-[#03EF62]/10 p-5">
             <div>
               <p className="font-bangla text-[17px] font-bold text-[#061621]">
                 {isRegistered ? 'আপনি এই ইভেন্টে রেজিস্টার্ড আছেন' : 'ইভেন্টে আসন সংখ্যা সীমিত'}
@@ -173,7 +173,7 @@ export function EventDetailPage({
                 'inline-flex h-11 items-center gap-2 rounded-xl border border-[#061621] px-6 font-bangla text-[15px] font-bold shadow-tactile-xs transition',
                 isRegistered
                   ? 'bg-canvas text-[#061621] hover:bg-canvas-subtle'
-                  : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                  : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
               )}
             >
               {isRegistered ? (
@@ -191,7 +191,7 @@ export function EventDetailPage({
           {/* Schedule / Agenda */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="size-5 text-[#00ED64]" />
+              <Sparkles className="size-5 text-[#03EF62]" />
               <h2 className="font-bangla text-[20px] font-bold text-[#061621]">
                 ইভেন্টের পূর্ণাঙ্গ কর্মসূচি ও সেশন
               </h2>
@@ -263,21 +263,21 @@ export function EventDetailPage({
           {/* Perks & Features */}
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="flex items-center gap-3 rounded-xl border border-canvas-border bg-canvas-subtle p-3.5">
-              <Award className="size-5 text-[#00ED64] shrink-0" />
+              <Award className="size-5 text-[#03EF62] shrink-0" />
               <div>
                 <p className="font-bangla text-[13px] font-bold text-pine-900">সার্টিফিকেট প্রদান</p>
                 <p className="font-bangla text-[11.5px] text-pine-900/70">অংশগ্রহণকারীদের সনদপত্র</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-canvas-border bg-canvas-subtle p-3.5">
-              <BookOpen className="size-5 text-[#00ED64] shrink-0" />
+              <BookOpen className="size-5 text-[#03EF62] shrink-0" />
               <div>
                 <p className="font-bangla text-[13px] font-bold text-pine-900">রিসার্চ কিট ও হ্যান্ডআউট</p>
                 <p className="font-bangla text-[11.5px] text-pine-900/70">গবেষণা পুস্তিকা ও গাইড</p>
               </div>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-canvas-border bg-canvas-subtle p-3.5">
-              <Coffee className="size-5 text-[#00ED64] shrink-0" />
+              <Coffee className="size-5 text-[#03EF62] shrink-0" />
               <div>
                 <p className="font-bangla text-[13px] font-bold text-pine-900">রিফ্রেশমেন্ট ও লাঞ্চ</p>
                 <p className="font-bangla text-[11.5px] text-pine-900/70">চা-নাস্তা ও নেটওয়ার্কিং লাঞ্চ</p>
@@ -288,7 +288,7 @@ export function EventDetailPage({
           {/* Venue & Directions */}
           <div className="rounded-xl border border-[#061621] bg-canvas-subtle p-5 font-bangla text-[14px] text-pine-900/80 leading-relaxed">
             <p className="font-bold text-pine-950 mb-1 flex items-center gap-1.5">
-              <MapPin className="size-4 text-[#00ED64]" /> ভেন্যু ও আগমন নির্দেশিকা:
+              <MapPin className="size-4 text-[#03EF62]" /> ভেন্যু ও আগমন নির্দেশিকা:
             </p>
             <p>
               অনুষ্ঠানের নির্ধারিত সময়ের ১৫ মিনিট আগে ভেন্যুর অভ্যর্থনা ডেস্কে উপস্থিত হয়ে আপনার টিকিটের ডিজিটাল বা প্রিন্ট কপি দেখিয়ে এন্ট্রি ব্যাজ সংগ্রহ করুন। ভেন্যুতে পার্কিং ও ওয়াই-ফাই সুবিধা থাকবে।

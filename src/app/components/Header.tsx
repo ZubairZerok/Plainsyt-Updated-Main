@@ -336,7 +336,7 @@ export function Header(p: Props) {
                         className="rounded-full p-1 text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10"
                       >
                         {isUnread ? (
-                          <span className="size-2 rounded-full bg-[#00ED64] block" />
+                          <span className="size-2 rounded-full bg-[#03EF62] block" />
                         ) : (
                           <span className="size-2 rounded-full border border-slate-300 dark:border-white/30 block" />
                         )}
@@ -385,7 +385,7 @@ export function Header(p: Props) {
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 border-b border-[#061621]/15 bg-[#00ED64] text-[#061621] shadow-sm backdrop-blur-sm transition-transform duration-300 ease-in-out',
+          'sticky top-0 z-40 border-b border-[#061621]/15 bg-[#03EF62] text-[#061621] shadow-sm backdrop-blur-sm transition-transform duration-300 ease-in-out',
           !navVisible && '-translate-y-full md:translate-y-0',
         )}
       >
@@ -465,7 +465,7 @@ export function Header(p: Props) {
                 >
                   <ShoppingBag className="size-[18px]" />
                   {p.cartCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#00ED64] ring-2 ring-[#00ED64]">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.cartCount}
                     </span>
                   )}
@@ -479,7 +479,7 @@ export function Header(p: Props) {
                 >
                   <Bookmark className="size-[18px]" />
                   {p.savedCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#00ED64] ring-2 ring-[#00ED64]">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.savedCount}
                     </span>
                   )}
@@ -648,7 +648,7 @@ export function Header(p: Props) {
                   </span>
                   <span className="truncate">গবেষক অ্যানালিটিক্স ও রিচ</span>
                 </div>
-                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#00ED64]">
+                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#03EF62]">
                   +১৮%
                 </span>
               </button>
@@ -756,7 +756,7 @@ export function Header(p: Props) {
 
       {/* Mobile Fixed Bottom Ergonomic Navigation Bar (5 clean tabs, reels removed, notification icon, profile dropdown trigger) */}
       <nav
-        className="fixed bottom-0 inset-x-0 z-50 border-t border-[#061621]/15 bg-[#00ED64]/95 backdrop-blur-md shadow-[0_-4px_24px_rgba(0,0,0,0.08)] md:hidden pb-[max(0.4rem,env(safe-area-inset-bottom))]"
+        className="fixed bottom-0 inset-x-0 z-50 border-t border-[#061621]/15 bg-[#03EF62]/95 backdrop-blur-md shadow-[0_-4px_24px_rgba(0,0,0,0.08)] md:hidden pb-[max(0.4rem,env(safe-area-inset-bottom))]"
         aria-label="Mobile Bottom Navigation"
       >
         <ul className="grid grid-cols-5 h-13 items-center px-1">
@@ -846,7 +846,7 @@ export function SeeAllLink({ children, onClick }: { children: string; onClick?: 
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 font-bangla text-[12px] font-bold tracking-tight text-[#008f3c] dark:text-[#00ED64] hover:text-[#006e2e] dark:hover:text-[#29f57c] transition active:scale-95"
+      className="inline-flex items-center gap-1 font-bangla text-[12px] font-bold tracking-tight text-[#008f3c] dark:text-[#03EF62] hover:text-[#006e2e] dark:hover:text-[#29f57c] transition active:scale-95"
     >
       <span>{children}</span> <ArrowUpRight className="size-3.5" />
     </button>

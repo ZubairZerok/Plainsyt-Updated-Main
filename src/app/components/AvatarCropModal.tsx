@@ -161,7 +161,7 @@ export function AvatarCropModal({
         {/* Viewport Area */}
         <div className="flex flex-col items-center justify-center p-6 bg-slate-50/60 dark:bg-[#06120d]/60">
           <div
-            className="relative size-[260px] cursor-grab active:cursor-grabbing overflow-hidden rounded-full select-none shadow-inner border-2 border-[#00ED64]"
+            className="relative size-[260px] cursor-grab active:cursor-grabbing overflow-hidden rounded-full select-none shadow-inner border-2 border-[#03EF62]"
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -222,7 +222,7 @@ export function AvatarCropModal({
                 step="0.05"
                 value={zoom}
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-white/20 accent-[#00ED64]"
+                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 dark:bg-white/20 accent-[#03EF62]"
               />
               <span className="w-9 text-right font-mono text-[11px] text-slate-500 dark:text-slate-400">
                 {zoom.toFixed(1)}x
@@ -268,7 +268,7 @@ export function AvatarCropModal({
               <button
                 type="button"
                 onClick={handleCropAndSave}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#00ED64] px-4 py-1.5 text-xs font-bold text-[#061621] shadow-sm hover:bg-[#00d859] active:scale-95 transition"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#03EF62] px-4 py-1.5 text-xs font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition"
               >
                 <Check className="size-3.5" /> ক্রপ করুন
               </button>

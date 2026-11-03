@@ -64,7 +64,7 @@ export function TrendingList({
               </span>
               <span className="mt-1 flex items-center gap-2 font-bangla text-[11px] text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1">
-                  <Calendar className="size-2.5 text-[#00ED64]" />
+                  <Calendar className="size-2.5 text-[#03EF62]" />
                   {a.publishedAt}
                 </span>
                 <span className="flex items-center gap-0.5">
@@ -82,7 +82,7 @@ export function TrendingList({
               rel="noopener noreferrer"
               title="নতুন ট্যাবে পড়ুন"
               aria-label="নতুন ট্যাবে পড়ুন"
-              className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#00ED64] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
+              className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
             >
               <ExternalLink className="size-3.5" />
             </a>
@@ -107,9 +107,9 @@ export function EventRow({
       <button
         type="button"
         onClick={() => onNavigate(`/events/${e.id}`)}
-        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white text-center shadow-xs hover:border-[#00ED64] transition"
+        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white text-center shadow-xs hover:border-[#03EF62] transition"
       >
-        <span className="w-full bg-[#061621] py-0.5 font-mono text-[8.5px] font-bold text-[#00ED64]">
+        <span className="w-full bg-[#061621] py-0.5 font-mono text-[8.5px] font-bold text-[#03EF62]">
           {e.dateMonth}
         </span>
         <span className="py-0.5 font-display text-base font-bold leading-none text-slate-800">
@@ -140,7 +140,7 @@ export function EventRow({
               'inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-semibold transition',
               e.isRegistered
                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859] font-bold',
+                : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955] font-bold',
             )}
           >
             {e.isRegistered ? (
@@ -290,7 +290,7 @@ export function RightSidebar(p: Props) {
                           'h-6 shrink-0 rounded-full px-2.5 text-[10px] font-semibold transition',
                           isFollowing
                             ? 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
-                            : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                            : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
                         )}
                       >
                         {isFollowing ? 'যুক্ত' : 'ফলো'}

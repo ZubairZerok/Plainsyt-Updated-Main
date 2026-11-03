@@ -68,13 +68,13 @@ export function CreateProductModal({
   };
 
   const inputCls =
-    'w-full rounded-xl border border-pine-900/25 bg-canvas-card px-3 py-2 text-[14px] text-pine-900 outline-none placeholder:text-pine-900/40 focus:border-[#00ED64]';
+    'w-full rounded-xl border border-pine-900/25 bg-canvas-card px-3 py-2 text-[14px] text-pine-900 outline-none placeholder:text-pine-900/40 focus:border-[#03EF62]';
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
       <div onClick={onClose} className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
       <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#061621] bg-canvas shadow-tactile-lg z-10">
-        <div className="flex items-center justify-between border-b border-[#061621]/15 bg-[#00ED64] px-5 py-3.5 text-[#061621]">
+        <div className="flex items-center justify-between border-b border-[#061621]/15 bg-[#03EF62] px-5 py-3.5 text-[#061621]">
           <h2 className="font-bangla text-[18px] font-bold">
             নতুন পণ্য যোগ করুন · Add Product
           </h2>
@@ -174,7 +174,7 @@ export function CreateProductModal({
             </button>
             <button
               type="submit"
-              className="h-10 rounded-xl border border-[#061621] bg-[#00ED64] px-5 text-[13.5px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
+              className="h-10 rounded-xl border border-[#061621] bg-[#03EF62] px-5 text-[13.5px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95"
             >
               পণ্য প্রকাশ করুন
             </button>
@@ -309,7 +309,7 @@ export function BkashCheckoutModal({
   };
 
   const inputCls =
-    'w-full rounded-xl border border-pine-900/25 bg-canvas-card px-3 py-2 text-[14px] text-pine-900 outline-none placeholder:text-pine-900/40 focus:border-[#00ED64]';
+    'w-full rounded-xl border border-pine-900/25 bg-canvas-card px-3 py-2 text-[14px] text-pine-900 outline-none placeholder:text-pine-900/40 focus:border-[#03EF62]';
 
   return (
     <div className="fixed inset-0 z-[130] overflow-hidden" aria-modal="true" role="dialog">
@@ -326,7 +326,7 @@ export function BkashCheckoutModal({
           <div
             className={cn(
               'flex items-center justify-between border-b px-5 py-4 transition-colors',
-              step === 'bkash' ? 'bg-[#e2136e] text-white border-white/20' : 'bg-[#00ED64] text-[#061621] border-[#061621]/15',
+              step === 'bkash' ? 'bg-[#e2136e] text-white border-white/20' : 'bg-[#03EF62] text-[#061621] border-[#061621]/15',
             )}
           >
             <div className="flex items-center gap-2.5">
@@ -530,7 +530,7 @@ export function BkashCheckoutModal({
 
                   <button
                     type="submit"
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#00ED64] text-[15px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95 transition"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#03EF62] text-[15px] font-bold text-[#061621] shadow-tactile-xs hover:opacity-95 transition"
                   >
                     বিকাশে ৳{toBengaliNumerals(grandTotal)} পরিশোধে এগিয়ে যান
                     <ArrowRight className="size-4" />
@@ -594,7 +594,7 @@ export function BkashCheckoutModal({
                     >
                       <Upload className="size-3.5" /> Attach Screenshot
                     </button>
-                    {screenshot && <span className="font-mono text-[11px] text-[#00ED64]">✓ Attached</span>}
+                    {screenshot && <span className="font-mono text-[11px] text-[#03EF62]">✓ Attached</span>}
                     <input
                       ref={screenRef}
                       type="file"
@@ -639,8 +639,8 @@ export function BkashCheckoutModal({
           {/* Drawer Body: Step 3 (Receipt) */}
           {step === 'receipt' && completedOrder && (
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="rounded-xl border border-[#00ED64]/40 bg-[#00ED64]/10 p-4 text-center">
-                <Check className="mx-auto size-12 text-[#00ED64]" />
+              <div className="rounded-xl border border-[#03EF62]/40 bg-[#03EF62]/10 p-4 text-center">
+                <Check className="mx-auto size-12 text-[#03EF62]" />
                 <h3 className="mt-2 font-bangla text-[18px] font-bold text-pine-950">
                   অর্ডার সফলভাবে গৃহীত হয়েছে!
                 </h3>
@@ -682,7 +682,7 @@ export function BkashCheckoutModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex h-10 flex-1 items-center justify-center rounded-xl bg-[#00ED64] font-bangla text-[13px] font-bold text-[#061621]"
+                  className="flex h-10 flex-1 items-center justify-center rounded-xl bg-[#03EF62] font-bangla text-[13px] font-bold text-[#061621]"
                 >
                   সম্পন্ন
                 </button>

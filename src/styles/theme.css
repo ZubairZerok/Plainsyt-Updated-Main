@@ -1,12 +1,12 @@
 @custom-variant dark (&:is(.dark *));
 
 ::selection {
-  background-color: #00ED64 !important;
+  background-color: #03EF62 !important;
   color: #ffffff !important;
 }
 
 ::-moz-selection {
-  background-color: #00ED64 !important;
+  background-color: #03EF62 !important;
   color: #ffffff !important;
 }
 
@@ -19,7 +19,7 @@
   --card-foreground: #061621;
   --popover: #ffffff;
   --popover-foreground: #061621;
-  --primary: #00ED64;
+  --primary: #03EF62;
   --primary-foreground: #061621;
   --secondary: #edf1f4;
   --secondary-foreground: #061621;
@@ -35,8 +35,8 @@
   --switch-background: #cbd5e1;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #00ED64;
-  --chart-1: #00ED64;
+  --ring: #03EF62;
+  --chart-1: #03EF62;
   --chart-2: #061621;
   --chart-3: #f59e0b;
   --chart-4: #10b981;
@@ -44,16 +44,16 @@
   --radius: 1rem;
   --sidebar: #f4f6f8;
   --sidebar-foreground: #061621;
-  --sidebar-primary: #00ED64;
+  --sidebar-primary: #03EF62;
   --sidebar-primary-foreground: #061621;
   --sidebar-accent: #f0fdf4;
   --sidebar-accent-foreground: #061621;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #00ED64;
+  --sidebar-ring: #03EF62;
 
   /* Plainsyt Lime Green brand scale */
-  --lime-main: #00ED64;
-  --navbar-bg: #00ED64;
+  --lime-main: #03EF62;
+  --navbar-bg: #03EF62;
   --navbar-icon: #061621;
   --navbar-fg: #061621;
 
@@ -61,8 +61,8 @@
   --pine-900: #061621;
   --pine-800: #0d2838;
   --pine-700: #00bf50;
-  --pine-600: #00ED64;
-  --pine-500: #00ED64;
+  --pine-600: #03EF62;
+  --pine-500: #03EF62;
   --pine-400: #29f57c;
   --pine-200: #b3fad1;
   --pine-100: #e2fceb;
@@ -81,7 +81,7 @@
   --card-foreground: #ffffff;
   --popover: #0a1c14;
   --popover-foreground: #ffffff;
-  --primary: #00ED64;
+  --primary: #03EF62;
   --primary-foreground: #061621;
   --secondary: #0f271d;
   --secondary-foreground: #ffffff;
@@ -95,26 +95,26 @@
   --input: #1a3c2c;
   --input-background: #0f271d;
   --switch-background: #1f4734;
-  --ring: #00ED64;
+  --ring: #03EF62;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --chart-1: #00ED64;
+  --chart-1: #03EF62;
   --chart-2: #b3fad1;
   --chart-3: #f59e0b;
   --chart-4: #f0fdf4;
   --chart-5: #10b981;
   --sidebar: #06120d;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #00ED64;
+  --sidebar-primary: #03EF62;
   --sidebar-primary-foreground: #061621;
   --sidebar-accent: #0f271d;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #1a3c2c;
-  --sidebar-ring: #00ED64;
+  --sidebar-ring: #03EF62;
 
   /* inverted brand scale for dark mode */
-  --lime-main: #00ED64;
-  --navbar-bg: #00ED64;
+  --lime-main: #03EF62;
+  --navbar-bg: #03EF62;
   --navbar-icon: #061621;
   --navbar-fg: #061621;
 
@@ -122,8 +122,8 @@
   --pine-900: #ffffff;
   --pine-800: #f8fafc;
   --pine-700: #f1f5f9;
-  --pine-600: #00ED64;
-  --pine-500: #00ED64;
+  --pine-600: #03EF62;
+  --pine-500: #03EF62;
   --pine-400: #29f57c;
   --pine-200: #1a3c2c;
   --pine-100: #133627;
@@ -132,7 +132,7 @@
   --canvas-card: #0a1c14;
   --canvas-subtle: #0f271d;
   --canvas-border: #1a3c2c;
-  --tactile: #00ED64;
+  --tactile: #03EF62;
 
   /* Tailwind slate palette mapped in dark mode to white or near-white */
   --color-slate-950: #ffffff;
@@ -262,11 +262,11 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-.border-\[\#061621\]:not(header *):not([class*="bg-[#00ED64]"]) {
+.border-\[\#061621\]:not(header *):not([class*="bg-[#03EF62]"]) {
   border-color: rgba(226, 232, 240, 0.9);
 }
 
-.dark .border-\[\#061621\]:not(header *):not([class*="bg-[#00ED64]"]) {
+.dark .border-\[\#061621\]:not(header *):not([class*="bg-[#03EF62]"]) {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -385,6 +385,24 @@ button.text-white svg.lucide,
 }
 @keyframes blink { 50% { opacity: 0; } }
 
+/* Facebook-style reaction tray */
+@keyframes fb-reaction-tray {
+  0% { opacity: 0; transform: scale(0.35) translateY(12px); }
+  55% { opacity: 1; transform: scale(1.08) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes fb-reaction-pop {
+  0% { opacity: 0; transform: scale(0.2) translateY(8px); }
+  60% { opacity: 1; transform: scale(1.18) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.fb-reaction-tray-in {
+  animation: fb-reaction-tray 0.32s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+.fb-reaction-emoji {
+  animation: fb-reaction-pop 0.28s cubic-bezier(0.22, 1.35, 0.36, 1) both;
+}
+
 /* ============================================================
    Dark Mode Font Color Inversion & Contrast Guarantee
    Requirement: In dark mode, no dark font color can be used;
@@ -445,12 +463,12 @@ button.text-white svg.lucide,
 }
 
 /* Invert dark text color #061621 when not on a bright lime button / navbar */
-.dark [class*="text-[#061621]"]:not(header *):not(.bg-\[\#00ED64\] *):not([class*="bg-[#00ED64]"]):not([class*="bg-primary"]) {
+.dark [class*="text-[#061621]"]:not(header *):not(.bg-\[\#03EF62\] *):not([class*="bg-[#03EF62]"]):not([class*="bg-primary"]) {
   color: #ffffff !important;
 }
 
 /* Card surfaces and inputs in dark mode to ensure clear contrast */
-.dark .bg-white:not(header *):not([class*="bg-[#00ED64]"]):not([class*="bg-primary"]):not([class*="bg-white/"]):not(.toast) {
+.dark .bg-white:not(header *):not([class*="bg-[#03EF62]"]):not([class*="bg-primary"]):not([class*="bg-white/"]):not(.toast) {
   background-color: #0b1e15 !important;
   color: #ffffff !important;
 }

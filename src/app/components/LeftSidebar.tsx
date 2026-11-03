@@ -97,7 +97,7 @@ export function LeftSidebar(p: Props) {
             >
               <span
                 className={cn(
-                  'flex size-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-[#00ED64] group-hover:border-[#00ED64] group-hover:text-[#061621] group-hover:shadow-sm',
+                  'flex size-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-[#03EF62] group-hover:border-[#03EF62] group-hover:text-[#061621] group-hover:shadow-sm',
                   s.tone,
                 )}
               >
@@ -134,8 +134,8 @@ export function LeftSidebar(p: Props) {
                 onClick={() => p.onNavigate('/explore')}
                 className="group flex items-center justify-between rounded-lg px-2 py-1.5 text-left font-bangla text-[13px] font-medium text-black dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition"
               >
-                <span className="truncate group-hover:text-[#008f3c] dark:group-hover:text-[#00ED64] transition-colors">{topic.name}</span>
-                <Sparkles className="size-3 text-slate-400 group-hover:text-[#00ED64] transition-colors shrink-0" />
+                <span className="truncate group-hover:text-[#008f3c] dark:group-hover:text-[#03EF62] transition-colors">{topic.name}</span>
+                <Sparkles className="size-3 text-slate-400 group-hover:text-[#03EF62] transition-colors shrink-0" />
               </button>
             ))}
           </div>

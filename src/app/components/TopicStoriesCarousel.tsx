@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu, UserRound } from 'lucide-react';
 import type { TopicStory, UserProfile } from '../types';
 import { Avatar } from './Primitives';
 
@@ -51,11 +51,17 @@ export function TopicStoriesCarousel({
               }}
               className="flex h-[68%] w-full items-center justify-center"
             >
-              <Avatar
-                src={currentUser?.avatar || 'PS'}
-                name={currentUser?.name || 'User'}
-                size="size-12"
-              />
+              {/* Logged-out must NOT fall back to name="User" → Avatar initials "U" */}
+              {currentUser ? (
+                <Avatar src={currentUser.avatar} name={currentUser.name} size="size-12" />
+              ) : (
+                <span
+                  className="flex size-12 items-center justify-center rounded-full border-2 border-white/40 bg-black/35 text-white shadow-md backdrop-blur-sm"
+                  aria-hidden
+                >
+                  <UserRound className="size-6" strokeWidth={2.25} />
+                </span>
+              )}
             </div>
             <span className="absolute left-1/2 top-[68%] flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-canvas-card bg-pine-600 text-white">
               <Plus className="size-5" strokeWidth={3} />

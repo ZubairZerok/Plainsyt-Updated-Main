@@ -109,18 +109,18 @@ export function PublicationsStudioView({
       <section className={cn(FEED_CARD, 'p-4 sm:p-6 bg-gradient-to-br from-white via-emerald-50/20 to-slate-50 dark:from-[#061621] dark:via-[#072418] dark:to-[#071f2d] border-emerald-500/20')}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
-            <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-[#00ED64] to-[#008f3c] p-0.5 shadow-md flex items-center justify-center shrink-0">
-              <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#00ED64]">
+            <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-[#03EF62] to-[#008f3c] p-0.5 shadow-md flex items-center justify-center shrink-0">
+              <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#03EF62]">
                 <FileText className="size-7" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#00ED64] uppercase">
+                <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#03EF62] uppercase">
                   RESEARCHER STUDIO
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
-                  <CheckCircle2 className="size-3 text-emerald-600 dark:text-[#00ED64]" /> ভেরিফাইড লেখক
+                  <CheckCircle2 className="size-3 text-emerald-600 dark:text-[#03EF62]" /> ভেরিফাইড লেখক
                 </span>
               </div>
               <h1 className="font-sans text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -135,7 +135,7 @@ export function PublicationsStudioView({
           <button
             type="button"
             onClick={onOpenWriteArticle}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#061621] dark:bg-[#00ED64] px-4 py-2.5 text-xs sm:text-sm font-bold text-white dark:text-[#061621] shadow-md hover:bg-slate-800 dark:hover:bg-[#00c954] transition active:scale-95 shrink-0"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#061621] dark:bg-[#03EF62] px-4 py-2.5 text-xs sm:text-sm font-bold text-white dark:text-[#061621] shadow-md hover:bg-slate-800 dark:hover:bg-[#00c954] transition active:scale-95 shrink-0"
           >
             <PenLine className="size-4" />
             <span>নতুন গবেষণা লিখুন</span>
@@ -158,7 +158,7 @@ export function PublicationsStudioView({
           </div>
           <div className="p-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">মোট পাঠক সংখ্যা</span>
-            <span className="font-mono text-xl font-bold text-[#008f3c] dark:text-[#00ED64]">২৪,৫৮০</span>
+            <span className="font-mono text-xl font-bold text-[#008f3c] dark:text-[#03EF62]">২৪,৫৮০</span>
           </div>
         </div>
       </section>
@@ -180,7 +180,7 @@ export function PublicationsStudioView({
             className={cn(
               'px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap',
               filter === tab.key
-                ? 'bg-[#061621] text-white dark:bg-[#00ED64] dark:text-[#061621] shadow-xs'
+                ? 'bg-[#061621] text-white dark:bg-[#03EF62] dark:text-[#061621] shadow-xs'
                 : 'bg-white dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200/70 dark:border-white/10'
             )}
           >
@@ -289,7 +289,7 @@ export function PublicationsStudioView({
                 <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[10.5px] font-bold text-emerald-800 dark:text-emerald-300">
                   {art.category}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-[#00ED64]">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-[#03EF62]">
                   <CheckCircle2 className="size-3.5" /> পিয়ার-রিভিউড ও প্রকাশিত
                 </span>
               </div>
@@ -393,14 +393,14 @@ export function ResearcherAnalyticsView({
       <section className={cn(FEED_CARD, 'p-4 sm:p-6 bg-gradient-to-br from-white via-slate-50 to-emerald-50/20 dark:from-[#061621] dark:via-[#072418] dark:to-[#071f2d] border-emerald-500/20')}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-[#00ED64] to-[#008f3c] p-0.5 shadow-md flex items-center justify-center shrink-0">
-              <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#00ED64]">
+            <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-[#03EF62] to-[#008f3c] p-0.5 shadow-md flex items-center justify-center shrink-0">
+              <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#03EF62]">
                 <BarChart3 className="size-7" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#00ED64] uppercase">
+                <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#03EF62] uppercase">
                   ACADEMIC ANALYTICS
                 </span>
                 <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/70 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
@@ -433,7 +433,7 @@ export function ResearcherAnalyticsView({
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">মোট পাঠক সংখ্যা</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">২৪,৫৮০</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#00ED64]">+১৮.২%</span>
+              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১৮.২%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">বিগত ৩০ দিনে বৃদ্ধি পেয়েছে</span>
           </div>
@@ -442,7 +442,7 @@ export function ResearcherAnalyticsView({
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">একাডেমিক উদ্ধৃতি (Citations)</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">১৪৭ বার</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#00ED64]">+১২</span>
+              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১২</span>
             </div>
             <span className="text-[10.5px] text-slate-400">Google Scholar ও Plainsyt সূচক</span>
           </div>
@@ -451,7 +451,7 @@ export function ResearcherAnalyticsView({
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">গড় পঠন সময়</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">৪:৩৮ মি.</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#00ED64]">৮৯%</span>
+              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">৮৯%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">সম্পূর্ণ পাঠের হার উচ্চ</span>
           </div>
@@ -460,7 +460,7 @@ export function ResearcherAnalyticsView({
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">রিসার্চ ইমপ্যাক্ট স্কোর</span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">৯৩ / ১০০</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#00ED64]">Top 5%</span>
+              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">Top 5%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">শীর্ষ গবেষকদের সূচকে স্থান</span>
           </div>
@@ -490,7 +490,7 @@ export function ResearcherAnalyticsView({
                   {toBengaliNumerals(bar.count)}
                 </span>
                 <div
-                  className="w-full max-w-[36px] rounded-t-lg bg-gradient-to-t from-emerald-600 to-[#00ED64] transition-all duration-300 group-hover:brightness-110 shadow-xs"
+                  className="w-full max-w-[36px] rounded-t-lg bg-gradient-to-t from-emerald-600 to-[#03EF62] transition-all duration-300 group-hover:brightness-110 shadow-xs"
                   style={{ height: bar.height }}
                 />
                 <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
@@ -514,7 +514,7 @@ export function ResearcherAnalyticsView({
               </h2>
               <p className="text-xs text-slate-500">শীর্ষ বিশ্ববিদ্যালয় ও গবেষণা প্রতিষ্ঠান</p>
             </div>
-            <Globe2 className="size-4 text-emerald-600 dark:text-[#00ED64]" />
+            <Globe2 className="size-4 text-emerald-600 dark:text-[#03EF62]" />
           </div>
 
           <div className="space-y-3.5">
@@ -786,12 +786,12 @@ export function AccountSecurityView({
       <section className={cn(FEED_CARD, 'p-4 sm:p-6')}>
         <div className="flex items-center gap-3.5">
           <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
-            <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#00ED64]">
+            <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#03EF62]">
               <ShieldCheck className="size-7" />
             </div>
           </div>
           <div>
-            <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#00ED64] uppercase">
+            <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#03EF62] uppercase">
               SECURITY & VERIFICATION
             </span>
             <h1 className="font-sans text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -805,10 +805,10 @@ export function AccountSecurityView({
       </section>
 
       {/* Verified Researcher Identity Card */}
-      <section className={cn(FEED_CARD, 'p-4 sm:p-5 border-l-4 border-l-[#00ED64]')}>
+      <section className={cn(FEED_CARD, 'p-4 sm:p-5 border-l-4 border-l-[#03EF62]')}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-[#00ED64] flex items-center justify-center shrink-0">
+            <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-[#03EF62] flex items-center justify-center shrink-0">
               <Award className="size-5" />
             </div>
             <div>
@@ -867,7 +867,7 @@ export function AccountSecurityView({
                       {sess.device}
                     </span>
                     {sess.isCurrent && (
-                      <span className="rounded bg-emerald-100 dark:bg-emerald-950/70 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-[#00ED64]">
+                      <span className="rounded bg-emerald-100 dark:bg-emerald-950/70 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-[#03EF62]">
                         এই ডিভাইস
                       </span>
                     )}
@@ -906,7 +906,7 @@ export function AccountSecurityView({
               <span className="font-sans text-sm font-bold text-slate-900 dark:text-white">টু-ফ্যাক্টর অথেনটিকেশন (2FA)</span>
               <p className="text-xs text-slate-500">লগইনের সময় অতিরিক্ত নিরাপত্তা কোড নিশ্চিত করে</p>
             </div>
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-[#00ED64]">
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-[#03EF62]">
               <CheckCircle2 className="size-4" /> সক্রিয় (সুরক্ষিত)
             </span>
           </div>
@@ -1011,12 +1011,12 @@ export function EditorialHelpView({
       <section className={cn(FEED_CARD, 'p-4 sm:p-6 bg-gradient-to-br from-white via-slate-50 to-emerald-50/20 dark:from-[#061621] dark:via-[#072418] dark:to-[#071f2d] border-emerald-500/20')}>
         <div className="flex items-center gap-3.5">
           <div className="size-13 sm:size-15 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 p-0.5 shadow-md flex items-center justify-center shrink-0">
-            <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#00ED64]">
+            <div className="size-full rounded-[14px] bg-[#061621] flex items-center justify-center text-[#03EF62]">
               <HelpCircle className="size-7" />
             </div>
           </div>
           <div>
-            <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#00ED64] uppercase">
+            <span className="font-mono text-[11px] font-bold tracking-widest text-[#008f3c] dark:text-[#03EF62] uppercase">
               EDITORIAL DESK & SUPPORT
             </span>
             <h1 className="font-sans text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -1041,7 +1041,7 @@ export function EditorialHelpView({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {steps.map((st) => (
             <div key={st.step} className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 relative">
-              <span className="size-6 rounded-full bg-[#061621] dark:bg-[#00ED64] text-white dark:text-[#061621] font-mono text-xs font-black flex items-center justify-center mb-2 shadow-xs">
+              <span className="size-6 rounded-full bg-[#061621] dark:bg-[#03EF62] text-white dark:text-[#061621] font-mono text-xs font-black flex items-center justify-center mb-2 shadow-xs">
                 {st.step}
               </span>
               <h3 className="font-sans text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">
@@ -1130,7 +1130,7 @@ export function EditorialHelpView({
           <button
             type="submit"
             disabled={sending}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#061621] dark:bg-[#00ED64] px-5 py-2.5 text-xs sm:text-sm font-bold text-white dark:text-[#061621] shadow-md hover:bg-slate-800 dark:hover:bg-[#00c954] transition active:scale-95"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#061621] dark:bg-[#03EF62] px-5 py-2.5 text-xs sm:text-sm font-bold text-white dark:text-[#061621] shadow-md hover:bg-slate-800 dark:hover:bg-[#00c954] transition active:scale-95"
           >
             {sending ? <RefreshCw className="size-4 animate-spin" /> : <Send className="size-4" />}
             <span>{sending ? 'বার্তা পাঠানো হচ্ছে...' : 'বার্তা পাঠান'}</span>

@@ -179,7 +179,7 @@ export function AuthModal({
         <div className="relative border-b border-slate-100 dark:border-white/10 bg-gradient-to-r from-[#041d13] via-[#062c1d] to-[#041d13] px-6 py-5 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-2xl bg-[#00ED64]/15 border border-[#00ED64]/30 text-[#00ED64] shadow-xs">
+              <span className="flex size-10 items-center justify-center rounded-2xl bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62] shadow-xs">
                 {isNewUser ? <UserPlus className="size-5" /> : <Sparkles className="size-5" />}
               </span>
               <div>
@@ -189,7 +189,7 @@ export function AuthModal({
                 >
                   {isNewUser ? 'নতুন অ্যাকাউন্ট তৈরি করুন' : 'প্ল্যাটফর্মে প্রবেশ করুন'}
                 </h2>
-                <p className="font-mono text-[10.5px] text-[#00ED64] tracking-wider uppercase">
+                <p className="font-mono text-[10.5px] text-[#03EF62] tracking-wider uppercase">
                   PLAiNSYT Ecosystem
                 </p>
               </div>
@@ -202,7 +202,7 @@ export function AuthModal({
 
           {displayReason && (
             <div className="mt-3.5 rounded-xl bg-white/10 border border-white/15 px-3.5 py-2 text-xs text-white/95 backdrop-blur-sm">
-              <span className="font-semibold text-[#00ED64]">প্রয়োজনীয়: </span>
+              <span className="font-semibold text-[#03EF62]">প্রয়োজনীয়: </span>
               {displayReason}
             </div>
           )}
@@ -217,7 +217,7 @@ export function AuthModal({
             className="flex h-11 w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 dark:border-white/15 bg-white dark:bg-white/5 font-sans text-sm font-semibold text-slate-800 dark:text-white hover:bg-slate-50 dark:hover:bg-white/10 transition shadow-xs active:scale-[0.99] disabled:opacity-50"
           >
             {googleLoading ? (
-              <Loader2 className="size-4 animate-spin text-[#00ED64]" />
+              <Loader2 className="size-4 animate-spin text-[#03EF62]" />
             ) : (
               <svg className="size-4" viewBox="0 0 24 24">
                 <path
@@ -255,7 +255,7 @@ export function AuthModal({
           <form onSubmit={handleSubmit} className="space-y-3.5">
             {/* Intelligent info notice when system auto-detects new user */}
             {infoNotice && (
-              <div className="rounded-xl border border-[#00ED64]/40 bg-[#00ED64]/10 p-3 text-xs font-semibold text-[#006f30] dark:text-[#00ED64] animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="rounded-xl border border-[#03EF62]/40 bg-[#03EF62]/10 p-3 text-xs font-semibold text-[#006f30] dark:text-[#03EF62] animate-in fade-in slide-in-from-top-1 duration-200">
                 ✨ {infoNotice}
               </div>
             )}
@@ -267,7 +267,7 @@ export function AuthModal({
             )}
 
             {successMsg && (
-              <div className="rounded-xl border border-[#00ED64]/40 bg-[#00ED64]/10 p-3 text-xs font-semibold text-[#006f30] dark:text-[#00ED64]">
+              <div className="rounded-xl border border-[#03EF62]/40 bg-[#03EF62]/10 p-3 text-xs font-semibold text-[#006f30] dark:text-[#03EF62]">
                 {successMsg}
               </div>
             )}
@@ -287,7 +287,7 @@ export function AuthModal({
                     if (error) setError(null);
                   }}
                   placeholder="your.email@example.com"
-                  className="h-10.5 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 pl-10 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-[#00ED64] focus:bg-white dark:focus:bg-[#071f2d] focus:ring-2 focus:ring-[#00ED64]/20 transition"
+                  className="h-10.5 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 pl-10 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-[#03EF62] focus:bg-white dark:focus:bg-[#071f2d] focus:ring-2 focus:ring-[#03EF62]/20 transition"
                   required
                 />
               </div>
@@ -300,7 +300,7 @@ export function AuthModal({
                   আপনার পূর্ণ নাম *
                 </label>
                 <div className="relative flex items-center">
-                  <User className="absolute left-3.5 size-4 text-[#00ED64]" />
+                  <User className="absolute left-3.5 size-4 text-[#03EF62]" />
                   <input
                     ref={nameInputRef}
                     type="text"
@@ -310,7 +310,7 @@ export function AuthModal({
                       if (error) setError(null);
                     }}
                     placeholder="যেমন: জুবায়ের হাসান / ড. আবদুর রহমান"
-                    className="h-10.5 w-full rounded-xl border border-[#00ED64]/60 dark:border-[#00ED64]/40 bg-white dark:bg-white/5 pl-10 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-[#00ED64] focus:ring-2 focus:ring-[#00ED64]/30 transition shadow-xs"
+                    className="h-10.5 w-full rounded-xl border border-[#03EF62]/60 dark:border-[#03EF62]/40 bg-white dark:bg-white/5 pl-10 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/30 transition shadow-xs"
                     required
                   />
                 </div>
@@ -327,7 +327,7 @@ export function AuthModal({
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-[11px] font-medium text-[#008f3c] dark:text-[#00ED64] hover:underline"
+                    className="text-[11px] font-medium text-[#008f3c] dark:text-[#03EF62] hover:underline"
                   >
                     পাসওয়ার্ড ভুলে গেছেন?
                   </button>
@@ -343,7 +343,7 @@ export function AuthModal({
                     if (error) setError(null);
                   }}
                   placeholder="কমপক্ষে ৬ অক্ষর"
-                  className="h-10.5 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 pl-10 pr-10 text-sm text-slate-900 dark:text-white outline-none focus:border-[#00ED64] focus:bg-white dark:focus:bg-[#071f2d] focus:ring-2 focus:ring-[#00ED64]/20 transition"
+                  className="h-10.5 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 pl-10 pr-10 text-sm text-slate-900 dark:text-white outline-none focus:border-[#03EF62] focus:bg-white dark:focus:bg-[#071f2d] focus:ring-2 focus:ring-[#03EF62]/20 transition"
                   required
                 />
                 <button
@@ -356,7 +356,7 @@ export function AuthModal({
                 </button>
               </div>
               {forgotSent && (
-                <p className="mt-1 text-[11px] text-[#008f3c] dark:text-[#00ED64]">
+                <p className="mt-1 text-[11px] text-[#008f3c] dark:text-[#03EF62]">
                   পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে।
                 </p>
               )}
@@ -366,7 +366,7 @@ export function AuthModal({
             <button
               type="submit"
               disabled={loading}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#00ED64] hover:bg-[#00d859] text-sm font-bold text-[#061621] shadow-tactile-xs disabled:opacity-50 transition active:scale-[0.98] mt-3"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#03EF62] hover:bg-[#02d955] text-sm font-bold text-[#061621] shadow-tactile-xs disabled:opacity-50 transition active:scale-[0.98] mt-3"
             >
               {loading ? (
                 <>
@@ -400,7 +400,7 @@ export function AuthModal({
             {/* Cloud Security Indicator */}
             <div className="pt-2 text-center text-[11px] text-slate-400">
               <span className="flex items-center justify-center gap-1">
-                <ShieldCheck className="size-3.5 text-[#00ED64]" /> সম্পূর্ণ সুরক্ষিত ও এনক্রিপ্টেড সংযোগ
+                <ShieldCheck className="size-3.5 text-[#03EF62]" /> সম্পূর্ণ সুরক্ষিত ও এনক্রিপ্টেড সংযোগ
               </span>
             </div>
           </form>

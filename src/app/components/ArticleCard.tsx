@@ -79,12 +79,12 @@ export function ArticleCard({
             {a.category}
           </span>
           <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
-            <Clock className="size-3 text-[#00ED64]" />
+            <Clock className="size-3 text-[#03EF62]" />
             {toBengaliNumerals(a.readTimeMinutes)} মিনিট পড়া
           </span>
           {/* Post Date & Time replacing Views count */}
           <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
-            <Calendar className="size-3 text-[#00ED64]" />
+            <Calendar className="size-3 text-[#03EF62]" />
             {a.publishedAt}
           </span>
           <a
@@ -93,7 +93,7 @@ export function ArticleCard({
             rel="noopener noreferrer"
             title="নতুন ট্যাবে পড়ুন"
             aria-label="নতুন ট্যাবে পড়ুন"
-            className="ml-auto inline-flex size-7.5 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#00ED64] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
+            className="ml-auto inline-flex size-7.5 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
           >
             <ExternalLink className="size-4" />
           </a>
@@ -138,7 +138,7 @@ export function ArticleCard({
           <button
             type="button"
             onClick={onOpenPopup}
-            className="hidden shrink-0 items-center gap-1.5 rounded-full bg-[#00ED64] hover:bg-[#00d859] px-4 py-1.5 text-[12.5px] font-bold text-[#061621] transition active:scale-95 shadow-sm sm:inline-flex"
+            className="hidden shrink-0 items-center gap-1.5 rounded-full bg-[#03EF62] hover:bg-[#02d955] px-4 py-1.5 text-[12.5px] font-bold text-[#061621] transition active:scale-95 shadow-sm sm:inline-flex"
           >
             <span>পড়ুন</span>
             <ArrowRight className="size-3.5 text-[#061621]" strokeWidth={2.5} />
@@ -197,7 +197,7 @@ export function ArticleCard({
           aria-label="Bookmark"
           className={cn(
             'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
-            bookmarked ? 'text-emerald-600 dark:text-[#00ED64]' : 'text-pine-900/70 dark:text-slate-200',
+            bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/70 dark:text-slate-200',
           )}
         >
           <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', bookmarked && 'fill-current')} />

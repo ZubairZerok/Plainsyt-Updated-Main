@@ -42,7 +42,7 @@ export function Avatar({
         className={cn(
           'relative flex size-full items-center justify-center overflow-hidden rounded-full font-semibold text-[0.7em] leading-none select-none',
           ring ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card' : 'border border-slate-200/60 dark:border-white/10',
-          isPlainsytAvatar ? 'bg-[#00ED64]' : ((!isUrl || loadFailed) && tone),
+          isPlainsytAvatar ? 'bg-[#03EF62]' : ((!isUrl || loadFailed) && tone),
         )}
       >
         {isUrl && !loadFailed ? (
@@ -57,7 +57,7 @@ export function Avatar({
         )}
       </span>
       {online && (
-        <span className="absolute bottom-0 right-0 size-[28%] min-h-2.5 min-w-2.5 rounded-full border-2 border-canvas-card bg-[#00ED64]" />
+        <span className="absolute bottom-0 right-0 size-[28%] min-h-2.5 min-w-2.5 rounded-full border-2 border-canvas-card bg-[#03EF62]" />
       )}
     </span>
   );
@@ -65,7 +65,7 @@ export function Avatar({
 
 export function VerifiedBadge() {
   return (
-    <svg viewBox="0 0 16 16" className="inline size-3.5 shrink-0 text-[#00ED64]" aria-label="Verified">
+    <svg viewBox="0 0 16 16" className="inline size-3.5 shrink-0 text-[#03EF62]" aria-label="Verified">
       <path fill="currentColor" d="M8 0l2 1.6 2.5-.2.7 2.4 2.2 1.3-.9 2.4.9 2.4-2.2 1.3-.7 2.4-2.5-.2L8 16l-2-1.6-2.5.2-.7-2.4L.6 10.9l.9-2.4-.9-2.4 2.2-1.3.7-2.4 2.5.2z" />
       <path fill="none" stroke="var(--canvas-card)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M5 8.2l2 2 4-4.2" />
     </svg>

@@ -2,6 +2,7 @@ import type {
   Article, Comment, CommunityPost, LinkedInReactionType, ReactionCounts, ReactionRecord, UserProfile,
 } from '../types';
 
+/** Plainsyt SaaS reactions — lime / harvest / pine / crimson system */
 export const LINKEDIN_REACTIONS: {
   type: LinkedInReactionType;
   label: string;
@@ -10,12 +11,12 @@ export const LINKEDIN_REACTIONS: {
   bg: string;
   emoji: string;
 }[] = [
-  { type: 'like', label: 'Like', labelBn: 'পছন্দ', color: '#0a66c2', bg: '#0a66c2', emoji: '👍' },
-  { type: 'celebrate', label: 'Celebrate', labelBn: 'অভিনন্দন', color: '#44712e', bg: '#44712e', emoji: '👏' },
-  { type: 'support', label: 'Support', labelBn: 'সমর্থন', color: '#7c3aed', bg: '#7c3aed', emoji: '🤲' },
-  { type: 'love', label: 'Love', labelBn: 'ভালোবাসা', color: '#df704d', bg: '#e11d48', emoji: '❤️' },
-  { type: 'insightful', label: 'Insightful', labelBn: 'তথ্যবহুল', color: '#d97706', bg: '#f59e0b', emoji: '💡' },
-  { type: 'curious', label: 'Curious', labelBn: 'কৌতূহলী', color: '#8b5cf6', bg: '#8b5cf6', emoji: '🤔' },
+  { type: 'like', label: 'Like', labelBn: 'পছন্দ', color: '#03EF62', bg: '#03EF62', emoji: '👍' },
+  { type: 'love', label: 'Love', labelBn: 'ভালোবাসা', color: '#E11D48', bg: '#E11D48', emoji: '❤️' },
+  { type: 'celebrate', label: 'Celebrate', labelBn: 'অভিনন্দন', color: '#F5A524', bg: '#F5A524', emoji: '🎉' },
+  { type: 'support', label: 'Support', labelBn: 'সমর্থন', color: '#0D9488', bg: '#0D9488', emoji: '🤝' },
+  { type: 'insightful', label: 'Insightful', labelBn: 'তথ্যবহুল', color: '#F59E0B', bg: '#D97706', emoji: '💡' },
+  { type: 'curious', label: 'Curious', labelBn: 'কৌতূহলী', color: '#061621', bg: '#061621', emoji: '🤔' },
 ];
 
 export const COVER_GRADIENT_PRESETS: { id: string; name: string; css: string }[] = [

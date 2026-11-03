@@ -81,17 +81,17 @@ export function ExploreView({
           className={cn(
             'inline-flex items-center gap-1.5 sm:gap-2 rounded-full sm:rounded-xl px-3 sm:px-3.5 py-1.5 sm:py-2 text-[12px] sm:text-xs font-semibold shrink-0 transition-all duration-200 active:scale-95 border shadow-xs',
             pillar === null
-              ? 'bg-[#061621] text-white border-[#00ED64] ring-1 ring-[#00ED64]/50 shadow-sm'
-              : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#00ED64]/60 hover:text-black dark:hover:text-white',
+              ? 'bg-[#061621] text-white border-[#03EF62] ring-1 ring-[#03EF62]/50 shadow-sm'
+              : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#03EF62]/60 hover:text-black dark:hover:text-white',
           )}
         >
-          <Sparkles className={cn('size-3 sm:size-3.5 shrink-0', pillar === null ? 'text-[#00ED64]' : 'text-slate-500')} />
+          <Sparkles className={cn('size-3 sm:size-3.5 shrink-0', pillar === null ? 'text-[#03EF62]' : 'text-slate-500')} />
           <span className="font-bangla font-semibold whitespace-nowrap">সকল বিষয়</span>
           <span
             className={cn(
               'font-mono text-[9.5px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold',
               pillar === null
-                ? 'bg-[#00ED64] text-[#061621]'
+                ? 'bg-[#03EF62] text-[#061621]'
                 : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300',
             )}
           >
@@ -112,17 +112,17 @@ export function ExploreView({
               className={cn(
                 'inline-flex items-center gap-1.5 sm:gap-2 rounded-full sm:rounded-xl px-3 sm:px-3.5 py-1.5 sm:py-2 text-[12px] sm:text-xs font-semibold shrink-0 transition-all duration-200 active:scale-95 border shadow-xs',
                 active
-                  ? 'bg-[#061621] text-white border-[#00ED64] ring-1 ring-[#00ED64]/50 shadow-sm'
-                  : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#00ED64]/60 hover:text-black dark:hover:text-white',
+                  ? 'bg-[#061621] text-white border-[#03EF62] ring-1 ring-[#03EF62]/50 shadow-sm'
+                  : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#03EF62]/60 hover:text-black dark:hover:text-white',
               )}
             >
-              <Icon className={cn('size-3 sm:size-3.5 shrink-0', active ? 'text-[#00ED64]' : 'text-slate-500')} />
+              <Icon className={cn('size-3 sm:size-3.5 shrink-0', active ? 'text-[#03EF62]' : 'text-slate-500')} />
               <span className="font-bangla font-semibold whitespace-nowrap">{p.bn}</span>
               <span
                 className={cn(
                   'font-mono text-[9.5px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold',
                   active
-                    ? 'bg-[#00ED64] text-[#061621]'
+                    ? 'bg-[#03EF62] text-[#061621]'
                     : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300',
                 )}
               >
@@ -171,10 +171,10 @@ export function ExploreView({
                   rel="noopener noreferrer"
                   title="নতুন ট্যাবে নিবন্ধটি পড়ুন"
                   aria-label="Open article in new tab"
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-800/90 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 font-mono text-[10.5px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00ED64] hover:border-emerald-300 dark:hover:border-emerald-500/30 shadow-2xs transition-all group/tab"
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-800/90 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 font-mono text-[10.5px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#03EF62] hover:border-emerald-300 dark:hover:border-emerald-500/30 shadow-2xs transition-all group/tab"
                 >
                   <span className="hidden sm:inline">নতুন ট্যাব</span>
-                  <ArrowUpRight className="size-3.5 text-slate-400 group-hover/tab:text-emerald-600 dark:group-hover/tab:text-[#00ED64] transition-transform group-hover/tab:-translate-y-0.5 group-hover/tab:translate-x-0.5" />
+                  <ArrowUpRight className="size-3.5 text-slate-400 group-hover/tab:text-emerald-600 dark:group-hover/tab:text-[#03EF62] transition-transform group-hover/tab:-translate-y-0.5 group-hover/tab:translate-x-0.5" />
                 </a>
               </li>
             ))}
@@ -221,13 +221,13 @@ export function EventsView({
             {events.map((e) => (
               <div
                 key={e.id}
-                className="flex flex-col justify-between rounded-xl border border-slate-200/90 bg-white p-4 shadow-xs hover:border-[#00ED64] transition"
+                className="flex flex-col justify-between rounded-xl border border-slate-200/90 bg-white p-4 shadow-xs hover:border-[#03EF62] transition"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <span className="flex flex-col items-center justify-center rounded-lg bg-[#061621] px-2.5 py-1.5 text-center text-white">
-                        <span className="font-mono text-[9px] font-bold text-[#00ED64]">{e.dateMonth}</span>
+                        <span className="font-mono text-[9px] font-bold text-[#03EF62]">{e.dateMonth}</span>
                         <span className="font-display text-lg font-bold leading-tight">{e.dateDay}</span>
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
@@ -268,7 +268,7 @@ export function EventsView({
                       'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-4 text-xs font-bold transition shadow-xs flex-1',
                       e.isRegistered
                         ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                        : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                        : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
                     )}
                   >
                     {e.isRegistered ? 'টিকিট ও তথ্য দেখুন' : 'নিবন্ধন করুন'}
@@ -322,7 +322,7 @@ export function StoreView({
             <button
               type="button"
               onClick={onOpenCheckout}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#00ED64] px-4 text-xs font-bold text-[#061621] hover:bg-[#00d859] shadow-xs transition"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955] shadow-xs transition"
             >
               <ShoppingBag className="size-4" />
               কার্ট ({toBengaliNumerals(totalCartQty)})
@@ -394,7 +394,7 @@ export function StoreView({
                         'inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-xs font-semibold transition shadow-xs',
                         inCartQty > 0
                           ? 'bg-emerald-600 text-white'
-                          : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                          : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
                       )}
                     >
                       <Plus className="size-3" />
@@ -470,7 +470,7 @@ export function IdeasView({
           <button
             type="submit"
             disabled={!title.trim()}
-            className="h-9 rounded-md bg-[#00ED64] px-4 text-xs font-bold text-[#061621] hover:bg-[#00d859] disabled:opacity-40 transition"
+            className="h-9 rounded-md bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955] disabled:opacity-40 transition"
           >
             আইডিয়া প্রকাশ করুন
           </button>
@@ -796,7 +796,7 @@ export function ProfileView({
         <button
           type="button"
           onClick={onOpenProfileSettings}
-          className="mt-4 inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#00ED64] px-4 text-xs font-bold text-[#061621] hover:bg-[#00d859]"
+          className="mt-4 inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955]"
         >
           <Sparkles className="size-3.5" /> প্রোফাইল তৈরি করুন
         </button>
@@ -812,7 +812,7 @@ export function ProfileView({
           style={{
             background:
               profile.coverGradient ||
-              'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #00ED64 100%)',
+              'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
           }}
           className="relative h-32 w-full sm:h-40"
         >
@@ -899,7 +899,7 @@ export function ProfileView({
                     'inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition shadow-xs',
                     isFollowing
                       ? 'bg-slate-100 text-slate-700'
-                      : 'bg-[#00ED64] text-[#061621] hover:bg-[#00d859]',
+                      : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
                   )}
                 >
                   {isFollowing ? (
@@ -996,7 +996,7 @@ export function ProfileView({
             >
               {t.label}
               {tab === t.key && (
-                <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-t-full bg-[#00ED64]" />
+                <span className="absolute inset-x-2 bottom-0 h-[2.5px] rounded-t-full bg-[#03EF62]" />
               )}
             </button>
           ))}
@@ -1026,11 +1026,11 @@ export function ProfileView({
               onClick={onOpenCreatePost}
               className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#00ED64]/15 border border-[#00ED64]/30 text-[#00ED64]">
-                <PenLine className="size-4.5 text-[#00ED64]" strokeWidth={2.5} />
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
+                <PenLine className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
               </span>
               <div>
-                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#00ED64]">
+                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
                   পোস্ট তৈরি করুন
                 </p>
                 <p className="font-sans text-[11px] text-slate-500">
@@ -1044,11 +1044,11 @@ export function ProfileView({
               onClick={onOpenCreateStory}
               className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#00ED64]/15 border border-[#00ED64]/30 text-[#00ED64]">
-                <Clapperboard className="size-4.5 text-[#00ED64]" strokeWidth={2.5} />
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
+                <Clapperboard className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
               </span>
               <div>
-                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#00ED64]">
+                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
                   স্টোরি তৈরি করুন
                 </p>
                 <p className="font-sans text-[11px] text-slate-500">
@@ -1062,11 +1062,11 @@ export function ProfileView({
               onClick={onOpenWriteArticle}
               className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#00ED64]/15 border border-[#00ED64]/30 text-[#00ED64]">
-                <Plus className="size-4.5 text-[#00ED64]" strokeWidth={2.5} />
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
+                <Plus className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
               </span>
               <div>
-                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#00ED64]">
+                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
                   প্রতিবেদন লিখুন
                 </p>
                 <p className="font-sans text-[11px] text-slate-500">
@@ -1166,7 +1166,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={onOpenCreateStory}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#00ED64] px-4 py-1.5 text-xs font-bold text-[#061621]"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#03EF62] px-4 py-1.5 text-xs font-bold text-[#061621]"
                   >
                     <Plus className="size-3.5" /> নতুন স্টোরি যোগ করুন
                   </button>
@@ -1197,7 +1197,7 @@ export function ProfileView({
                       </button>
                     )}
                     <div className="absolute bottom-3 inset-x-3 text-white">
-                      <span className="font-mono text-[10px] uppercase text-[#00ED64]">
+                      <span className="font-mono text-[10px] uppercase text-[#03EF62]">
                         {s.category}
                       </span>
                       <p className="mt-1 font-sans text-xs font-bold leading-snug line-clamp-2">
