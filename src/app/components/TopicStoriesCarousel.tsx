@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu, UserRound } from 'lucide-react';
 import type { TopicStory, UserProfile } from '../types';
 import { Avatar } from './Primitives';
+import { YouTubeMark } from './YouTubeMark';
 
 const ICONS = {
   drone: Plane,
