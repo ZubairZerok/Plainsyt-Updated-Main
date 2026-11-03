@@ -2,21 +2,69 @@ import type {
   Article, Comment, CommunityPost, LinkedInReactionType, ReactionCounts, ReactionRecord, UserProfile,
 } from '../types';
 
-/** Plainsyt SaaS reactions — lime / harvest / pine / crimson system */
-export const LINKEDIN_REACTIONS: {
+export interface ReactionDefinition {
   type: LinkedInReactionType;
   label: string;
   labelBn: string;
+  desc: string;
+  descBn: string;
   color: string;
   bg: string;
   emoji: string;
-}[] = [
-  { type: 'like', label: 'Like', labelBn: 'পছন্দ', color: '#03EF62', bg: '#03EF62', emoji: '👍' },
-  { type: 'love', label: 'Love', labelBn: 'ভালোবাসা', color: '#E11D48', bg: '#E11D48', emoji: '❤️' },
-  { type: 'celebrate', label: 'Celebrate', labelBn: 'অভিনন্দন', color: '#F5A524', bg: '#F5A524', emoji: '🎉' },
-  { type: 'support', label: 'Support', labelBn: 'সমর্থন', color: '#0D9488', bg: '#0D9488', emoji: '🤝' },
-  { type: 'insightful', label: 'Insightful', labelBn: 'তথ্যবহুল', color: '#F59E0B', bg: '#D97706', emoji: '💡' },
-  { type: 'curious', label: 'Curious', labelBn: 'কৌতূহলী', color: '#061621', bg: '#061621', emoji: '🤔' },
+}
+
+/** Plainsyt SaaS reactions — 5 specific actionable research/initiative reactions */
+export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
+  {
+    type: 'like',
+    label: 'Like',
+    labelBn: 'পছন্দ',
+    desc: 'Standard agreement',
+    descBn: 'সাধারণ সম্মতি',
+    color: '#03EF62',
+    bg: '#03EF62',
+    emoji: '👍',
+  },
+  {
+    type: 'insightful',
+    label: 'Insightful',
+    labelBn: 'তথ্যবহুল',
+    desc: 'Learned something new',
+    descBn: 'নতুন শিক্ষা',
+    color: '#F59E0B',
+    bg: '#D97706',
+    emoji: '💡',
+  },
+  {
+    type: 'support',
+    label: 'Support',
+    labelBn: 'সমর্থন',
+    desc: 'Backing the initiative or policy stance',
+    descBn: 'উদ্যোগে সমর্থন',
+    color: '#0D9488',
+    bg: '#0F766E',
+    emoji: '🤝',
+  },
+  {
+    type: 'celebrate',
+    label: 'Celebrate',
+    labelBn: 'অভিনন্দন',
+    desc: 'For milestones, breakthroughs, or success stories',
+    descBn: 'মাইলফলক ও সাফল্য',
+    color: '#8B5CF6',
+    bg: '#7C3AED',
+    emoji: '👏',
+  },
+  {
+    type: 'curious',
+    label: 'Curious',
+    labelBn: 'কৌতূহলী',
+    desc: 'Want to see more data / follow-ups on this',
+    descBn: 'আরও তথ্য চাই',
+    color: '#3B82F6',
+    bg: '#2563EB',
+    emoji: '🔍',
+  },
 ];
 
 export const COVER_GRADIENT_PRESETS: { id: string; name: string; css: string }[] = [
@@ -34,8 +82,21 @@ export const COVER_GRADIENT_PRESETS: { id: string; name: string; css: string }[]
   { id: 'paper-sage', name: 'Editorial Sage', css: 'linear-gradient(135deg, #183a2b 0%, #3d6b56 55%, #bbf0d8 100%)' },
 ];
 
-export const getReactionMeta = (type?: LinkedInReactionType | null) =>
-  LINKEDIN_REACTIONS.find((r) => r.type === type) ?? LINKEDIN_REACTIONS[0];
+export const getReactionMeta = (type?: LinkedInReactionType | null): ReactionDefinition => {
+  if (type === 'love') {
+    return {
+      type: 'love' as LinkedInReactionType,
+      label: 'Love',
+      labelBn: 'ভালোবাসা',
+      desc: 'Appreciation',
+      descBn: 'আন্তরিক ভালোবাসা',
+      color: '#E11D48',
+      bg: '#E11D48',
+      emoji: '❤️',
+    };
+  }
+  return LINKEDIN_REACTIONS.find((r) => r.type === type) ?? LINKEDIN_REACTIONS[0];
+};
 
 export const totalReactions = (counts?: ReactionCounts, fallback = 0): number => {
   if (!counts) return fallback;

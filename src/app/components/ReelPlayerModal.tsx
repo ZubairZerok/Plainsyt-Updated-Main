@@ -306,18 +306,20 @@ export function ReelPlayerModal({
         >
           {/* Media — YouTube never shows native controls */}
           {ytInfo ? (
-            <iframe
-              ref={iframeRef}
-              key={it.id}
-              src={buildYouTubeEmbedSrc(ytInfo.videoId, {
-                autoplay: true,
-                muted: isMuted,
-                loop: true,
-              })}
-              title={it.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              className="absolute inset-0 size-full border-0 pointer-events-none"
-            />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+              <iframe
+                ref={iframeRef}
+                key={it.id}
+                src={buildYouTubeEmbedSrc(ytInfo.videoId, {
+                  autoplay: true,
+                  muted: isMuted,
+                  loop: true,
+                })}
+                title={it.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                className="absolute left-1/2 top-1/2 h-[128%] w-[128%] -translate-x-1/2 -translate-y-1/2 border-0 pointer-events-none select-none"
+              />
+            </div>
           ) : it.videoUrl || it.image?.endsWith('.mp4') ? (
             <video
               ref={videoRef}

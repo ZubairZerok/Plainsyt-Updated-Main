@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 import type { LinkedInReactionType, StoryReel } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, cn } from './Primitives';
-import { LinkedInReactionPickerButton } from './LinkedInReactionBar';
-import { formatBengaliNumberCompact, totalReactions } from '../utils/pureLogic';
+import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
+import { formatBengaliNumberCompact, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
 import { getYouTubeEmbedInfo } from './ReelPlayerModal';
 import {
   YouTubeMark,
@@ -250,18 +250,20 @@ export function IntegratedReelCard({
         )}
         <div className="relative mx-auto aspect-[9/16] max-h-[600px] w-full max-w-[330px] overflow-hidden bg-black">
           {ytInfo ? (
-            <iframe
-              ref={iframeRef}
-              key={ytInfo.videoId}
-              src={buildYouTubeEmbedSrc(ytInfo.videoId, {
-                autoplay: true,
-                muted: isMuted,
-                loop: true,
-              })}
-              title={reel.title}
-              className="size-full border-0 pointer-events-none"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
+              <iframe
+                ref={iframeRef}
+                key={ytInfo.videoId}
+                src={buildYouTubeEmbedSrc(ytInfo.videoId, {
+                  autoplay: true,
+                  muted: isMuted,
+                  loop: true,
+                })}
+                title={reel.title}
+                className="absolute left-1/2 top-1/2 h-[128%] w-[128%] -translate-x-1/2 -translate-y-1/2 border-0 pointer-events-none select-none"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            </div>
           ) : isPlaying || reel.videoUrl || reel.mediaUrl?.endsWith('.mp4') ? (
             <video
               ref={videoRef}
@@ -443,13 +445,59 @@ export function IntegratedReelCard({
         </div>
       </div>
 
-      {/* Bottom reaction row only — no বিরতি দিন */}
-      <div className="flex items-center border-t border-slate-200/80 dark:border-white/10 px-3 py-2 sm:px-4">
+      {/* Reaction Summary */}
+      <LinkedInReactionSummary
+        counts={reel.reactionCounts}
+        fallbackTotal={reel.likes}
+        userReaction={reel.userReaction}
+        className="mt-2.5 px-3 pt-2 sm:px-4"
+        rightSlot={
+          <button
+            type="button"
+            onClick={onPlay}
+            className="font-bangla font-bold text-[12px] text-slate-500 hover:underline dark:text-slate-400"
+          >
+            {toBengaliNumerals(0)} comments
+          </button>
+        }
+      />
+
+      {/* Action Bar: exactly the same Like, Comment, Share, Save as regular posts */}
+      <div className="grid grid-cols-4 items-center gap-1 border-t border-canvas-border px-1.5 py-1 sm:px-3">
         <LinkedInReactionPickerButton
           userReaction={reel.userReaction}
           onSelect={onReact}
           countLabel={rxTotal > 0 ? formatBengaliNumberCompact(rxTotal) : undefined}
+          className="w-full justify-center"
         />
+        <button
+          type="button"
+          onClick={onPlay}
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+        >
+          <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
+          <span className="truncate">Comment</span>
+        </button>
+        <button
+          type="button"
+          onClick={onShare}
+          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+        >
+          <Share2 className="size-4 sm:size-[18px] shrink-0" />
+          <span className="truncate">Share</span>
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          aria-pressed={saved}
+          className={cn(
+            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            saved ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/70 dark:text-slate-200',
+          )}
+        >
+          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', saved && 'fill-current')} />
+          <span className="truncate">{saved ? 'Saved' : 'Save'}</span>
+        </button>
       </div>
     </article>
   );

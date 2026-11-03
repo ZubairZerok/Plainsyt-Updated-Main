@@ -18,39 +18,45 @@ export function LinkedInReactionBadge({
       title={meta.label}
       style={{ backgroundColor: meta.bg }}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full text-white select-none shadow-sm',
+        'inline-flex shrink-0 items-center justify-center rounded-full text-white select-none shadow-sm transition-transform',
         size,
         className,
       )}
     >
       {type === 'like' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current drop-shadow-xs">
-          <path d="M9.5 2.5c0-.8-.7-1.5-1.5-1.5-.6 0-1.1.3-1.4.9L4.8 6H2.5C1.7 6 1 6.7 1 7.5v5c0 .8.7 1.5 1.5 1.5h8.8c.7 0 1.3-.5 1.5-1.2l1.1-4.5c.2-.9-.5-1.8-1.5-1.8H9.5V2.5z" />
-        </svg>
-      )}
-      {type === 'celebrate' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
-          <path d="M8 1.2 9.2 4.6 12.8 5l-2.6 2.4.8 3.6L8 9.4 4.9 11l.8-3.6L3.2 5l3.6-.4L8 1.2z" />
-        </svg>
-      )}
-      {type === 'support' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
-          <path d="M3.2 7.2c0-1.4 1-2.5 2.3-2.5.6 0 1.1.2 1.5.6.4-.4.9-.6 1.5-.6 1.3 0 2.3 1.1 2.3 2.5 0 .4-.1.8-.3 1.1L8 12.2 3.5 8.3c-.2-.3-.3-.7-.3-1.1zm8.6-.2c.7.1 1.2.7 1.2 1.5v1.8c0 1.7-1.4 3.1-3.1 3.1H8.4c-.4 0-.8-.2-1-.5l-.8-1.1c-.2-.3-.1-.7.2-.9.3-.2.7-.1.9.2l.5.7h1.7c.9 0 1.6-.7 1.6-1.5V8.5c0-.2-.1-.3-.3-.3h-.4c-.4 0-.7-.3-.7-.7s.3-.7.7-.7h.4c.4 0 .7.1 1 .2z" />
-        </svg>
-      )}
-      {type === 'love' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current drop-shadow-xs">
-          <path d="M8 13.7 2.5 8.3C1 6.8 1 4.3 2.5 2.8c1.5-1.5 3.9-1.5 5.5 0 1.6-1.5 4-1.5 5.5 0 1.5 1.5 1.5 4 0 5.5L8 13.7z" />
+        /* Thumbs Up — Standard agreement */
+        <svg viewBox="0 0 20 20" className="size-[62%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M2 10.5a1.5 1.5 0 1 1 3 0v6a1.5 1.5 0 0 1-3 0v-6zM6 10.2c0-.5.3-1 .8-1.2l3.4-1.7V4a2 2 0 0 1 2-2c.6 0 1.1.4 1.2 1l.6 4h3.5a2 2 0 0 1 2 2.3l-1.3 6.5A2 2 0 0 1 16.2 17H7a1 1 0 0 1-1-1v-5.8z" />
         </svg>
       )}
       {type === 'insightful' && (
-        <svg viewBox="0 0 16 16" className="size-[62%] fill-current">
-          <path d="M8 1.5a4.5 4.5 0 0 0-2.6 8.2c.4.3.6.7.6 1.2v.6h4v-.6c0-.5.2-.9.6-1.2A4.5 4.5 0 0 0 8 1.5zM6.5 13h3v1.2h-3V13z" />
+        /* Lightbulb — Learned something new */
+        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M10 2a6 6 0 0 0-4 10.5V14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.5A6 6 0 0 0 10 2zm-2 14h4v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1z" />
+        </svg>
+      )}
+      {type === 'support' && (
+        /* Handshake — Backing the initiative, project, or policy stance */
+        <svg viewBox="0 0 24 24" className="size-[66%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M21.7 8.3a2.5 2.5 0 0 0-3.5 0l-2.7 2.7-2.1-2.1a2.5 2.5 0 0 0-3.5 0L7.4 11.4 4.9 8.9a1.5 1.5 0 0 0-2.1 2.1l3.5 3.5a1.5 1.5 0 0 0 2.1 0l3-3 2.1 2.1a2.5 2.5 0 0 0 3.5 0l4.7-4.7a2.5 2.5 0 0 0 0-3.5zM3.5 14.5l2.5 2.5a2.5 2.5 0 0 0 3.5 0l2.2-2.2-2.1-2.1-2.2 2.2a1.5 1.5 0 0 1-2.1 0l-1.8-1.8a1.5 1.5 0 0 0-2.1 2.1l2.1-0.7z" />
+        </svg>
+      )}
+      {type === 'celebrate' && (
+        /* Clapping Hands / Trophy — For milestones, breakthroughs, or success stories */
+        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M15 3h1.5A2.5 2.5 0 0 1 19 5.5V6a3.5 3.5 0 0 1-3.5 3.5H15a5 5 0 0 1-4 4.9V16h2a1 1 0 0 1 1 1v1H6v-1a1 1 0 0 1 1-1h2v-1.6A5 5 0 0 1 5 9.5H4.5A3.5 3.5 0 0 1 1 6v-.5A2.5 2.5 0 0 1 3.5 3H5V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1zm0 2V3H5v2h10zM3.5 5a.5.5 0 0 0-.5.5V6a1.5 1.5 0 0 0 1.5 1.5H5V5h-1.5zm13 0H15v2.5h.5A1.5 1.5 0 0 0 17 6v-.5a.5.5 0 0 0-.5-.5z" />
         </svg>
       )}
       {type === 'curious' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current">
-          <path d="M8 2a4 4 0 0 0-3.8 2.8l1.7.6A2.2 2.2 0 0 1 8 3.8c1.2 0 2.1.8 2.1 1.8 0 .8-.5 1.3-1.3 1.7-.9.5-1.6 1.1-1.6 2.4v.3h1.8v-.2c0-.7.4-1.1 1.2-1.5 1-.5 1.8-1.3 1.8-2.7C12 3.5 10.2 2 8 2zm-.9 9.8v2h2v-2h-2z" />
+        /* Magnifying Glass — Want to see more data / follow-ups on this */
+        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M9 3a6 6 0 1 0 3.7 10.7l4.3 4.3a1 1 0 0 0 1.4-1.4l-4.3-4.3A6 6 0 0 0 9 3zm-4 6a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" />
+          <circle cx="9" cy="9" r="1.5" />
+        </svg>
+      )}
+      {type === 'love' && (
+        <svg viewBox="0 0 16 16" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M8 13.7 2.5 8.3C1 6.8 1 4.3 2.5 2.8c1.5-1.5 3.9-1.5 5.5 0 1.6-1.5 4-1.5 5.5 0 1.5 1.5 1.5 4 0 5.5L8 13.7z" />
         </svg>
       )}
     </span>
@@ -284,8 +290,9 @@ export function LinkedInReactionPickerButton({
             aria-label={`${r.label} (${r.labelBn})`}
           >
             {isHot && (
-              <span className="pointer-events-none absolute -top-7 whitespace-nowrap rounded-full bg-[#061621] px-2 py-0.5 font-bangla text-[10px] font-semibold text-white shadow-md">
-                {r.labelBn}
+              <span className="pointer-events-none absolute -top-11 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[#061621] px-2.5 py-1 text-center font-bangla shadow-2xl ring-1 ring-white/15 z-40">
+                <span className="block text-[11px] font-bold text-white leading-tight">{r.labelBn}</span>
+                <span className="block text-[9.5px] font-medium text-slate-300 leading-tight">{r.desc}</span>
               </span>
             )}
             <LinkedInReactionBadge type={r.type} size="size-9" className="shadow-md ring-2 ring-white/90" />

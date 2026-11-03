@@ -94,6 +94,11 @@ export function TopicStoriesCarousel({
                   <div className="absolute inset-0 bg-gradient-to-br from-pine-900 via-pine-700 to-pine-500" />
                 )}
                 <span className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
+                {s.videoUrl && (s.videoUrl.includes('youtube.com') || s.videoUrl.includes('youtu.be')) && (
+                  <span className="absolute top-2 right-2 md:top-2 md:left-2 z-10 rounded bg-black/60 px-1.5 py-0.5 backdrop-blur-xs">
+                    <YouTubeMark size="sm" />
+                  </span>
+                )}
                 <span className="absolute left-2 top-2 hidden size-8 items-center justify-center rounded-lg border border-white/50 bg-black/30 text-white backdrop-blur-sm md:flex">
                   <Icon className="size-4" />
                 </span>
