@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import {
   ArrowBigUp, ShoppingBag, Lightbulb, Plus, Bell, Settings, ExternalLink, MapPin, Globe2,
   UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard,
   CheckCheck, Clock, ArrowRight, ArrowUpRight, MessageSquare, AlertTriangle, Filter, LogIn, LogOut,
+  ChevronDown, X,
 } from 'lucide-react';
 import type {
   Article, BkashOrder, CartItem, CommunityIdea, CommunityPost, LinkedInReactionType,
@@ -42,6 +43,238 @@ function ViewHeader({
   );
 }
 
+export function ExploreTopicDropdown({
+  articles,
+  pillar,
+  onPillar,
+}: {
+  articles: Article[];
+  pillar: string | null;
+  onPillar: (k: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const activePillarDef = useMemo(() => {
+    if (!pillar) return null;
+    return PILLAR_DEFS.find((d) => d.key === pillar) ?? null;
+  }, [pillar]);
+
+  const activeCount = useMemo(() => {
+    if (!pillar) return articles.length;
+    const def = PILLAR_DEFS.find((d) => d.key === pillar);
+    if (!def) return articles.length;
+    return articles.filter((a) => (def.cats as readonly string[]).includes(a.category)).length;
+  }, [articles, pillar]);
+
+  // Click outside listener and Escape key dismiss
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  const ActiveIcon = activePillarDef ? activePillarDef.icon : Sparkles;
+
+  return (
+    <div className="relative inline-block w-full sm:w-auto" ref={dropdownRef}>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          aria-expanded={open}
+          aria-haspopup="listbox"
+          className={cn(
+            'group relative flex w-full sm:w-auto items-center justify-between gap-3 rounded-2xl border px-3.5 sm:px-4 py-2 text-left shadow-xs transition-all duration-200 active:scale-[0.99]',
+            open
+              ? 'border-[#03EF62] bg-[#061621] text-white ring-2 ring-[#03EF62]/30'
+              : 'border-slate-200/90 dark:border-white/10 bg-white dark:bg-[#071f2d] text-slate-800 dark:text-slate-100 hover:border-[#03EF62]/60 hover:shadow-sm',
+          )}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span
+              className={cn(
+                'flex size-7 sm:size-6.5 shrink-0 items-center justify-center rounded-xl transition-colors',
+                open || pillar !== null
+                  ? 'bg-[#03EF62]/20 text-[#03EF62]'
+                  : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 group-hover:text-[#03EF62]',
+              )}
+            >
+              <ActiveIcon className="size-4 sm:size-3.5" />
+            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-400 leading-tight">
+                বিষয় নির্বাচন
+              </span>
+              <span className="font-bangla text-sm font-semibold truncate leading-tight">
+                {activePillarDef ? activePillarDef.bn : 'সকল বিষয়'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 ml-3">
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 font-bangla text-xs font-bold transition-colors',
+                open || pillar !== null
+                  ? 'bg-[#03EF62] text-[#061621]'
+                  : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300',
+              )}
+            >
+              {toBengaliNumerals(activeCount)}
+            </span>
+            <ChevronDown
+              className={cn(
+                'size-4 text-slate-400 transition-transform duration-200',
+                open && 'rotate-180 text-[#03EF62]',
+              )}
+            />
+          </div>
+        </button>
+
+        {pillar !== null && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPillar(null);
+            }}
+            title="ফিল্টার মুছে সকল বিষয় দেখুন"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#071f2d] px-3 py-2 font-bangla text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 transition active:scale-95 shadow-xs"
+          >
+            <X className="size-3.5" />
+            <span>মুছে ফেলুন</span>
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 sm:right-auto top-full z-50 mt-2 w-full sm:w-[320px] origin-top-left rounded-2xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#071f2d]/95 p-2 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
+        >
+          <div className="px-3 py-2 border-b border-slate-100 dark:border-white/10 mb-1 flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 font-bangla">
+              ক্যাটাগরি বা বিষয় নির্বাচন করুন
+            </span>
+            <span className="text-[11px] font-bangla font-bold text-slate-400">
+              মোট {toBengaliNumerals(articles.length)} টি
+            </span>
+          </div>
+
+          <div className="max-h-[340px] overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+            {/* All Topics Option */}
+            <button
+              type="button"
+              role="option"
+              aria-selected={pillar === null}
+              onClick={() => {
+                onPillar(null);
+                setOpen(false);
+              }}
+              className={cn(
+                'group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-medium transition-all active:scale-[0.98]',
+                pillar === null
+                  ? 'bg-[#061621] text-white shadow-xs'
+                  : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200',
+              )}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span
+                  className={cn(
+                    'flex size-7 shrink-0 items-center justify-center rounded-lg',
+                    pillar === null ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500',
+                  )}
+                >
+                  <Sparkles className="size-3.5" />
+                </span>
+                <div className="min-w-0">
+                  <div className="font-bangla font-semibold text-sm leading-tight">সকল বিষয়</div>
+                  <div className="text-[10px] text-slate-400 truncate">সমস্ত গবেষণা ও নিবন্ধ</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 font-bangla text-[11px] font-bold',
+                    pillar === null ? 'bg-[#03EF62] text-[#061621]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400',
+                  )}
+                >
+                  {toBengaliNumerals(articles.length)}
+                </span>
+                {pillar === null && <Check className="size-4 text-[#03EF62]" />}
+              </div>
+            </button>
+
+            {/* Individual Pillars */}
+            {PILLAR_DEFS.map((p) => {
+              const Icon = p.icon;
+              const active = pillar === p.key;
+              const count = articles.filter((a) => (p.cats as readonly string[]).includes(a.category)).length;
+              return (
+                <button
+                  key={p.key}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => {
+                    onPillar(p.key);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    'group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-medium transition-all active:scale-[0.98]',
+                    active
+                      ? 'bg-[#061621] text-white shadow-xs'
+                      : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200',
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span
+                      className={cn(
+                        'flex size-7 shrink-0 items-center justify-center rounded-lg',
+                        active ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 group-hover:text-slate-800 dark:group-hover:text-white',
+                      )}
+                    >
+                      <Icon className="size-3.5" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="font-bangla font-semibold text-sm leading-tight">{p.bn}</div>
+                      <div className="text-[10px] text-slate-400 truncate">{p.label}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span
+                      className={cn(
+                        'rounded-full px-2 py-0.5 font-bangla text-[11px] font-bold',
+                        active ? 'bg-[#03EF62] text-[#061621]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400',
+                      )}
+                    >
+                      {toBengaliNumerals(count)}
+                    </span>
+                    {active && <Check className="size-4 text-[#03EF62]" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ExploreView({
   articles,
   pillar,
@@ -72,65 +305,21 @@ export function ExploreView({
         sub="ছয়টি প্রধান বিষয়ে সাজানো চিন্তাশীল প্রবন্ধ, বিশ্লেষণ ও নিবন্ধের সংগ্রহশালা।"
       />
 
-      {/* Ultra-Modern Compact Category Options */}
-      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-2 sm:mx-0 sm:flex-wrap sm:overflow-visible">
-        <button
-          type="button"
-          onClick={() => onPillar(null)}
-          aria-pressed={pillar === null}
-          className={cn(
-            'inline-flex items-center gap-1.5 sm:gap-2 rounded-full sm:rounded-xl px-3 sm:px-3.5 py-1.5 sm:py-2 text-[12px] sm:text-xs font-semibold shrink-0 transition-all duration-200 active:scale-95 border shadow-xs',
-            pillar === null
-              ? 'bg-[#061621] text-white border-[#03EF62] ring-1 ring-[#03EF62]/50 shadow-sm'
-              : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#03EF62]/60 hover:text-black dark:hover:text-white',
-          )}
-        >
-          <Sparkles className={cn('size-3 sm:size-3.5 shrink-0', pillar === null ? 'text-[#03EF62]' : 'text-slate-500')} />
-          <span className="font-bangla font-semibold whitespace-nowrap">সকল বিষয়</span>
-          <span
-            className={cn(
-              'font-mono text-[9.5px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold',
-              pillar === null
-                ? 'bg-[#03EF62] text-[#061621]'
-                : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300',
-            )}
-          >
-            {toBengaliNumerals(articles.length)}
+      {/* Topic Dropdown - Accessible, Modern SaaS Component */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
+        <div className="flex items-center gap-2">
+          <ExploreTopicDropdown
+            articles={articles}
+            pillar={pillar}
+            onPillar={onPillar}
+          />
+        </div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 font-bangla flex items-center gap-1.5 self-end sm:self-center">
+          <span>প্রদর্শন করা হচ্ছে:</span>
+          <span className="font-bangla font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/10">
+            {pillar ? (PILLAR_DEFS.find((p) => p.key === pillar)?.bn ?? 'নির্দিষ্ট বিষয়') : 'সকল বিষয়'}
           </span>
-        </button>
-
-        {PILLAR_DEFS.map((p) => {
-          const Icon = p.icon;
-          const active = pillar === p.key;
-          const count = articles.filter((a) => (p.cats as readonly string[]).includes(a.category)).length;
-          return (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => onPillar(active ? null : p.key)}
-              aria-pressed={active}
-              className={cn(
-                'inline-flex items-center gap-1.5 sm:gap-2 rounded-full sm:rounded-xl px-3 sm:px-3.5 py-1.5 sm:py-2 text-[12px] sm:text-xs font-semibold shrink-0 transition-all duration-200 active:scale-95 border shadow-xs',
-                active
-                  ? 'bg-[#061621] text-white border-[#03EF62] ring-1 ring-[#03EF62]/50 shadow-sm'
-                  : 'bg-white dark:bg-[#071f2d] text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-white/10 hover:border-[#03EF62]/60 hover:text-black dark:hover:text-white',
-              )}
-            >
-              <Icon className={cn('size-3 sm:size-3.5 shrink-0', active ? 'text-[#03EF62]' : 'text-slate-500')} />
-              <span className="font-bangla font-semibold whitespace-nowrap">{p.bn}</span>
-              <span
-                className={cn(
-                  'font-mono text-[9.5px] sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold',
-                  active
-                    ? 'bg-[#03EF62] text-[#061621]'
-                    : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300',
-                )}
-              >
-                {toBengaliNumerals(count)}
-              </span>
-            </button>
-          );
-        })}
+        </div>
       </div>
 
       <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>

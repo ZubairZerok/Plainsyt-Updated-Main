@@ -272,10 +272,15 @@ export async function signupWithEmail(email: string, pass: string, name: string)
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:5173/';
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'select_account',
+        },
       },
     });
 
@@ -287,6 +292,10 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
         };
       }
       return { ok: false, error: error.message };
+    }
+
+    if (data?.url && typeof window !== 'undefined') {
+      window.location.assign(data.url);
     }
 
     return { ok: true };

@@ -100,6 +100,106 @@ export function RootShell() {
     }
   }, []);
 
+    const syncUserSession = useCallback(
+    async (u: { id: string; email?: string | null; user_metadata?: Record<string, any> }) => {
+      if (!u || !u.id) return;
+      const userEmail = u.email || '';
+      const alias = resolveEmailAlias(userEmail);
+      let profile: UserProfile;
+
+      let dbProfile: any = null;
+      try {
+        const { data } = await supabase.from('profiles').select('*').eq('id', u.id).maybeSingle();
+        dbProfile = data;
+      } catch {
+        // Non-blocking fetch
+      }
+
+      if (alias.isAdmin) {
+        const existingAdmin = snap.profiles.find((pr) => pr.id === 'usr-plainsyt-admin') || getStoredAuthUser();
+        profile = {
+          ...ADMIN_PROFILE,
+          ...existingAdmin,
+          ...(dbProfile
+            ? {
+                name: dbProfile.name || ADMIN_PROFILE.name,
+                nameBn: dbProfile.name_bn || ADMIN_PROFILE.nameBn,
+                avatar: dbProfile.avatar || ADMIN_PROFILE.avatar,
+                bio: dbProfile.bio || ADMIN_PROFILE.bio,
+              }
+            : {}),
+          avatar: existingAdmin?.avatar || ADMIN_PROFILE.avatar,
+          email: userEmail || ADMIN_PROFILE.email,
+        };
+      } else if (alias.canonicalUserId === 'usr-zubair') {
+        const existingZubair = snap.profiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
+        profile = {
+          ...ZUBAIR_PROFILE,
+          ...existingZubair,
+          ...(dbProfile
+            ? {
+                name: dbProfile.name || 'Hasan Zubair',
+                nameBn: dbProfile.name_bn || 'হাসান জুবায়ের',
+                avatar: dbProfile.avatar || '/images/hasan_zubair.png',
+                bio: dbProfile.bio || ZUBAIR_PROFILE.bio,
+              }
+            : {}),
+          name: existingZubair?.name || 'Hasan Zubair',
+          nameBn: existingZubair?.nameBn || 'হাসান জুবায়ের',
+          avatar: existingZubair?.avatar || '/images/hasan_zubair.png',
+          email: userEmail || ZUBAIR_PROFILE.email,
+        };
+      } else {
+        const existing =
+          snap.profiles.find((pr) => pr.id === u.id || (userEmail && pr.email === userEmail)) || getStoredAuthUser();
+        const metaName = u.user_metadata?.full_name || u.user_metadata?.name || u.user_metadata?.user_name;
+        const avatarFromMeta = u.user_metadata?.avatar_url || u.user_metadata?.picture;
+        const fallbackName = userEmail ? userEmail.split('@')[0] : 'PLAiNSYT Member';
+        const cleanHandle = (userEmail ? userEmail.split('@')[0] : 'user')
+          .toLowerCase()
+          .replace(/[^a-z0-9_]/g, '_');
+
+        profile = {
+          id: u.id,
+          name: dbProfile?.name || existing?.name || metaName || fallbackName,
+          nameBn: dbProfile?.name_bn || existing?.nameBn || metaName || fallbackName,
+          handle: dbProfile?.handle || existing?.handle || cleanHandle,
+          role: dbProfile?.role || existing?.role || 'সদস্য',
+          organization: dbProfile?.organization || existing?.organization || 'PLAiNSYT Platform',
+          location: dbProfile?.location || existing?.location || 'বাংলাদেশ',
+          bio: dbProfile?.bio || existing?.bio || 'PLAiNSYT কমিউনিটি সদস্য।',
+          avatar:
+            dbProfile?.avatar ||
+            avatarFromMeta ||
+            existing?.avatar ||
+            `https://api.dicebear.com/7.x/bottts/svg?seed=${u.id}`,
+          coverGradient:
+            dbProfile?.cover_gradient ||
+            existing?.coverGradient ||
+            'linear-gradient(135deg, #061621 0%, #03EF62 100%)',
+          isVerified: Boolean(dbProfile?.is_verified ?? existing?.isVerified),
+          focusArea: dbProfile?.focus_area || existing?.focusArea || 'কৃষি ও প্রযুক্তি',
+          email: userEmail,
+          publicationsCount: dbProfile?.publications_count || existing?.publicationsCount || 0,
+          followersCount: dbProfile?.followers_count || existing?.followersCount || 0,
+          followingCount: dbProfile?.following_count || existing?.followingCount || 0,
+          createdAt: dbProfile?.created_at || existing?.createdAt || new Date().toISOString(),
+        };
+      }
+
+      setStoredAuth(profile, userEmail || null);
+      commit((prev) => {
+        const exists = prev.profiles.some((p) => p.id === profile.id);
+        const profiles = exists
+          ? prev.profiles.map((p) => (p.id === profile.id ? { ...p, ...profile } : p))
+          : [profile, ...prev.profiles];
+        return { ...prev, profiles, currentUserId: profile.id };
+      });
+      dbUpsertProfile(profile);
+    },
+    [commit, snap.profiles],
+  );
+
   useEffect(() => {
     refreshFromSupabase();
     const channel = supabase
@@ -109,60 +209,53 @@ export function RootShell() {
       })
       .subscribe();
 
-    const { data: authSub } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const u = session.user;
-        const alias = resolveEmailAlias(u.email || '');
-        let profile: UserProfile;
+    // 1. Audit URL for Google OAuth errors or code
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashClean = window.location.hash.replace(/^#/, '');
+      const hashParams = new URLSearchParams(hashClean);
 
-        if (alias.isAdmin) {
-          const existingAdmin = snap.profiles.find((pr) => pr.id === 'usr-plainsyt-admin') || getStoredAuthUser();
-          profile = {
-            ...ADMIN_PROFILE,
-            ...existingAdmin,
-            avatar: existingAdmin?.avatar || ADMIN_PROFILE.avatar,
-            email: u.email || ADMIN_PROFILE.email,
-          };
-        } else if (alias.canonicalUserId === 'usr-zubair') {
-          const existingZubair = snap.profiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
-          profile = {
-            ...ZUBAIR_PROFILE,
-            ...existingZubair,
-            name: existingZubair?.name || 'Hasan Zubair',
-            nameBn: existingZubair?.nameBn || 'হাসান জুবায়ের',
-            avatar: existingZubair?.avatar || '/images/hasan_zubair.png',
-            email: u.email || ZUBAIR_PROFILE.email,
-          };
-        } else {
-          profile = {
-            id: u.id,
-            name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'PLAiNSYT Member',
-            nameBn: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'সদস্য',
-            handle: (u.email?.split('@')[0] || 'user').toLowerCase().replace(/[^a-z0-9_]/g, '_'),
-            role: 'সদস্য',
-            organization: 'PLAiNSYT Platform',
-            location: 'বাংলাদেশ',
-            bio: 'PLAiNSYT কমিউনিটি সদস্য।',
-            avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || `https://api.dicebear.com/7.x/bottts/svg?seed=${u.id}`,
-            coverGradient: 'linear-gradient(135deg, #061621 0%, #03EF62 100%)',
-            isVerified: false,
-            focusArea: 'কৃষি ও প্রযুক্তি',
-            email: u.email || '',
-            publicationsCount: 0,
-            followersCount: 0,
-            followingCount: 0,
-          };
+      const oauthError =
+        searchParams.get('error_description') ||
+        searchParams.get('error') ||
+        hashParams.get('error_description') ||
+        hashParams.get('error');
+
+      if (oauthError) {
+        toast.error('গুগল সাইন-ইন সম্পন্ন হয়নি: ' + decodeURIComponent(oauthError));
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    // 2. Fetch existing session immediately on mount
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (session?.user && !error) {
+        syncUserSession(session.user);
+        if (
+          window.location.hash.includes('access_token') ||
+          window.location.search.includes('code=')
+        ) {
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
+      }
+    });
 
-        setStoredAuth(profile, u.email || null);
-        commit((prev) => {
-          const exists = prev.profiles.some((p) => p.id === profile.id);
-          const profiles = exists
-            ? prev.profiles.map((p) => (p.id === profile.id ? { ...p, ...profile } : p))
-            : [profile, ...prev.profiles];
-          return { ...prev, profiles, currentUserId: profile.id };
-        });
-        dbUpsertProfile(profile);
+    // 3. Listen to auth state transitions
+    const { data: authSub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setStoredAuth(null, null);
+        commit((prev) => ({ ...prev, currentUserId: '' }));
+      } else if (session?.user) {
+        await syncUserSession(session.user);
+        if (event === 'SIGNED_IN') {
+          toast.success('সফলভাবে প্রবেশ করা হয়েছে!');
+        }
+        if (
+          window.location.hash.includes('access_token') ||
+          window.location.search.includes('code=')
+        ) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       }
     });
 
@@ -170,7 +263,7 @@ export function RootShell() {
       supabase.removeChannel(channel);
       authSub?.subscription.unsubscribe();
     };
-  }, [refreshFromSupabase, commit]);
+  }, [refreshFromSupabase, commit, syncUserSession]);
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authPromptReason, setAuthPromptReason] = useState<string | undefined>();
@@ -180,8 +273,204 @@ export function RootShell() {
     const stored = getStoredAuthUser();
     const activeId = snap.currentUserId || stored?.id;
     if (!activeId) return null;
-    return snap.profiles.find((p) => p.id === activeId) ?? null;
+    const found = snap.profiles.find((p) => p.id === activeId);
+    if (found) return found;
+    if (stored && stored.id === activeId) return stored;
+    return null;
   }, [snap.profiles, snap.currentUserId]);
+
+  // --- Mobile Back Button & Modal History Manager ---
+  const modalHistoryDepthRef = useRef<number>(0);
+  const isClosingViaUiRef = useRef<boolean>(false);
+  const lastBackPressRef = useRef<number>(0);
+
+  // Active modals in reverse stack order
+  const activeModals = useMemo(() => {
+    const list: string[] = [];
+    if (readerId) list.push('reader');
+    if (player) list.push('player');
+    if (writeOpen) list.push('write');
+    if (reelUploadOpen) list.push('reelUpload');
+    if (aiOpen) list.push('ai');
+    if (savedOpen) list.push('saved');
+    if (profileSettingsOpen) list.push('profileSettings');
+    if (createProductOpen) list.push('createProduct');
+    if (checkoutOpen) list.push('checkout');
+    if (registrationEvent) list.push('registration');
+    if (rxBreakdown) list.push('rxBreakdown');
+    if (authModalOpen) list.push('auth');
+    if (lightbox) list.push('lightbox');
+    return list;
+  }, [
+    readerId,
+    player,
+    writeOpen,
+    reelUploadOpen,
+    aiOpen,
+    savedOpen,
+    profileSettingsOpen,
+    createProductOpen,
+    checkoutOpen,
+    registrationEvent,
+    rxBreakdown,
+    authModalOpen,
+    lightbox,
+  ]);
+
+  const prevModalCountRef = useRef<number>(0);
+
+  // When a modal opens, push history entry so hardware back can close it
+  useEffect(() => {
+    const currentCount = activeModals.length;
+    const prevCount = prevModalCountRef.current;
+
+    if (currentCount > prevCount) {
+      const diff = currentCount - prevCount;
+      for (let i = 0; i < diff; i++) {
+        modalHistoryDepthRef.current += 1;
+        window.history.pushState(
+          { plainsytModal: true, depth: modalHistoryDepthRef.current },
+          '',
+          window.location.href,
+        );
+      }
+    }
+    prevModalCountRef.current = currentCount;
+  }, [activeModals.length]);
+
+  // Unified function to close the foreground modal
+  const closeTopModal = useCallback(() => {
+    if (lightbox) {
+      setLightbox(null);
+      return true;
+    }
+    if (authModalOpen) {
+      setAuthModalOpen(false);
+      setPendingAction(null);
+      return true;
+    }
+    if (rxBreakdown) {
+      setRxBreakdown(null);
+      return true;
+    }
+    if (registrationEvent) {
+      setRegistrationEvent(null);
+      return true;
+    }
+    if (checkoutOpen) {
+      setCheckoutOpen(false);
+      return true;
+    }
+    if (createProductOpen) {
+      setCreateProductOpen(false);
+      return true;
+    }
+    if (profileSettingsOpen) {
+      setProfileSettingsOpen(false);
+      return true;
+    }
+    if (savedOpen) {
+      setSavedOpen(false);
+      return true;
+    }
+    if (aiOpen) {
+      setAiOpen(false);
+      return true;
+    }
+    if (reelUploadOpen) {
+      setReelUploadOpen(false);
+      return true;
+    }
+    if (writeOpen) {
+      setWriteOpen(false);
+      return true;
+    }
+    if (player) {
+      setPlayer(null);
+      return true;
+    }
+    if (readerId) {
+      setReaderId(null);
+      return true;
+    }
+    return false;
+  }, [
+    lightbox,
+    authModalOpen,
+    rxBreakdown,
+    registrationEvent,
+    checkoutOpen,
+    createProductOpen,
+    profileSettingsOpen,
+    savedOpen,
+    aiOpen,
+    reelUploadOpen,
+    writeOpen,
+    player,
+    readerId,
+  ]);
+
+  // When user clicks UI "X" or backdrop to close modal:
+  const handleUiCloseModal = useCallback((closeAction: () => void) => {
+    closeAction();
+    if (modalHistoryDepthRef.current > 0) {
+      modalHistoryDepthRef.current -= 1;
+      isClosingViaUiRef.current = true;
+      window.history.back();
+    }
+  }, []);
+
+  // Global popstate navigation & back button guard
+  useEffect(() => {
+    // Initial root state guard for mobile apps
+    if (typeof window !== 'undefined') {
+      if (!window.history.state?.plainsytRoot) {
+        window.history.replaceState({ plainsytRoot: true }, '');
+        window.history.pushState({ plainsytActive: true }, '');
+      }
+    }
+
+    const handlePopState = () => {
+      // If close was triggered by UI button, history is already popped
+      if (isClosingViaUiRef.current) {
+        isClosingViaUiRef.current = false;
+        return;
+      }
+
+      // If a modal is open, intercept back button to close modal and STAY on site!
+      if (activeModals.length > 0) {
+        if (modalHistoryDepthRef.current > 0) {
+          modalHistoryDepthRef.current -= 1;
+        }
+        closeTopModal();
+        return;
+      }
+
+      // If on subroute and no modals open: navigate back towards home '/'
+      if (location.pathname !== '/') {
+        if (window.history.length <= 2) {
+          navigate('/');
+        }
+        return;
+      }
+
+      // If at root '/' with no modals open: double-back to exit guard
+      const now = Date.now();
+      if (now - lastBackPressRef.current < 2200) {
+        // User confirmed exit
+        window.history.back();
+      } else {
+        lastBackPressRef.current = now;
+        toast('অ্যাপ্লিকেশন বন্ধ করতে আবার ব্যাক বাটনে চাপুন', {
+          duration: 2000,
+        });
+        window.history.pushState({ plainsytActive: true }, '');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeModals.length, closeTopModal, location.pathname, navigate]);
 
   const requestAuth = useCallback((reason: string, onAuthed?: () => void) => {
     setAuthPromptReason(reason);
@@ -1489,23 +1778,23 @@ export function RootShell() {
       {/* Modals & Popups */}
       <CreatePostModal
         open={writeOpen}
-        onClose={() => setWriteOpen(false)}
+        onClose={() => handleUiCloseModal(() => setWriteOpen(false))}
         currentUser={currentUser}
         onPublish={handlePublishArticle}
       />
 
       <FacebookCreatePostModal
         open={reelUploadOpen}
-        onClose={() => setReelUploadOpen(false)}
+        onClose={() => handleUiCloseModal(() => setReelUploadOpen(false))}
         currentUser={currentUser}
         onSubmitReel={handlePublishReel}
       />
 
-      <AskAIModal open={aiOpen} onClose={() => setAiOpen(false)} currentUser={currentUser} />
+      <AskAIModal open={aiOpen} onClose={() => handleUiCloseModal(() => setAiOpen(false))} currentUser={currentUser} />
 
       <SavedArticlesModal
         open={savedOpen}
-        onClose={() => setSavedOpen(false)}
+        onClose={() => handleUiCloseModal(() => setSavedOpen(false))}
         articles={savedArticles}
         posts={savedPosts}
         onOpenArticle={handleOpenArticlePopup}
@@ -1517,7 +1806,7 @@ export function RootShell() {
         article={readerArticle}
         bookmarked={!!readerArticle && (snap.bookmarkedArticleIds ?? []).includes(readerArticle.id)}
         currentUser={currentUser}
-        onClose={() => setReaderId(null)}
+        onClose={() => handleUiCloseModal(() => setReaderId(null))}
         onReact={(type) => readerArticle && handleReact('article', readerArticle.id, type)}
         onOpenReactionsBreakdown={() =>
           readerArticle && setRxBreakdown({ targetType: 'article', targetId: readerArticle.id })
@@ -1537,7 +1826,7 @@ export function RootShell() {
         start={player?.start ?? 0}
         currentUser={currentUser}
         comments={snap.comments}
-        onClose={() => setPlayer(null)}
+        onClose={() => handleUiCloseModal(() => setPlayer(null))}
         onShare={handleShare}
         onOpenAuth={() => requestAuth('মন্তব্য বা প্রতিক্রিয়া জানাতে অনুগ্রহ করে লগইন করুন')}
         onComment={handleCommentStoryOrReel}
@@ -1547,13 +1836,13 @@ export function RootShell() {
 
       <PhotoLightboxModal
         payload={lightbox}
-        onClose={() => setLightbox(null)}
+        onClose={() => handleUiCloseModal(() => setLightbox(null))}
         onNavigateProfile={navigateToProfile}
       />
 
       <ReactionBreakdownModal
         open={!!rxBreakdown}
-        onClose={() => setRxBreakdown(null)}
+        onClose={() => handleUiCloseModal(() => setRxBreakdown(null))}
         records={breakdownRecords}
         counts={breakdownCounts}
         onNavigateProfile={navigateToProfile}
@@ -1561,7 +1850,7 @@ export function RootShell() {
 
       <ProfileSettingsModal
         open={profileSettingsOpen}
-        onClose={() => setProfileSettingsOpen(false)}
+        onClose={() => handleUiCloseModal(() => setProfileSettingsOpen(false))}
         currentUser={currentUser}
         allProfiles={snap.profiles}
         onSaveProfile={handleSaveProfile}
@@ -1573,7 +1862,7 @@ export function RootShell() {
 
       <CreateProductModal
         open={createProductOpen}
-        onClose={() => setCreateProductOpen(false)}
+        onClose={() => handleUiCloseModal(() => setCreateProductOpen(false))}
         currentUser={currentUser}
         onCreateProduct={(product) => {
           commit((prev) => ({
@@ -1587,7 +1876,7 @@ export function RootShell() {
 
       <BkashCheckoutModal
         open={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
+        onClose={() => handleUiCloseModal(() => setCheckoutOpen(false))}
         cart={snap.cart}
         products={snap.storeProducts}
         currentUser={currentUser}
@@ -1601,7 +1890,7 @@ export function RootShell() {
         open={!!registrationEvent}
         event={registrationEvent}
         currentUser={currentUser}
-        onClose={() => setRegistrationEvent(null)}
+        onClose={() => handleUiCloseModal(() => setRegistrationEvent(null))}
         onConfirmRegistration={(eventId) => {
           commit((prev) => ({
             ...prev,
@@ -1618,10 +1907,12 @@ export function RootShell() {
         open={authModalOpen}
         promptReason={authPromptReason}
         reason={authPromptReason}
-        onClose={() => {
-          setAuthModalOpen(false);
-          setPendingAction(null);
-        }}
+        onClose={() =>
+          handleUiCloseModal(() => {
+            setAuthModalOpen(false);
+            setPendingAction(null);
+          })
+        }
         onSuccess={handleAuthSuccess}
       />
 
