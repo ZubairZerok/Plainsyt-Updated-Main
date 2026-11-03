@@ -31,7 +31,7 @@ export interface DatabaseSnapshot {
   notifications: NotificationItem[];
 }
 
-const STORAGE_KEY = 'plainsyt_clean_mirror_v7';
+const STORAGE_KEY = 'plainsyt_clean_mirror_v8';
 
 export const ADMIN_PROFILE: UserProfile = {
   id: 'usr-plainsyt-admin',

@@ -14,10 +14,24 @@
     <meta property="og:description" content="বাংলাদেশের আধুনিক কৃষি, শস্যবিজ্ঞান, ড্রোন সেন্সিং ও এগ্রি-টেক উদ্ভাবনের প্ল্যাটফর্ম।" />
     <meta property="og:image" content="/logos/English.png" />
     <script>
-      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('/sw.js').catch(function() {});
-        });
+      // AGGRESSIVE CACHE KILLER: Completely unregister any service worker & wipe CacheStorage on localhost
+      if ('serviceWorker' in navigator) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var reg of registrations) {
+              reg.unregister();
+              console.log('[Plainsyt] Stale Service Worker unregistered.');
+            }
+          });
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              for (var name of names) {
+                caches.delete(name);
+                console.log('[Plainsyt] Stale cache purged:', name);
+              }
+            });
+          }
+        }
       }
     </script>
     <style>
