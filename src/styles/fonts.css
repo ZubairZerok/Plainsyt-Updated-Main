@@ -1,1 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/*
+ * Rule: Always use Bold 700 version of Hind Siliguri for any numbers (0-9 and ০-৯)
+ * While text remains normal (300-600), any number is rendered in Hind Siliguri 700 Bold.
+ */
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 100 600;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF; /* Bengali numerals ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯ */
+}
+
+@font-face {
+  font-family: 'Hind Siliguri';
+  font-style: normal;
+  font-weight: 100 600;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039; /* Latin numerals 0 1 2 3 4 5 6 7 8 9 */
+}
