@@ -146,9 +146,7 @@ export function ArticleReaderContent({
             <ol className="mt-3 space-y-2">
               {a.takeaways.map((t, i) => (
                 <li key={t + i} className="flex gap-2.5 font-bangla text-[14.5px] text-slate-800 dark:text-slate-100">
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-bold">
-                    {i + 1}
-                  </span>
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 font-bangla text-[12px] font-bold">{i + 1}</span>
                   {t}
                 </li>
               ))}
@@ -226,7 +224,7 @@ export function ArticleReaderContent({
 
         <section className="mt-8 border-t border-slate-100 dark:border-white/10 pt-5">
           <h2 className="font-display text-[22px] font-semibold text-slate-900 dark:text-white">
-            আলোচনা <span className="font-mono text-[13px] text-emerald-600">({toBengaliNumerals(a.stats.commentsCount)})</span>
+            আলোচনা <span className="font-bangla font-bold text-[14px] text-emerald-600">({toBengaliNumerals(a.stats.commentsCount)})</span>
           </h2>
           <form
             onSubmit={(e) => {

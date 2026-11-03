@@ -35,7 +35,7 @@ export function SavedList({ articles, posts, onOpenArticle, onRemoveArticle, onR
                   <ImageGraphic type={a.imageType} className="size-16 shrink-0 rounded-xl [&_span]:hidden" />
                   <span className="min-w-0">
                     <span className="line-clamp-2 font-bangla text-[14px] font-semibold leading-snug text-slate-900 dark:text-white">{a.title}</span>
-                    <span className="font-mono text-[10.5px] text-emerald-600 dark:text-emerald-400">{a.categoryEn} · {a.readTimeMinutes} min</span>
+                    <span className="font-bangla font-bold text-[11px] text-emerald-600 dark:text-emerald-400">{a.categoryEn} · {a.readTimeMinutes} min</span>
                   </span>
                 </button>
                 <button onClick={() => onRemoveArticle(a.id)} aria-label="Remove" className="flex size-9 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 transition"><BookmarkX className="size-[18px]" /></button>
@@ -72,7 +72,7 @@ export function SavedArticlesModal(p: Props) {
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 px-6 py-4">
           <div>
             <h2 id="saved-title" className="font-display text-[22px] font-semibold text-slate-900 dark:text-white">সংরক্ষিত তালিকা</h2>
-            <p className="font-mono text-[10.5px] tracking-wider text-emerald-600 dark:text-emerald-400">Reading list · {toBengaliNumerals(p.articles.length + p.posts.length)} items</p>
+            <p className="font-bangla font-bold text-[11px] tracking-wide text-emerald-600 dark:text-emerald-400">Reading list · {toBengaliNumerals(p.articles.length + p.posts.length)} items</p>
           </div>
           <CloseButton onClick={p.onClose} />
         </div>

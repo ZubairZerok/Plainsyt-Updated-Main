@@ -1,23 +1,125 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/*
- * Rule: Always use Bold 700 version of Hind Siliguri for any numbers (0-9 and ০-৯)
- * While text remains normal (300-600), any number is rendered in Hind Siliguri 700 Bold.
- */
+/* ==========================================================================
+   HIND SILIGURI BOLD 700 FOR ALL NUMBERS (ENGLISH 0-9 & BENGALI ০-৯)
+   Rule: Normal reading text uses standard font weight (300-500).
+   Any number anywhere in the app is ALWAYS rendered in Hind Siliguri Bold 700.
+   ========================================================================== */
+
+/* 1. Bengali Digits: ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯ (Unicode: U+09E6-09EF) */
 @font-face {
-  font-family: 'Hind Siliguri';
+  font-family: 'Hind Siliguri Bold Numbers';
   font-style: normal;
-  font-weight: 100 600;
+  font-weight: 100 900;
   font-display: swap;
-  src: url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
-  unicode-range: U+09E6-09EF; /* Bengali numerals ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯ */
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+
+/* 2. Latin Digits: 0 1 2 3 4 5 6 7 8 9 (Unicode: U+0030-0039) */
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
+/* Discrete weight declarations so strict browser matchers always resolve to 700 Bold */
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
 }
 
 @font-face {
-  font-family: 'Hind Siliguri';
+  font-family: 'Hind Siliguri Bold Numbers';
   font-style: normal;
-  font-weight: 100 600;
+  font-weight: 400;
   font-display: swap;
-  src: url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
-  unicode-range: U+0030-0039; /* Latin numerals 0 1 2 3 4 5 6 7 8 9 */
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0vQVKxGv.woff2') format('woff2');
+  unicode-range: U+09E6-09EF;
+}
+@font-face {
+  font-family: 'Hind Siliguri Bold Numbers';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Hind Siliguri Bold'), local('HindSiliguri-Bold'),
+       url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
+  unicode-range: U+0030-0039;
 }

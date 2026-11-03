@@ -358,7 +358,7 @@ export function LinkedInReactionPickerButton({
           />
         )}
         <span>{activeMeta ? activeMeta.labelBn : 'লাইক'}</span>
-        {countLabel && <span className="font-mono text-[11px] opacity-75">({countLabel})</span>}
+        {countLabel && <span className="font-bangla font-bold text-[12px] opacity-90">({countLabel})</span>}
       </button>
     </div>
   );

@@ -361,30 +361,28 @@ export function IntegratedReelCard({
                 floating
                 className={actionIcon}
               />
-              <span className="font-mono text-[10px] font-medium drop-shadow">
-                {formatBengaliNumberCompact(rxTotal)}
-              </span>
+              <span className="font-bangla font-bold text-[11px] drop-shadow">{formatBengaliNumberCompact(rxTotal)}</span>
             </div>
 
             <button type="button" onClick={onPlay} className={actionBtn} aria-label="Comment">
               <span className={actionIcon}>
                 <MessageCircle className="size-[18px]" />
               </span>
-              <span className="font-mono text-[10px] font-medium drop-shadow">Comment</span>
+              <span className="font-bangla text-[10.5px] font-medium drop-shadow">Comment</span>
             </button>
 
             <button type="button" onClick={onShare} className={actionBtn} aria-label="Share">
               <span className={actionIcon}>
                 <Share2 className="size-[18px]" />
               </span>
-              <span className="font-mono text-[10px] font-medium drop-shadow">Share</span>
+              <span className="font-bangla text-[10.5px] font-medium drop-shadow">Share</span>
             </button>
 
             <button type="button" onClick={onSave} className={actionBtn} aria-label="Save">
               <span className={actionIcon}>
                 <Bookmark className={cn('size-[18px]', saved && 'fill-current text-[#03EF62]')} />
               </span>
-              <span className="font-mono text-[10px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
+              <span className="font-bangla text-[10.5px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
             </button>
 
             <button

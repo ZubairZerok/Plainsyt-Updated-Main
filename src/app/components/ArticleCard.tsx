@@ -80,13 +80,10 @@ export function ArticleCard({
           </span>
           <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
             <Clock className="size-3 text-[#03EF62]" />
-            {toBengaliNumerals(a.readTimeMinutes)} মিনিট পড়া
+            <span className="font-bangla font-bold">{toBengaliNumerals(a.readTimeMinutes)}</span> মিনিট পড়া
           </span>
           {/* Post Date & Time replacing Views count */}
-          <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
-            <Calendar className="size-3 text-[#03EF62]" />
-            {a.publishedAt}
-          </span>
+          <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300"><Calendar className="size-3 text-[#03EF62]" /><span className="font-bangla font-bold">{a.publishedAt}</span></span>
           <a
             href={`/article/${a.id}`}
             target="_blank"
@@ -156,7 +153,7 @@ export function ArticleCard({
             <button
               type="button"
               onClick={() => setShowComments((s) => !s)}
-              className="font-mono text-[11px] hover:underline"
+              className="font-bangla font-bold text-[12px] hover:underline"
             >
               {toBengaliNumerals(a.stats.commentsCount)} comments
             </button>
@@ -179,7 +176,7 @@ export function ArticleCard({
         >
           <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
           <span className="truncate">
-            <span className="hidden xs:inline">Comment</span> ({toBengaliNumerals(a.stats.commentsCount)})
+            <span className="hidden xs:inline">Comment</span> (<span className="font-bangla font-bold">{toBengaliNumerals(a.stats.commentsCount)}</span>)
           </span>
         </button>
         <button

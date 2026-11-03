@@ -374,14 +374,14 @@ export function ReelPlayerModal({
               <span className={cn(actionIcon, isLiked && 'bg-[#ff3b5c]/25')}>
                 <Heart className={cn('size-5', isLiked ? 'fill-[#ff3b5c] text-[#ff3b5c]' : 'text-white')} />
               </span>
-              <span className="font-mono text-[10px]">{toBengaliNumerals((it.likes ?? 0) + (isLiked ? 1 : 0))}</span>
+              <span className="font-bangla font-bold text-[11px]">{toBengaliNumerals((it.likes ?? 0) + (isLiked ? 1 : 0))}</span>
             </button>
 
             <button type="button" onClick={handleToggleComments} className={actionBtn}>
               <span className={cn(actionIcon, showComments && 'bg-[#03EF62]/30 ring-2 ring-[#03EF62]')}>
                 <MessageCircle className={cn('size-5', showComments ? 'text-[#03EF62]' : 'text-white')} />
               </span>
-              <span className="font-mono text-[10px]">{toBengaliNumerals(itemComments.length)}</span>
+              <span className="font-bangla font-bold text-[11px]">{toBengaliNumerals(itemComments.length)}</span>
             </button>
 
             <button type="button" onClick={() => onShare(it.title)} className={actionBtn}>
@@ -450,7 +450,7 @@ export function ReelPlayerModal({
                   style={{ left: `calc(${progress * 100}% - 5px)` }}
                 />
               </div>
-              <span className="font-mono text-[10px] text-white/70 tabular-nums shrink-0">
+              <span className="font-bangla font-bold text-[11px] text-white/80 tabular-nums shrink-0">
                 {toBengaliNumerals(idx + 1)}/{toBengaliNumerals(count)}
               </span>
             </div>

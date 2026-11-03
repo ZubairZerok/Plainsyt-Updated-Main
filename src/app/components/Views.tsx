@@ -254,10 +254,7 @@ export function EventsView({
                     <span>{e.location}</span>
                   </p>
 
-                  <p className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
-                    <Users className="size-3.5" />
-                    <span>{e.attendeesCount} জন অংশ নিচ্ছেন</span>
-                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 font-bangla text-[12px] text-slate-400"><Users className="size-3.5" /><span><strong className="font-bold">{e.attendeesCount}</strong> জন অংশ নিচ্ছেন</span></p>
                 </div>
 
                 <div className="mt-5 flex items-center gap-2.5 pt-3 border-t border-slate-100">
@@ -497,7 +494,7 @@ export function IdeasView({
                 )}
               >
                 <ArrowBigUp className={cn('size-5', i.voted && 'fill-current text-emerald-600')} />
-                <span className="font-mono text-xs font-semibold">{i.votes}</span>
+                <span className="font-bangla text-xs font-bold">{i.votes}</span>
               </button>
               <div className="min-w-0">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400">{i.tag}</span>
@@ -1235,13 +1232,13 @@ export function ProfileView({
             orders.map((o) => (
               <div key={o.id} className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-bold text-slate-900">#{o.orderNumber}</span>
+                  <span className="font-bangla text-xs font-bold text-slate-900">#{o.orderNumber}</span>
                   <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[11px] font-bold text-emerald-700">
                     TrxID: {o.trxId}
                   </span>
                 </div>
                 <p className="mt-1 font-sans text-xs text-slate-700">
-                  {o.deliveryAddress}, {o.district} · ৳{toBengaliNumerals(o.totalBdt)}
+                  {o.deliveryAddress}, {o.district} · ৳<strong className="font-bangla font-bold">{toBengaliNumerals(o.totalBdt)}</strong>
                 </p>
               </div>
             ))

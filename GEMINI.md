@@ -8,3 +8,4 @@
   - This applies to all statistics, view counts, reaction counts, dates, timestamps, order amounts, prices (BDT ৳), metrics, page numbers, and inline numbers in text.
   - In CSS (`src/styles/fonts.css`), an automated `@font-face` rule maps `unicode-range: U+0030-0039, U+09E6-09EF` to Hind Siliguri weight 700 across normal weights (100–600) so that digits automatically render in Bold 700 even inside standard text blocks.
   - When explicitly formatting standalone numeric badges, counters, or metrics in React/Tailwind, explicitly apply `font-bold` (700) or ensure Hind Siliguri 700 is active.
+

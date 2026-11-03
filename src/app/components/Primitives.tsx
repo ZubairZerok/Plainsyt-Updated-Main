@@ -121,6 +121,15 @@ export function SectionLabel({ children, className }: { children: ReactNode; cla
   );
 }
 
+/** Strict Hind Siliguri Bold 700 wrapper for numbers */
+export function Num({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className={cn('font-bangla font-bold tracking-normal', className)}>
+      {children}
+    </span>
+  );
+}
+
 export const FEED_CARD =
   'border-y border-slate-200/70 dark:border-white/10 bg-canvas-card sm:rounded-2xl sm:border sm:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] sm:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all duration-200';
 

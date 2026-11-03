@@ -465,7 +465,7 @@ export function Header(p: Props) {
                 >
                   <ShoppingBag className="size-[18px]" />
                   {p.cartCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.cartCount}
                     </span>
                   )}
@@ -479,7 +479,7 @@ export function Header(p: Props) {
                 >
                   <Bookmark className="size-[18px]" />
                   {p.savedCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-mono text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.savedCount}
                     </span>
                   )}
@@ -492,7 +492,7 @@ export function Header(p: Props) {
                 >
                   <Bell className="size-[18px]" />
                   {unread > 0 && (
-                    <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-[#e41e3f] font-mono text-[10px] font-bold text-white shadow-xs">
+                    <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-[#e41e3f] font-bangla text-[10px] font-bold text-white shadow-xs">
                       {unread}
                     </span>
                   )}
@@ -792,7 +792,7 @@ export function Header(p: Props) {
                   <span className="relative flex items-center justify-center">
                     <t.icon className={cn('size-5', active ? 'text-white' : 'text-[#061621]')} strokeWidth={active ? 2.5 : 2} />
                     {t.badge && (
-                      <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e41e3f] px-1 font-mono text-[9px] font-bold text-white shadow-xs">
+                      <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e41e3f] px-1 font-bangla text-[9px] font-bold text-white shadow-xs">
                         {t.badge}
                       </span>
                     )}

@@ -128,10 +128,7 @@ export function EventRow({
           <MapPin className="size-2.5 shrink-0" />
           <span className="truncate">{e.location}</span>
         </span>
-        <span className="mt-0.5 flex items-center gap-1 font-mono text-[10px] text-slate-400">
-          <Users className="size-2.5" />
-          {e.attendeesCount} নিবন্ধিত
-        </span>
+        <span className="mt-0.5 flex items-center gap-1 font-bangla text-[11px] text-slate-400"><Users className="size-2.5" /><strong className="font-bold">{e.attendeesCount}</strong> নিবন্ধিত</span>
         <div className="mt-1.5 flex items-center gap-1.5">
           <button
             type="button"

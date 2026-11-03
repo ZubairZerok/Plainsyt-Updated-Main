@@ -410,7 +410,7 @@ export function BkashCheckoutModal({
                           >
                             <Minus className="size-3.5" />
                           </button>
-                          <span className="w-6 text-center font-mono text-[13px] font-semibold">
+                          <span className="w-6 text-center font-bangla font-bold text-[13px]">
                             {it.quantity}
                           </span>
                           <button
@@ -548,9 +548,7 @@ export function BkashCheckoutModal({
                   <span className="font-mono text-[12px] font-bold text-[#e2136e]">
                     bKash Direct Payment
                   </span>
-                  <span className="font-mono text-[15px] font-extrabold text-[#e2136e]">
-                    ৳{toBengaliNumerals(grandTotal)}
-                  </span>
+                  <span className="font-bangla text-[16px] font-bold text-[#e2136e]">৳{toBengaliNumerals(grandTotal)}</span>
                 </div>
                 <p className="mt-1 font-bangla text-[13px] text-gray-700">
                   আপনার বিকাশ অ্যাকাউন্ট থেকে পেমেন্ট সম্পন্ন করে নিচের বক্সে বিকাশ নম্বর ও ট্রানজেকশন আইডি (TrxID) লিখুন।

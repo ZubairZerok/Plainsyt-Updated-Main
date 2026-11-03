@@ -230,10 +230,10 @@
   --color-canvas-subtle: var(--canvas-subtle);
   --color-canvas-border: var(--canvas-border);
 
-  --font-display: "Hind Siliguri", "Inter", sans-serif;
-  --font-sans: "Hind Siliguri", "Inter", sans-serif;
-  --font-bangla: "Hind Siliguri", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Hind Siliguri Bold Numbers", "Hind Siliguri", "Inter", sans-serif;
+  --font-sans: "Hind Siliguri Bold Numbers", "Hind Siliguri", "Inter", sans-serif;
+  --font-bangla: "Hind Siliguri Bold Numbers", "Hind Siliguri", sans-serif;
+  --font-mono: "Hind Siliguri Bold Numbers", "JetBrains Mono", ui-monospace, monospace;
 }
 
 @utility shadow-tactile-xs { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04); }

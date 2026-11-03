@@ -146,19 +146,19 @@ export function PublicationsStudioView({
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 border-t border-slate-200/80 dark:border-white/10 pt-4">
           <div className="p-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">প্রকাশিত প্রবন্ধ</span>
-            <span className="font-mono text-xl font-bold text-slate-900 dark:text-white">{toBengaliNumerals(totalPublished)} টি</span>
+            <span className="font-bangla text-2xl font-bold text-slate-900 dark:text-white">{toBengaliNumerals(totalPublished)} টি</span>
           </div>
           <div className="p-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">পর্যালোচনায় (Review)</span>
-            <span className="font-mono text-xl font-bold text-amber-600 dark:text-amber-400">{toBengaliNumerals(totalInReview)} টি</span>
+            <span className="font-bangla text-2xl font-bold text-amber-600 dark:text-amber-400">{toBengaliNumerals(totalInReview)} টি</span>
           </div>
           <div className="p-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">সংরক্ষিত খসড়া</span>
-            <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400">{toBengaliNumerals(totalDrafts)} টি</span>
+            <span className="font-bangla text-2xl font-bold text-blue-600 dark:text-blue-400">{toBengaliNumerals(totalDrafts)} টি</span>
           </div>
           <div className="p-3 rounded-xl bg-white/70 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">মোট পাঠক সংখ্যা</span>
-            <span className="font-mono text-xl font-bold text-[#008f3c] dark:text-[#03EF62]">২৪,৫৮০</span>
+            <span className="font-bangla text-2xl font-bold text-[#008f3c] dark:text-[#03EF62]">২৪,৫৮০</span>
           </div>
         </div>
       </section>
@@ -230,7 +230,7 @@ export function PublicationsStudioView({
             </div>
 
             <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/60 dark:border-white/5">
-              <span>আনুমানিক পঠন সময়: {toBengaliNumerals(item.readTimeMinutes)} মিনিট · {toBengaliNumerals(item.wordCount)} শব্দ</span>
+              <span>আনুমানিক পঠন সময়: <span className="font-bangla font-bold">{toBengaliNumerals(item.readTimeMinutes)}</span> মিনিট · <span className="font-bangla font-bold">{toBengaliNumerals(item.wordCount)}</span> শব্দ</span>
               <button
                 type="button"
                 onClick={() => toast.info('রিভিউয়ার ফিডব্যাক', { description: 'রিভিউয়ার ১ পজিটিভ সুপারিশ করেছেন। রিভিউয়ার ২ এর রিপোর্টের অপেক্ষায়।' })}
@@ -263,7 +263,7 @@ export function PublicationsStudioView({
               <div className="flex-1 max-w-xs">
                 <div className="flex justify-between text-[11px] text-slate-500 mb-1">
                   <span>খসড়া সম্পূর্ণতা</span>
-                  <span>{toBengaliNumerals(draft.progressPercent)}%</span>
+                  <span className="font-bangla font-bold">{toBengaliNumerals(draft.progressPercent)}%</span>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                   <div className="h-full bg-blue-500 rounded-full" style={{ width: `${draft.progressPercent}%` }} />
@@ -432,8 +432,8 @@ export function ResearcherAnalyticsView({
           <div className="p-3.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/70 dark:border-white/10 shadow-2xs">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">মোট পাঠক সংখ্যা</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">২৪,৫৮০</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১৮.২%</span>
+              <span className="font-bangla text-2xl font-bold text-slate-900 dark:text-white">২৪,৫৮০</span>
+              <span className="font-bangla text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১৮.২%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">বিগত ৩০ দিনে বৃদ্ধি পেয়েছে</span>
           </div>
@@ -441,8 +441,8 @@ export function ResearcherAnalyticsView({
           <div className="p-3.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/70 dark:border-white/10 shadow-2xs">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">একাডেমিক উদ্ধৃতি (Citations)</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">১৪৭ বার</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১২</span>
+              <span className="font-bangla text-2xl font-bold text-slate-900 dark:text-white">১৪৭ বার</span>
+              <span className="font-bangla text-xs font-bold text-emerald-600 dark:text-[#03EF62]">+১২</span>
             </div>
             <span className="text-[10.5px] text-slate-400">Google Scholar ও Plainsyt সূচক</span>
           </div>
@@ -450,8 +450,8 @@ export function ResearcherAnalyticsView({
           <div className="p-3.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/70 dark:border-white/10 shadow-2xs">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">গড় পঠন সময়</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">৪:৩৮ মি.</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">৮৯%</span>
+              <span className="font-bangla text-2xl font-bold text-slate-900 dark:text-white">৪:৩৮ মি.</span>
+              <span className="font-bangla text-xs font-bold text-emerald-600 dark:text-[#03EF62]">৮৯%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">সম্পূর্ণ পাঠের হার উচ্চ</span>
           </div>
@@ -459,8 +459,8 @@ export function ResearcherAnalyticsView({
           <div className="p-3.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200/70 dark:border-white/10 shadow-2xs">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">রিসার্চ ইমপ্যাক্ট স্কোর</span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-black text-slate-900 dark:text-white">৯৩ / ১০০</span>
-              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-[#03EF62]">Top 5%</span>
+              <span className="font-bangla text-2xl font-bold text-slate-900 dark:text-white">৯৩ / ১০০</span>
+              <span className="font-bangla text-xs font-bold text-emerald-600 dark:text-[#03EF62]">Top 5%</span>
             </div>
             <span className="text-[10.5px] text-slate-400">শীর্ষ গবেষকদের সূচকে স্থান</span>
           </div>
@@ -522,7 +522,7 @@ export function ResearcherAnalyticsView({
               <div key={item.name} className="space-y-1">
                 <div className="flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-200">
                   <span className="truncate pr-2">{item.name}</span>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white shrink-0">{toBengaliNumerals(item.pct)}%</span>
+                  <span className="font-bangla font-bold text-slate-900 dark:text-white shrink-0">{toBengaliNumerals(item.pct)}%</span>
                 </div>
                 <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
                   <div className={cn('h-full rounded-full transition-all duration-500', item.color)} style={{ width: `${item.pct}%` }} />
@@ -633,11 +633,11 @@ export function ReadingHistoryView({
 
         {/* Stats Summary Bar */}
         <div className="mt-4 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600 dark:text-slate-300 pt-3 border-t border-slate-200/70 dark:border-white/10">
-          <span>মোট পঠিত: <strong className="font-mono text-slate-900 dark:text-white">{toBengaliNumerals(historyList.length)} টি</strong> গবেষণা নিবন্ধ</span>
+          <span>মোট পঠিত: <strong className="font-bangla font-bold text-slate-900 dark:text-white">{toBengaliNumerals(historyList.length)} টি</strong> গবেষণা নিবন্ধ</span>
           <span>·</span>
-          <span>পড়ার সময়: <strong className="font-mono text-slate-900 dark:text-white">৩ ঘণ্টা ২০ মিনিট</strong></span>
+          <span>পড়ার সময়: <strong className="font-bangla font-bold text-slate-900 dark:text-white">৩ ঘণ্টা ২০ মিনিট</strong></span>
           <span>·</span>
-          <span>রেফারেন্স সংগৃহীত: <strong className="font-mono text-slate-900 dark:text-white">১২ টি</strong></span>
+          <span>রেফারেন্স সংগৃহীত: <strong className="font-bangla font-bold text-slate-900 dark:text-white">১২ টি</strong></span>
         </div>
       </section>
 
@@ -698,7 +698,7 @@ export function ReadingHistoryView({
                   {item.title}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  লেখক: {item.author.name} · {toBengaliNumerals(item.readTimeMinutes)} মিনিট পড়ার সময়
+                  লেখক: {item.author.name} · <span className="font-bangla font-bold">{toBengaliNumerals(item.readTimeMinutes)}</span> মিনিট পড়ার সময়
                 </p>
               </div>
 
@@ -1041,7 +1041,7 @@ export function EditorialHelpView({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {steps.map((st) => (
             <div key={st.step} className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/70 dark:border-white/10 relative">
-              <span className="size-6 rounded-full bg-[#061621] dark:bg-[#03EF62] text-white dark:text-[#061621] font-mono text-xs font-black flex items-center justify-center mb-2 shadow-xs">
+              <span className="size-6 rounded-full bg-[#061621] dark:bg-[#03EF62] text-white dark:text-[#061621] font-bangla text-sm font-bold flex items-center justify-center mb-2 shadow-xs">
                 {st.step}
               </span>
               <h3 className="font-sans text-xs sm:text-sm font-bold text-slate-900 dark:text-white mb-1">
