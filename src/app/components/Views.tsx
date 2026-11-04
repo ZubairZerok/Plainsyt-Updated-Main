@@ -109,7 +109,7 @@ export function ExploreTopicDropdown({
                 'flex size-7 sm:size-6.5 shrink-0 items-center justify-center rounded-xl transition-colors',
                 open || pillar !== null
                   ? 'bg-[#03EF62]/20 text-[#03EF62]'
-                  : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400 group-hover:text-[#03EF62]',
+                  : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-[#03EF62] dark:border dark:border-[#03EF62]/30 group-hover:text-[#03EF62]',
               )}
             >
               <ActiveIcon className="size-4 sm:size-3.5" />
@@ -137,7 +137,7 @@ export function ExploreTopicDropdown({
             </span>
             <ChevronDown
               className={cn(
-                'size-4 text-slate-400 transition-transform duration-200',
+                'size-4 text-slate-400 dark:text-[#03EF62] transition-transform duration-200',
                 open && 'rotate-180 text-[#03EF62]',
               )}
             />
@@ -195,7 +195,7 @@ export function ExploreTopicDropdown({
                 <span
                   className={cn(
                     'flex size-7 shrink-0 items-center justify-center rounded-lg',
-                    pillar === null ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500',
+                    pillar === null ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-[#03EF62] dark:border dark:border-[#03EF62]/30',
                   )}
                 >
                   <Sparkles className="size-3.5" />
@@ -244,7 +244,7 @@ export function ExploreTopicDropdown({
                     <span
                       className={cn(
                         'flex size-7 shrink-0 items-center justify-center rounded-lg',
-                        active ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 group-hover:text-slate-800 dark:group-hover:text-white',
+                        active ? 'bg-[#03EF62]/20 text-[#03EF62]' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-[#03EF62] dark:border dark:border-[#03EF62]/30 group-hover:text-slate-800 dark:group-hover:text-white',
                       )}
                     >
                       <Icon className="size-3.5" />
@@ -326,14 +326,21 @@ export function ExploreView({
 
       <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>
         <div className="mb-3">
-          <div className="flex items-center justify-between gap-2"><span className="font-sans text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{pillar ? 'ফিল্টার করা প্রবন্ধসমূহ' : 'সকল প্রকাশিত প্রতিবেদন'}</span><span className="inline-flex items-center gap-1 rounded-full bg-[#03EF62]/15 px-2.5 py-0.5 font-bangla text-xs text-[#006f30] dark:text-[#03EF62]"><Num>{toBengaliNumerals(list.length)}</Num> টি</span></div>
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-bangla text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              {pillar ? 'ফিল্টার করা প্রবন্ধসমূহ' : 'সকল প্রকাশিত প্রতিবেদন'}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#03EF62]/15 px-2.5 py-0.5 font-bangla text-xs text-[#006f30] dark:text-[#03EF62]">
+              <Num>{toBengaliNumerals(list.length)}</Num> টি
+            </span>
+          </div>
         </div>
         {list.length === 0 ? (
-          <p className="py-8 text-center font-sans text-sm text-slate-500">
+          <p className="py-8 text-center font-bangla text-sm text-slate-500 dark:text-slate-400">
             এই বিষয়ে এখনো কোনো প্রতিবেদন প্রকাশিত হয়নি।
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-white/10">
             {list.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 py-3">
                 <button
@@ -347,12 +354,12 @@ export function ExploreView({
                     className="h-18 w-24 shrink-0 rounded-md [&_span]:hidden object-cover"
                   />
                   <span className="min-w-0">
-                    <span className="font-sans text-xs font-semibold text-emerald-600">{a.category}</span>
-                    <span className="line-clamp-2 font-sans text-sm font-semibold leading-snug text-slate-900 group-hover:text-emerald-700">
+                    <span className="font-bangla text-xs font-semibold text-emerald-600 dark:text-[#03EF62]">{a.category}</span>
+                    <span className="line-clamp-2 font-bangla text-sm font-semibold leading-snug text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
                       {a.title}
                     </span>
-                    <span className="font-mono text-[10px] text-slate-400">
-                      {a.author.name} · {a.readTimeMinutes} মিনিট পড়ার সময়
+                    <span className="font-bangla text-[11px] text-slate-500 dark:text-slate-400">
+                      {a.author.name} · <Num>{toBengaliNumerals(a.readTimeMinutes)}</Num> মিনিট পড়ার সময়
                     </span>
                   </span>
                 </button>
@@ -362,10 +369,10 @@ export function ExploreView({
                   rel="noopener noreferrer"
                   title="নতুন ট্যাবে নিবন্ধটি পড়ুন"
                   aria-label="Open article in new tab"
-                  className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-800/90 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 font-mono text-[10.5px] font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#03EF62] hover:border-emerald-300 dark:hover:border-emerald-500/30 shadow-2xs transition-all group/tab"
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-200/90 dark:border-[#03EF62]/40 bg-white dark:bg-slate-800/90 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 px-2.5 py-1.5 font-bangla text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-[#03EF62] hover:border-emerald-300 dark:hover:border-[#03EF62] shadow-2xs transition-all group/tab"
                 >
                   <span className="hidden sm:inline">নতুন ট্যাব</span>
-                  <ArrowUpRight className="size-3.5 text-slate-400 group-hover/tab:text-emerald-600 dark:group-hover/tab:text-[#03EF62] transition-transform group-hover/tab:-translate-y-0.5 group-hover/tab:translate-x-0.5" />
+                  <ArrowUpRight className="size-3.5 text-slate-400 dark:text-[#03EF62] group-hover/tab:text-emerald-600 dark:group-hover/tab:text-[#03EF62] transition-transform group-hover/tab:-translate-y-0.5 group-hover/tab:translate-x-0.5" />
                 </a>
               </li>
             ))}
@@ -374,7 +381,7 @@ export function ExploreView({
       </section>
 
       <section className={cn(FEED_CARD, 'px-4 pb-2 pt-4 lg:hidden')}>
-        <h3 className="font-sans text-base font-bold text-slate-900 mb-2">ট্রেন্ডিং প্রতিবেদন</h3>
+        <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white mb-2">ট্রেন্ডিং প্রতিবেদন</h3>
         <TrendingList
           articles={articles}
           onOpenPopup={onOpenArticlePopup}
@@ -1024,21 +1031,24 @@ export function ProfileView({
               <button
                 type="button"
                 onClick={() => {
-                  if (profile.avatar.startsWith('http') || profile.avatar.startsWith('data:')) {
+                  if (authorStories.length > 0 && onOpenStory) {
+                    onOpenStory(authorStories[0].id);
+                  } else if (profile.avatar.startsWith('http') || profile.avatar.startsWith('data:')) {
                     onOpenPhoto([profile.avatar], 0, profile.name, `${profile.role} · ${profile.organization}`, profile.name, profile.id);
                   } else if (isOwnProfile) {
                     onOpenProfileSettings();
                   }
                 }}
                 className="group relative block rounded-full"
-                title="প্রোফাইল ছবি"
+                title={authorStories.length > 0 ? 'স্টোরি দেখুন' : 'প্রোফাইল ছবি'}
               >
                 <Avatar
                   src={profile.avatar}
                   name={profile.name}
                   size="size-20 sm:size-24"
                   online={isSelf}
-                  className="rounded-full border-4 border-white shadow-sm"
+                  hasStory={authorStories.length > 0}
+                  className="rounded-full border-4 border-white dark:border-canvas-card shadow-sm"
                 />
               </button>
               {isSelf && (

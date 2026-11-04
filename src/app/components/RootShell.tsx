@@ -866,6 +866,19 @@ export function RootShell() {
         });
         return;
       }
+      // Interconnect story comments directly with post / article comments
+      const matchedStory = snap.stories.find((s) => s.id === targetId || s.articleId === targetId);
+      const articleId = matchedStory?.articleId || (snap.articles.some((a) => a.id === targetId) ? targetId : null);
+      if (articleId) {
+        handleCommentArticle(articleId, text);
+        return;
+      }
+      const isPost = snap.posts.some((p) => p.id === targetId);
+      if (isPost) {
+        handleCommentPost(targetId, text);
+        return;
+      }
+
       const newComment = makeComment(text, currentUser, 'reel', targetId);
       commit((prev) => ({
         ...prev,
@@ -873,7 +886,7 @@ export function RootShell() {
       }));
       dbInsertComment(newComment);
     },
-    [commit, currentUser, requestAuth],
+    [commit, currentUser, requestAuth, snap.stories, snap.articles, snap.posts, handleCommentArticle, handleCommentPost],
   );
 
   const handleReactStoryOrReel = useCallback(
@@ -1775,6 +1788,7 @@ export function RootShell() {
         onOpenProfileSettings={() => setProfileSettingsOpen(true)}
         articles={snap.articles}
         posts={snap.posts}
+        stories={snap.stories}
         onOpenArticle={handleOpenArticlePopup}
         onNavigateProfile={navigateToProfile}
       />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Bookmark, Share2, Clock, FlaskConical, Send, Eye, ExternalLink, Calendar } from 'lucide-react';
 import type { Article, LinkedInReactionType, UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, SectionLabel, cn } from './Primitives';
@@ -37,10 +37,52 @@ export function ArticleReaderContent({
   onOpenPhoto,
 }: Omit<Props, 'article'> & { article: Article; isStandalonePage?: boolean }) {
   const [text, setText] = useState('');
+  const [dragOffsetY, setDragOffsetY] = useState(0);
+  const touchStartY = useRef<number | null>(null);
   const rxTotal = totalReactions(a.reactionCounts, a.stats.likes);
 
+  // Pull-to-dismiss gesture for mobile view
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - touchStartY.current;
+    if (diff > 0) {
+      setDragOffsetY(diff);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (dragOffsetY > 110 && !isStandalonePage) {
+      onClose();
+    }
+    setDragOffsetY(0);
+    touchStartY.current = null;
+  };
+
   return (
-    <article className="rounded-t-3xl border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden">
+    <article
+      style={{
+        transform: dragOffsetY > 0 ? `translateY(${dragOffsetY}px)` : undefined,
+        transition: dragOffsetY > 0 ? 'none' : 'transform 200ms ease-out',
+      }}
+      className="rounded-t-3xl border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden animate-in slide-in-from-bottom-6 duration-300 ease-out"
+    >
+      {/* Mobile drag-down handle */}
+      {!isStandalonePage && (
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="sm:hidden flex items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing w-full bg-canvas-card select-none"
+        >
+          <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-[#03EF62]/40" />
+        </div>
+      )}
+
       <div className="sticky top-0 z-10 flex items-center justify-end border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md px-4 sm:px-5 py-2.5">
         <div className="flex items-center gap-2">
           {!isStandalonePage && (
@@ -48,7 +90,7 @@ export function ArticleReaderContent({
               href={`/article/${a.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-[#03EF62] transition shadow-2xs hover:scale-105 active:scale-95"
+              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62]/50 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 hover:text-slate-900 dark:hover:text-[#03EF62] transition shadow-2xs hover:scale-105 active:scale-95"
               title="নতুন ট্যাবে পড়ুন (Open in new tab)"
               aria-label="নতুন ট্যাবে পড়ুন"
             >
@@ -62,13 +104,18 @@ export function ArticleReaderContent({
             aria-label="Bookmark"
             title="সংরক্ষণ করুন"
             className={cn(
-              'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95',
-              bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-slate-600 dark:text-slate-200',
+              'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62]/50 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 transition shadow-2xs hover:scale-105 active:scale-95',
+              bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-slate-600 dark:text-[#03EF62]',
             )}
           >
             <Bookmark className={cn('size-4.5', bookmarked && 'fill-current')} />
           </button>
-          {!isStandalonePage && <CloseButton onClick={onClose} />}
+          {!isStandalonePage && (
+            <CloseButton
+              onClick={onClose}
+              className="border border-slate-200/80 dark:border-[#03EF62]/50 dark:text-[#03EF62] dark:hover:bg-[#03EF62]/10"
+            />
+          )}
         </div>
       </div>
 
@@ -205,7 +252,7 @@ export function ArticleReaderContent({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <div className="rounded-full border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-sm">
+          <div className="rounded-full border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card shadow-sm">
             <LinkedInReactionPickerButton
               userReaction={a.userReaction}
               onSelect={onReact}
@@ -215,9 +262,9 @@ export function ArticleReaderContent({
           <button
             type="button"
             onClick={onShare}
-            className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-white/10 bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-slate-200 shadow-sm hover:bg-slate-50 dark:hover:bg-white/5 transition"
+            className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition"
           >
-            <Share2 className="size-[18px]" />
+            <Share2 className="size-[18px] text-[#03EF62]" />
             Share
           </button>
         </div>

@@ -4,7 +4,7 @@ import {
   Clapperboard, Sparkles, FileText, ArrowUpRight, ShoppingBag, Trash2, LogIn, User, LogOut,
   Settings, Check, BarChart3, History, ShieldCheck, HelpCircle, CheckCircle2,
 } from 'lucide-react';
-import type { Article, CommunityPost, NotificationItem, UserProfile } from '../types';
+import type { Article, CommunityPost, NotificationItem, TopicStory, UserProfile } from '../types';
 import { PlainsytLogo } from './PlainsytLogo';
 import { Avatar, cn } from './Primitives';
 
@@ -55,6 +55,7 @@ interface Props {
   onDeleteNotification?: (id: string) => void;
   articles: Article[];
   posts: CommunityPost[];
+  stories?: TopicStory[];
   onOpenArticle: (id: string) => void;
   onNavigateProfile: (userId: string) => void;
 }
@@ -69,6 +70,11 @@ export function Header(p: Props) {
   const lastScrollY = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const unread = p.notifications.filter((n) => n.unread).length;
+
+  const storyAuthorIds = useMemo(
+    () => new Set((p.stories || []).map((s) => s.authorId).filter(Boolean)),
+    [p.stories],
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -283,6 +289,7 @@ export function Header(p: Props) {
                       src={n.actorAvatar || ''}
                       name={n.actorName || n.source || 'PS'}
                       size="size-8"
+                      hasStory={n.actorId ? storyAuthorIds.has(n.actorId) : false}
                     />
                   </button>
 
@@ -538,6 +545,7 @@ export function Header(p: Props) {
                     name={p.currentUser?.name || 'Profile'}
                     size="size-8 sm:size-9"
                     online
+                    hasStory={p.currentUser ? storyAuthorIds.has(p.currentUser.id) : false}
                   />
                 </button>
               </div>
@@ -580,7 +588,7 @@ export function Header(p: Props) {
           >
             {/* User Profile Header Card */}
             <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 mb-2">
-              <Avatar src={p.currentUser.avatar} name={p.currentUser.name} size="size-11" online />
+              <Avatar src={p.currentUser.avatar} name={p.currentUser.name} size="size-11" online hasStory={storyAuthorIds.has(p.currentUser.id)} />
               <div className="min-w-0 flex-1">
                 <p className="font-sans text-sm font-bold text-slate-900 dark:text-white truncate">
                   {p.currentUser.name}

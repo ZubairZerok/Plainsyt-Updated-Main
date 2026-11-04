@@ -17,7 +17,7 @@ import {
   Smile,
   ThumbsUp,
 } from 'lucide-react';
-import { Avatar, Num, cn } from './Primitives';
+import { Avatar, FollowIconButton, Num, cn } from './Primitives';
 import type { CommentItem, LinkedInReactionType, ReactionTargetType, TopicStory, UserProfile } from '../types';
 import { toBengaliNumerals, LINKEDIN_REACTIONS, getReactionMeta } from '../utils/pureLogic';
 import { YouTubeMark, buildYouTubeEmbedSrc, ytPostCommand, parseDurationLabel } from './YouTubeMark';
@@ -123,6 +123,7 @@ export function StoryViewerModal({
   const [commentText, setCommentText] = useState('');
   const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
   const [userReactions, setUserReactions] = useState<Record<string, LinkedInReactionType>>({});
+  const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -143,6 +144,7 @@ export function StoryViewerModal({
           setStoryIdx(sIndex);
           setProgress(0);
           setCubeAngle(0);
+          setIsCaptionExpanded(false);
           return;
         }
       }
@@ -151,7 +153,13 @@ export function StoryViewerModal({
     setStoryIdx(0);
     setProgress(0);
     setCubeAngle(0);
+    setIsCaptionExpanded(false);
   }, [open, initialStoryId, accountGroups]);
+
+  // Collapse expanded caption on story transition
+  useEffect(() => {
+    setIsCaptionExpanded(false);
+  }, [accountIdx, storyIdx]);
 
   const currentGroup = accountGroups[accountIdx] ?? accountGroups[0];
   const currentStory = currentGroup?.stories[storyIdx] ?? currentGroup?.stories[0];
@@ -161,24 +169,34 @@ export function StoryViewerModal({
   const storyDurationSec = ytInfo ? 10 : 5; // 5s for image stories, 10s for video clips
 
   // --- Story Progression Engine ---
-  const advanceToNext = useCallback(() => {
+  // isSwipe = true -> 3D cube rotate transition between accounts
+  // isSwipe = false (tap / timer) -> normal instant transition without 3D rotation (Facebook style)
+  const advanceToNext = useCallback((isSwipe = false) => {
     if (!currentGroup) return;
     if (storyIdx < currentGroup.stories.length - 1) {
       // Advance to next story within the same account
       setStoryIdx((s) => s + 1);
       setProgress(0);
     } else {
-      // Reached the end of this account's stories: 3D cube rotate to next account
+      // Reached the end of this account's stories
       if (accountIdx < accountGroups.length - 1) {
-        setIsRotating(true);
-        setCubeAngle(-90);
-        setTimeout(() => {
+        if (isSwipe) {
+          setIsRotating(true);
+          setCubeAngle(-90);
+          setTimeout(() => {
+            setAccountIdx((a) => a + 1);
+            setStoryIdx(0);
+            setProgress(0);
+            setCubeAngle(0);
+            setIsRotating(false);
+          }, 380);
+        } else {
+          // Instant normal transition on tap / timer (no 3D animation, just like Facebook)
           setAccountIdx((a) => a + 1);
           setStoryIdx(0);
           setProgress(0);
           setCubeAngle(0);
-          setIsRotating(false);
-        }, 420);
+        }
       } else {
         // Last story of last account -> Close viewer
         onClose();
@@ -186,25 +204,35 @@ export function StoryViewerModal({
     }
   }, [accountIdx, accountGroups.length, currentGroup, storyIdx, onClose]);
 
-  const advanceToPrev = useCallback(() => {
+  const advanceToPrev = useCallback((isSwipe = false) => {
     if (storyIdx > 0) {
       // Previous story within the same account
       setStoryIdx((s) => s - 1);
       setProgress(0);
     } else {
-      // Reached the beginning of this account's stories: 3D cube rotate back to previous account
+      // Reached the beginning of this account's stories
       if (accountIdx > 0) {
-        setIsRotating(true);
-        setCubeAngle(90);
-        setTimeout(() => {
+        if (isSwipe) {
+          setIsRotating(true);
+          setCubeAngle(90);
+          setTimeout(() => {
+            const prevAccIdx = accountIdx - 1;
+            const prevAccLastStoryIdx = (accountGroups[prevAccIdx]?.stories.length ?? 1) - 1;
+            setAccountIdx(prevAccIdx);
+            setStoryIdx(Math.max(0, prevAccLastStoryIdx));
+            setProgress(0);
+            setCubeAngle(0);
+            setIsRotating(false);
+          }, 380);
+        } else {
+          // Instant normal transition on tap (no 3D animation)
           const prevAccIdx = accountIdx - 1;
           const prevAccLastStoryIdx = (accountGroups[prevAccIdx]?.stories.length ?? 1) - 1;
           setAccountIdx(prevAccIdx);
           setStoryIdx(Math.max(0, prevAccLastStoryIdx));
           setProgress(0);
           setCubeAngle(0);
-          setIsRotating(false);
-        }, 420);
+        }
       } else {
         setProgress(0);
       }
@@ -213,7 +241,7 @@ export function StoryViewerModal({
 
   // Timer loop for story progression
   useEffect(() => {
-    if (!open || paused || isHolding || showComments || isRotating || !currentStory) {
+    if (!open || paused || isHolding || showComments || isCaptionExpanded || isRotating || !currentStory) {
       if (progressTimer.current) clearInterval(progressTimer.current);
       return;
     }
@@ -224,7 +252,7 @@ export function StoryViewerModal({
     progressTimer.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 1) {
-          advanceToNext();
+          advanceToNext(false);
           return 0;
         }
         return prev + step;
@@ -234,7 +262,7 @@ export function StoryViewerModal({
     return () => {
       if (progressTimer.current) clearInterval(progressTimer.current);
     };
-  }, [open, paused, isHolding, showComments, isRotating, currentStory, storyDurationSec, advanceToNext]);
+  }, [open, paused, isHolding, showComments, isCaptionExpanded, isRotating, currentStory, storyDurationSec, advanceToNext]);
 
   // YouTube / Video Playback Sync
   useEffect(() => {
@@ -379,11 +407,11 @@ export function StoryViewerModal({
       const relX = (e.clientX - rect.left) / rect.width;
 
       if (relX < 0.32) {
-        // Tapped left side: go to previous story or previous account
-        advanceToPrev();
+        // Tapped left side: go to previous story or previous account (instant without 3D rotation)
+        advanceToPrev(false);
       } else if (relX > 0.68) {
-        // Tapped right side: go to next story or next account
-        advanceToNext();
+        // Tapped right side: go to next story or next account (instant without 3D rotation)
+        advanceToNext(false);
       } else {
         // Center tap: toggle play / pause
         setPaused((p) => {
@@ -431,7 +459,8 @@ export function StoryViewerModal({
     }
     const val = commentText.trim();
     if (!val || !currentStory) return;
-    onComment(currentStory.id, val);
+    const targetId = currentStory.articleId || currentStory.id;
+    onComment(targetId, val);
     setCommentText('');
   };
 
@@ -441,7 +470,10 @@ export function StoryViewerModal({
   const isSaved = savedStoryIds.includes(currentStory.id);
   const activeReaction = userReactions[currentStory.id];
   const itemComments = comments.filter(
-    (c) => c.targetId === currentStory.id || c.targetId === `story-${currentStory.id}`,
+    (c) =>
+      c.targetId === currentStory.id ||
+      c.targetId === `story-${currentStory.id}` ||
+      (currentStory.articleId && (c.targetId === currentStory.articleId || c.targetId === `art-${currentStory.articleId}`)),
   );
 
   return (
@@ -458,16 +490,6 @@ export function StoryViewerModal({
         aria-hidden
         className="absolute inset-0 size-full object-cover opacity-20 blur-3xl pointer-events-none scale-110"
       />
-
-      {/* Close button */}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close"
-        className="absolute right-4 top-4 z-50 flex size-10 items-center justify-center rounded-full bg-black/50 text-white/90 hover:bg-black/75 hover:text-white transition active:scale-95 border border-white/15"
-      >
-        <X className="size-5" />
-      </button>
 
       {/* Floating Reaction Bursts Layer */}
       <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
@@ -553,15 +575,15 @@ export function StoryViewerModal({
             </div>
           )}
 
-          {/* --- TOP HEADER (Segmented Progress Bars + Author Info + Follow Button) --- */}
+          {/* --- TOP HEADER (Segmented Progress Bars at the VERY TOP + Author Info + Sound & Close Buttons) --- */}
           <div
             className={cn(
-              'absolute inset-x-0 top-0 z-30 flex flex-col gap-2.5 p-3.5 transition-opacity duration-200',
+              'absolute inset-x-0 top-0 z-30 flex flex-col gap-2 p-3 sm:p-3.5 transition-opacity duration-200 bg-gradient-to-b from-black/80 via-black/40 to-transparent',
               isHolding ? 'opacity-0' : 'opacity-100',
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Segmented Progress Bars (Facebook / Instagram Stories Style) */}
+            {/* 1. TOPMOST: Segmented Progress Bars (Zero overlap, strictly topmost position) */}
             <div className="flex items-center gap-1.5 w-full">
               {currentGroup.stories.map((st, i) => {
                 let fill = '0%';
@@ -582,8 +604,9 @@ export function StoryViewerModal({
               })}
             </div>
 
-            {/* Author Profile + Follow Button + Sound Toggle */}
-            <div className="flex items-center justify-between text-white mt-0.5">
+            {/* 2. DIRECTLY BELOW: Header Row with Author on Left, Sound + Close on Right */}
+            <div className="flex items-center justify-between gap-2 text-white pt-0.5">
+              {/* Left: Author Profile + Follow Icon Button */}
               <div className="flex items-center gap-2.5 min-w-0">
                 <button
                   type="button"
@@ -602,77 +625,111 @@ export function StoryViewerModal({
                 </button>
 
                 <div className="flex flex-col min-w-0 leading-tight">
-                  <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <span className="font-bangla font-bold text-sm truncate text-white drop-shadow">
                       {currentGroup.authorName}
                     </span>
-                    <span className="text-[11px] font-bangla font-bold text-emerald-400 drop-shadow">
-                      {toBengaliNumerals(storyIdx + 1)}/{toBengaliNumerals(totalAccountStories)}
+                    {/* Follow Icon Button (Icon Only, No Text) */}
+                    {currentGroup.authorId !== currentUser?.id && (
+                      <FollowIconButton
+                        isFollowing={isFollowing}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!currentUser) {
+                            onOpenAuth();
+                            return;
+                          }
+                          onToggleFollow(currentGroup.authorId);
+                        }}
+                        className="size-6 shrink-0"
+                      />
+                    )}
+                  </div>
+                  {/* Smaller tags / designations in a single line */}
+                  <div className="flex items-center gap-1.5 text-[10.5px] font-bangla text-white/70 drop-shadow truncate mt-0.5">
+                    <span className="truncate max-w-[120px] text-emerald-300 font-medium">
+                      {currentStory.category || 'প্রতিবেদন'}
+                    </span>
+                    <span>·</span>
+                    <span className="truncate text-white/60">
+                      {currentGroup.authorHandle ? `@${currentGroup.authorHandle}` : 'লেখক ও গবেষক'}
+                    </span>
+                    <span>·</span>
+                    <span className="text-emerald-400 font-bold shrink-0">
+                      <Num>{toBengaliNumerals(storyIdx + 1)}/{toBengaliNumerals(totalAccountStories)}</Num>
                     </span>
                   </div>
-                  <span className="text-[11px] font-bangla text-white/70 drop-shadow">
-                    {currentStory.category} · ২ ঘণ্টা আগে
-                  </span>
                 </div>
-
-                {/* Follow Account Button (Inside Stories Header) */}
-                {currentGroup.authorId !== currentUser?.id && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!currentUser) {
-                        onOpenAuth();
-                        return;
-                      }
-                      onToggleFollow(currentGroup.authorId);
-                    }}
-                    className={cn(
-                      'ml-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-bangla text-[11.5px] font-bold transition-all active:scale-95 shadow-md',
-                      isFollowing
-                        ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
-                        : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d857]',
-                    )}
-                  >
-                    {isFollowing ? (
-                      <>
-                        <Check className="size-3.5 stroke-[2.5]" />
-                        <span>অনুসরণ করছেন</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="size-3.5 stroke-[2.5]" />
-                        <span>ফলো করুন</span>
-                      </>
-                    )}
-                  </button>
-                )}
               </div>
 
-              <div className="flex items-center gap-2">
-                {ytInfo && <YouTubeMark size="sm" className="rounded-md bg-black/45 px-1.5 py-0.5" />}
+              {/* Right: Sound On/Off Button & Close (X) Button STRICTLY SIDE-BY-SIDE */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {ytInfo && <YouTubeMark size="sm" className="rounded-md bg-black/45 px-1.5 py-0.5 mr-0.5" />}
                 <button
                   type="button"
                   onClick={() => setIsMuted((m) => !m)}
-                  className="flex size-7 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition active:scale-95"
+                  className="flex size-7.5 items-center justify-center rounded-full bg-black/40 border border-white/20 text-white hover:bg-black/60 transition active:scale-90"
                   aria-label={isMuted ? 'শব্দ শুনুন' : 'শব্দ বন্ধ করুন'}
+                  title={isMuted ? 'শব্দ শুনুন' : 'শব্দ বন্ধ করুন'}
                 >
-                  {isMuted ? <VolumeX className="size-3.5" /> : <Volume2 className="size-3.5 text-[#03EF62]" />}
+                  {isMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4 text-[#03EF62]" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex size-7.5 items-center justify-center rounded-full bg-black/40 border border-white/20 text-white hover:bg-black/60 transition active:scale-90"
+                  aria-label="বন্ধ করুন"
+                  title="বন্ধ করুন"
+                >
+                  <X className="size-4" />
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Title / Caption overlay */}
+          {/* Title / Caption overlay with Facebook-style Lift & Expand */}
           <div
             className={cn(
-              'absolute inset-x-0 bottom-18 z-20 px-4 transition-opacity duration-200 pointer-events-none',
+              'absolute inset-x-0 bottom-[80px] z-25 px-3.5 transition-all duration-300 pointer-events-auto',
               isHolding ? 'opacity-0' : 'opacity-100',
+              isCaptionExpanded ? '-translate-y-4' : 'translate-y-0',
             )}
+            onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-bangla text-[15px] font-bold text-white drop-shadow-md line-clamp-2 leading-snug">
-              {currentStory.title}
-            </p>
+            <div
+              className={cn(
+                'transition-all duration-200',
+                isCaptionExpanded
+                  ? 'bg-black/85 backdrop-blur-md p-3.5 rounded-2xl border border-white/20 shadow-2xl max-h-56 overflow-y-auto custom-scrollbar'
+                  : 'bg-gradient-to-t from-black/60 to-transparent p-1.5 rounded-xl',
+              )}
+            >
+              <p
+                className={cn(
+                  'font-bangla leading-snug transition-colors',
+                  isCaptionExpanded
+                    ? 'text-white text-sm font-medium'
+                    : 'text-white/70 text-xs sm:text-[13px] line-clamp-2 font-normal drop-shadow',
+                )}
+              >
+                {currentStory.title}
+              </p>
+
+              {/* Expand / Collapse Button */}
+              {currentStory.title && currentStory.title.length > 40 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsCaptionExpanded((prev) => !prev);
+                    setPaused((p) => !isCaptionExpanded);
+                  }}
+                  className="mt-1 font-bangla text-xs font-bold text-[#03EF62] hover:underline cursor-pointer inline-flex items-center gap-1"
+                >
+                  {isCaptionExpanded ? 'সংক্ষেপ করুন' : '... আরও দেখুন'}
+                </button>
+              )}
+            </div>
           </div>
 
           {/* --- BOTTOM INTERACTIVE ACTIONS (Quick Reply, React, Comment, Share, Save) --- */}
@@ -683,21 +740,27 @@ export function StoryViewerModal({
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Floating LinkedIn / Facebook Reaction Picker */}
+            {/* Floating LinkedIn / Facebook Reaction Picker (Pops down when unpressed) */}
             {showReactionPicker && (
-              <div className="flex items-center gap-2 bg-[#061621]/95 border border-white/20 p-2 rounded-full shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150 self-start">
-                {LINKEDIN_REACTIONS.map((r) => (
-                  <button
-                    key={r.type}
-                    type="button"
-                    onClick={() => triggerReaction(r.type as LinkedInReactionType, r.emoji)}
-                    title={r.labelBn}
-                    className="p-1 hover:scale-125 transition-transform active:scale-95 flex items-center justify-center rounded-full"
-                  >
-                    <LinkedInReactionBadge type={r.type as LinkedInReactionType} size="size-7" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={() => setShowReactionPicker(false)}
+                />
+                <div className="relative z-30 flex items-center gap-2 bg-[#061621]/95 border border-white/20 p-2 rounded-full shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150 self-start">
+                  {LINKEDIN_REACTIONS.map((r) => (
+                    <button
+                      key={r.type}
+                      type="button"
+                      onClick={() => triggerReaction(r.type as LinkedInReactionType, r.emoji)}
+                      title={r.labelBn}
+                      className="p-1 hover:scale-125 transition-transform active:scale-95 flex items-center justify-center rounded-full"
+                    >
+                      <LinkedInReactionBadge type={r.type as LinkedInReactionType} size="size-7" />
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
 
             {/* Quick Reply Form + Action Buttons */}
@@ -803,12 +866,20 @@ export function StoryViewerModal({
         </div>
       </div>
 
-      {/* --- Comments Slide-Up / Drawer --- */}
+      {/* --- Comments Slide-Up / Drawer (Pops down when unpressed) --- */}
       {showComments && (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="fixed inset-x-0 bottom-0 sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[380px] z-50 flex flex-col bg-[#07161f] text-white border-t sm:border-t-0 sm:border-l border-white/15 shadow-2xl rounded-t-3xl sm:rounded-none max-h-[82vh] sm:max-h-full animate-in slide-in-from-bottom sm:slide-in-from-right duration-200"
-        >
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs"
+            onClick={() => {
+              setShowComments(false);
+              setPaused(false);
+            }}
+          />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-x-0 bottom-0 sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[380px] z-50 flex flex-col bg-[#07161f] text-white border-t sm:border-t-0 sm:border-l border-white/15 shadow-2xl rounded-t-3xl sm:rounded-none max-h-[82vh] sm:max-h-full animate-in slide-in-from-bottom sm:slide-in-from-right duration-200"
+          >
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5 bg-[#0a1f2b]/80">
             <div className="flex items-center gap-2">
               <MessageCircle className="size-4 text-[#03EF62]" />
@@ -868,6 +939,7 @@ export function StoryViewerModal({
             </button>
           </form>
         </div>
+      </>
       )}
 
       {/* Floating 3D CSS Keyframe in head */}

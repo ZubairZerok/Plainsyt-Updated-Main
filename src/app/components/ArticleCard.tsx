@@ -20,6 +20,7 @@ interface Props {
   onShare: () => void;
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
+  hasStory?: boolean;
 }
 
 export function ArticleCard({
@@ -36,6 +37,7 @@ export function ArticleCard({
   onShare,
   onNavigateProfile,
   onOpenPhoto,
+  hasStory,
 }: Props) {
   const [text, setText] = useState('');
   const [showComments, setShowComments] = useState(Boolean(lead));
@@ -117,7 +119,7 @@ export function ArticleCard({
               className="shrink-0"
               aria-label={`View ${a.author.name}'s profile`}
             >
-              <Avatar src={a.author.avatar} name={a.author.name} size="size-9" />
+              <Avatar src={a.author.avatar} name={a.author.name} size="size-9" hasStory={hasStory} />
             </button>
             <span className="min-w-0">
               <button

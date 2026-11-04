@@ -180,7 +180,11 @@ export function AuthModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="flex size-10 items-center justify-center rounded-2xl bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62] shadow-xs">
-                {isNewUser ? <UserPlus className="size-5" /> : <Sparkles className="size-5" />}
+                {isNewUser ? (
+                  <UserPlus className="size-5" />
+                ) : (
+                  <img src="/logos/icon.png" alt="Plainsyt" className="size-6 object-contain" />
+                )}
               </span>
               <div>
                 <h2
@@ -389,11 +393,19 @@ export function AuthModal({
                   setError(null);
                   setInfoNotice(null);
                 }}
-                className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition hover:underline"
+                className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition"
               >
-                {isNewUser
-                  ? 'ইতিমধ্যে অ্যাকাউন্ট আছে? সরাসরি লগইন করুন'
-                  : 'নতুন সদস্য? সরাসরি অ্যাকাউন্ট তৈরি করতে ক্লিক করুন'}
+                {isNewUser ? (
+                  <span>
+                    ইতিমধ্যে অ্যাকাউন্ট আছে? সরাসরি{' '}
+                    <span className="font-bold underline text-[#03EF62]">লগইন করতে ক্লিক করুন</span>
+                  </span>
+                ) : (
+                  <span>
+                    নতুন সদস্য? সরাসরি অ্যাকাউন্ট তৈরি করতে{' '}
+                    <span className="font-bold underline text-[#03EF62]">ক্লিক করুন</span>
+                  </span>
+                )}
               </button>
             </div>
 

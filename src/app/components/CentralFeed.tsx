@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useMemo, type ReactElement } from 'react';
 import { PenLine, Video, UserPlus, FileText } from 'lucide-react';
 import type {
   Article, CommunityPost, LinkedInReactionType, ReactionTargetType, StoryReel, TopicStory, UserProfile,
@@ -45,6 +45,11 @@ export function CentralFeed(f: FeedApi) {
   const savedReelIds = f.savedReelIds ?? [];
   const followingIds = f.followingIds ?? [];
 
+  const storyAuthorIds = useMemo(
+    () => new Set((f.stories || []).map((s) => s.authorId).filter(Boolean)),
+    [f.stories],
+  );
+
   const renderArticle = (a: Article, lead = false) => (
     <ArticleCard
       key={a.id}
@@ -52,6 +57,7 @@ export function CentralFeed(f: FeedApi) {
       lead={lead}
       bookmarked={bookmarkIds.includes(a.id)}
       currentUser={f.currentUser}
+      hasStory={storyAuthorIds.has(a.authorId || a.author.id)}
       onOpenPopup={() => f.onOpenArticlePopup(a.id)}
       onReact={(type) => f.onReact('article', a.id, type)}
       onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('article', a.id)}
@@ -71,6 +77,7 @@ export function CentralFeed(f: FeedApi) {
       key={p.id}
       post={p}
       currentUser={f.currentUser}
+      hasStory={storyAuthorIds.has(p.authorId)}
       onReact={(type) => f.onReact('post', p.id, type)}
       onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('post', p.id)}
       onSave={() => f.onSavePost(p.id)}

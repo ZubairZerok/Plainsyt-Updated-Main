@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { X } from 'lucide-react';
+import { X, UserPlus, Check } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export const cn = (...a: (string | false | null | undefined)[]) => clsx(a);
@@ -10,8 +10,8 @@ export const CARD =
 const TONES = ['bg-pine-100 text-pine-800', 'bg-[#f6e7c8] text-[#6b4a12]', 'bg-[#e8e1f5] text-[#3d2b6b]', 'bg-[#fbe1d8] text-[#7a2e16]', 'bg-[#dcecf5] text-[#163f5c]'];
 
 export function Avatar({
-  src, name, size = 'size-10', online, ring, className,
-}: { src?: string; name?: string; size?: string; online?: boolean; ring?: boolean; className?: string }) {
+  src, name, size = 'size-10', online, ring, hasStory, className,
+}: { src?: string; name?: string; size?: string; online?: boolean; ring?: boolean; hasStory?: boolean; className?: string }) {
   const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,11 @@ export function Avatar({
       <span
         className={cn(
           'relative flex size-full items-center justify-center overflow-hidden rounded-full font-semibold text-[0.7em] leading-none select-none',
-          ring ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card' : 'border border-slate-200/60 dark:border-white/10',
+          hasStory
+            ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-canvas-card shadow-sm'
+            : ring
+            ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card'
+            : 'border border-slate-200/60 dark:border-white/10',
           isPlainsytAvatar ? 'bg-[#03EF62]' : ((!isUrl || loadFailed) && tone),
         )}
       >
@@ -60,6 +64,41 @@ export function Avatar({
         <span className="absolute bottom-0 right-0 size-[28%] min-h-2.5 min-w-2.5 rounded-full border-2 border-canvas-card bg-[#03EF62]" />
       )}
     </span>
+  );
+}
+
+/** Standardized reusable Follow Icon Button across entire SAAS */
+export function FollowIconButton({
+  isFollowing,
+  onClick,
+  className,
+  title,
+}: {
+  isFollowing: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title || (isFollowing ? 'অনুসরণ করছেন' : 'ফলো করুন')}
+      aria-label={title || (isFollowing ? 'অনুসরণ করছেন' : 'ফলো করুন')}
+      className={cn(
+        'group relative inline-flex size-7 items-center justify-center rounded-full transition-all active:scale-90 shadow-sm shrink-0',
+        isFollowing
+          ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
+          : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d857] hover:scale-105',
+        className,
+      )}
+    >
+      {isFollowing ? (
+        <Check className="size-3.5 stroke-[2.8]" />
+      ) : (
+        <UserPlus className="size-3.5 stroke-[2.8]" />
+      )}
+    </button>
   );
 }
 

@@ -67,8 +67,8 @@ export function TopicStoriesCarousel({
         ref={ref}
         className="no-scrollbar flex snap-x gap-2 overflow-x-auto px-3 py-1 sm:px-0.5 md:gap-3 md:pb-2"
       >
-        {/* Create Story Card (Always available to add a Story/Reel) */}
-        {onCreate && (
+        {/* Create Story Card (Only available for logged-in users) */}
+        {onCreate && currentUser && (
           <button
             type="button"
             onClick={onCreate}
