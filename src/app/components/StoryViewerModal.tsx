@@ -306,6 +306,11 @@ export function StoryViewerModal({
   // --- Touch & Pointer Gestures for 3D Cube Rotation and Tap Zones ---
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (showComments) return;
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest('button, input, textarea, a, form, [role="button"]')) {
+      return;
+    }
+
     const x = e.clientX;
     const y = e.clientY;
     pointerStart.current = { x, y, time: Date.now() };
@@ -343,6 +348,14 @@ export function StoryViewerModal({
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
+
+    const target = e.target as HTMLElement | null;
+    if (target && target.closest('button, input, textarea, a, form, [role="button"]')) {
+      setIsHolding(false);
+      setPaused(false);
+      pointerStart.current = null;
+      return;
+    }
 
     if (isHolding) {
       setIsHolding(false);
@@ -787,15 +800,7 @@ export function StoryViewerModal({
               <button
                 type="button"
                 onClick={() => {
-                  if (activeReaction) {
-                    triggerReaction('like', '❤️');
-                  } else {
-                    setShowReactionPicker((prev) => !prev);
-                  }
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setShowReactionPicker(true);
+                  setShowReactionPicker((prev) => !prev);
                 }}
                 className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90 relative"
                 title="প্রতিক্রিয়া জানান"

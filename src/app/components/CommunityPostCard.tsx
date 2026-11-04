@@ -26,6 +26,7 @@ interface Props {
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (images: string[], index: number, title?: string, authorName?: string, authorId?: string) => void;
   hasStory?: boolean;
+  onOpenStory?: () => void;
 }
 
 export function CommunityPostCard({
@@ -40,6 +41,7 @@ export function CommunityPostCard({
   onNavigateProfile,
   onOpenPhoto,
   hasStory,
+  onOpenStory,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -62,7 +64,15 @@ export function CommunityPostCard({
   return (
     <article className={FEED_CARD}>
       <header className="flex items-start gap-2.5 px-3 pt-3 sm:px-4">
-        <button type="button" onClick={() => onNavigateProfile(post.authorId)} className="shrink-0">
+        <button
+          type="button"
+          onClick={() => {
+            if (hasStory && onOpenStory) onOpenStory();
+            else onNavigateProfile(post.authorId);
+          }}
+          className="shrink-0"
+          title={hasStory ? `${post.author.name} এর স্টোরি দেখুন` : post.author.name}
+        >
           <Avatar src={post.author.avatar} name={post.author.name} size="size-10" online hasStory={hasStory} />
         </button>
         <div className="min-w-0 flex-1">

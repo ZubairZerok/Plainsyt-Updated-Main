@@ -71,19 +71,20 @@ export function ArticleReaderContent({
       }}
       className="rounded-t-3xl border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden animate-in slide-in-from-bottom-6 duration-300 ease-out"
     >
-      {/* Mobile drag-down handle */}
-      {!isStandalonePage && (
-        <div
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className="sm:hidden flex items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing w-full bg-canvas-card select-none"
-        >
-          <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-[#03EF62]/40" />
-        </div>
-      )}
+      {/* Sticky top header with mobile drag-down handle */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="sticky top-0 z-10 flex flex-col border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md"
+      >
+        {!isStandalonePage && (
+          <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing w-full select-none">
+            <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-[#03EF62]/50" />
+          </div>
+        )}
 
-      <div className="sticky top-0 z-10 flex items-center justify-end border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md px-4 sm:px-5 py-2.5">
+        <div className="flex items-center justify-end px-4 sm:px-5 py-2">
         <div className="flex items-center gap-2">
           {!isStandalonePage && (
             <a
@@ -118,6 +119,7 @@ export function ArticleReaderContent({
           )}
         </div>
       </div>
+    </div>
 
       <ImageGraphic
         type={a.imageType}

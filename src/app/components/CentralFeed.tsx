@@ -50,46 +50,57 @@ export function CentralFeed(f: FeedApi) {
     [f.stories],
   );
 
-  const renderArticle = (a: Article, lead = false) => (
-    <ArticleCard
-      key={a.id}
-      article={a}
-      lead={lead}
-      bookmarked={bookmarkIds.includes(a.id)}
-      currentUser={f.currentUser}
-      hasStory={storyAuthorIds.has(a.authorId || a.author.id)}
-      onOpenPopup={() => f.onOpenArticlePopup(a.id)}
-      onReact={(type) => f.onReact('article', a.id, type)}
-      onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('article', a.id)}
-      onBookmark={() => f.onBookmarkArticle(a.id)}
-      onComment={(t) => f.onCommentArticle(a.id, t)}
-      onReactComment={(cid, type) => f.onReact('comment', cid, type)}
-      onShare={() => f.onShare(a.title)}
-      onNavigateProfile={f.onNavigateProfile}
-      onOpenPhoto={(src, title, subtitle, authorName, authorId) =>
-        f.onOpenPhoto([src], 0, title, subtitle, authorName, authorId)
-      }
-    />
-  );
+  const renderArticle = (a: Article, lead = false) => {
+    const authorId = a.authorId || a.author.id;
+    const authorStory = storyAuthorIds.has(authorId) ? f.stories.find((s) => s.authorId === authorId) : null;
 
-  const renderPost = (p: CommunityPost) => (
-    <CommunityPostCard
-      key={p.id}
-      post={p}
-      currentUser={f.currentUser}
-      hasStory={storyAuthorIds.has(p.authorId)}
-      onReact={(type) => f.onReact('post', p.id, type)}
-      onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('post', p.id)}
-      onSave={() => f.onSavePost(p.id)}
-      onComment={(t) => f.onCommentPost(p.id, t)}
-      onReactComment={(cid, type) => f.onReact('comment', cid, type)}
-      onShare={() => f.onShare(p.author.name)}
-      onNavigateProfile={f.onNavigateProfile}
-      onOpenPhoto={(imgs, idx, title, authorName, authorId) =>
-        f.onOpenPhoto(imgs, idx, title, undefined, authorName, authorId)
-      }
-    />
-  );
+    return (
+      <ArticleCard
+        key={a.id}
+        article={a}
+        lead={lead}
+        bookmarked={bookmarkIds.includes(a.id)}
+        currentUser={f.currentUser}
+        hasStory={storyAuthorIds.has(authorId)}
+        onOpenStory={authorStory ? () => f.onOpenStory(authorStory.id) : undefined}
+        onOpenPopup={() => f.onOpenArticlePopup(a.id)}
+        onReact={(type) => f.onReact('article', a.id, type)}
+        onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('article', a.id)}
+        onBookmark={() => f.onBookmarkArticle(a.id)}
+        onComment={(t) => f.onCommentArticle(a.id, t)}
+        onReactComment={(cid, type) => f.onReact('comment', cid, type)}
+        onShare={() => f.onShare(a.title)}
+        onNavigateProfile={f.onNavigateProfile}
+        onOpenPhoto={(src, title, subtitle, authorName, authorId) =>
+          f.onOpenPhoto([src], 0, title, subtitle, authorName, authorId)
+        }
+      />
+    );
+  };
+
+  const renderPost = (p: CommunityPost) => {
+    const authorStory = storyAuthorIds.has(p.authorId) ? f.stories.find((s) => s.authorId === p.authorId) : null;
+
+    return (
+      <CommunityPostCard
+        key={p.id}
+        post={p}
+        currentUser={f.currentUser}
+        hasStory={storyAuthorIds.has(p.authorId)}
+        onOpenStory={authorStory ? () => f.onOpenStory(authorStory.id) : undefined}
+        onReact={(type) => f.onReact('post', p.id, type)}
+        onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('post', p.id)}
+        onSave={() => f.onSavePost(p.id)}
+        onComment={(t) => f.onCommentPost(p.id, t)}
+        onReactComment={(cid, type) => f.onReact('comment', cid, type)}
+        onShare={() => f.onShare(p.author.name)}
+        onNavigateProfile={f.onNavigateProfile}
+        onOpenPhoto={(imgs, idx, title, authorName, authorId) =>
+          f.onOpenPhoto(imgs, idx, title, undefined, authorName, authorId)
+        }
+      />
+    );
+  };
 
   const [leadArticle, ...restArticles] = f.articles;
   const firstReel = f.reels[0];

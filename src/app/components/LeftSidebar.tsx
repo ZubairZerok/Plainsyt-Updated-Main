@@ -97,7 +97,7 @@ export function LeftSidebar(p: Props) {
             >
               <span
                 className={cn(
-                  'flex size-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-[#03EF62] group-hover:border-[#03EF62] group-hover:text-[#061621] group-hover:shadow-sm',
+                  'flex size-9 shrink-0 items-center justify-center rounded-xl border border-slate-200/70 dark:border-white/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-[#00ED64] group-hover:bg-[#03EF62] group-hover:border-[#03EF62] group-hover:text-[#061621] group-hover:shadow-sm',
                   s.tone,
                 )}
               >

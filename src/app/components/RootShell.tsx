@@ -429,6 +429,10 @@ export function RootShell() {
       setReaderId(null);
       return true;
     }
+    if (storyViewerId) {
+      setStoryViewerId(null);
+      return true;
+    }
     return false;
   }, [
     lightbox,
@@ -475,9 +479,10 @@ export function RootShell() {
         return;
       }
 
-      // If on subroute and at start of entry history: navigate back towards home '/'
-      if (location.pathname !== '/' && window.history.length <= 2) {
-        navigate('/', { replace: true });
+      // If on subroute: navigate back towards home '/'
+      if (location.pathname !== '/') {
+        navigate('/', { replace: false });
+        return;
       }
     };
 

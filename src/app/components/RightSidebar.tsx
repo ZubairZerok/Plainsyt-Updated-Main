@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin, Users, Check, MessageCircle, Eye, ExternalLink, Calendar } from 'lucide-react';
 import type { Article, UpcomingEvent, UserProfile } from '../types';
-import { Avatar, CARD, SectionLabel, cn } from './Primitives';
+import { Avatar, CARD, FollowIconButton, Num, SectionLabel, cn } from './Primitives';
 import { SeeAllLink } from './Header';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
@@ -47,7 +47,7 @@ export function TrendingList({
   }
 
   return (
-    <ol className="divide-y divide-slate-100">
+    <ol className="divide-y divide-slate-100 dark:divide-white/10">
       {ranked.map((a, idx) => (
         <li key={a.id} className="group flex items-start gap-2 py-2.5">
           <button
@@ -55,11 +55,11 @@ export function TrendingList({
             onClick={() => onOpenPopup(a.id)}
             className="flex min-w-0 flex-1 items-start gap-2 text-left"
           >
-            <span className="w-5 shrink-0 font-display text-lg font-bold text-slate-300 group-hover:text-emerald-500 transition-colors">
+            <span className="w-5 shrink-0 font-display text-lg font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-[#03EF62] transition-colors">
               {String(idx + 1).padStart(2, '0')}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="line-clamp-2 font-sans text-xs font-semibold leading-snug text-slate-900 group-hover:text-emerald-700">
+              <span className="line-clamp-2 font-bangla text-xs font-semibold leading-snug text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
                 {a.title}
               </span>
               <span className="mt-1 flex items-center gap-2 font-bangla text-[11px] text-slate-500 dark:text-slate-400">
@@ -67,9 +67,9 @@ export function TrendingList({
                   <Calendar className="size-2.5 text-[#03EF62]" />
                   {a.publishedAt}
                 </span>
-                <span className="flex items-center gap-0.5">
-                  <MessageCircle className="size-2.5" />
-                  {toBengaliNumerals(a.stats.commentsCount)}
+                <span className="flex items-center gap-1">
+                  <MessageCircle className="size-2.5 text-slate-400 dark:text-[#03EF62]" />
+                  <Num>{toBengaliNumerals(a.stats.commentsCount)}</Num>
                 </span>
               </span>
             </span>
@@ -279,19 +279,11 @@ export function RightSidebar(p: Props) {
                           {s.focusArea || s.role || 'লেখক'}
                         </span>
                       </span>
-                      <button
-                        type="button"
+                      <FollowIconButton
+                        isFollowing={isFollowing}
                         onClick={() => p.onToggleFollow(s.id)}
-                        aria-pressed={isFollowing}
-                        className={cn(
-                          'h-6 shrink-0 rounded-full px-2.5 text-[10px] font-semibold transition',
-                          isFollowing
-                            ? 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'
-                            : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
-                        )}
-                      >
-                        {isFollowing ? 'যুক্ত' : 'ফলো'}
-                      </button>
+                        className="size-6 shrink-0"
+                      />
                     </li>
                   );
                 })}

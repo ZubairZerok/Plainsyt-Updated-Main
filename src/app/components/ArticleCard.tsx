@@ -21,6 +21,7 @@ interface Props {
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
   hasStory?: boolean;
+  onOpenStory?: () => void;
 }
 
 export function ArticleCard({
@@ -38,6 +39,7 @@ export function ArticleCard({
   onNavigateProfile,
   onOpenPhoto,
   hasStory,
+  onOpenStory,
 }: Props) {
   const [text, setText] = useState('');
   const [showComments, setShowComments] = useState(Boolean(lead));
@@ -115,9 +117,13 @@ export function ArticleCard({
           <div className="flex min-w-0 items-center gap-2.5">
             <button
               type="button"
-              onClick={() => onNavigateProfile(a.authorId)}
+              onClick={() => {
+                if (hasStory && onOpenStory) onOpenStory();
+                else onNavigateProfile(a.authorId);
+              }}
               className="shrink-0"
-              aria-label={`View ${a.author.name}'s profile`}
+              aria-label={`View ${a.author.name}'s story or profile`}
+              title={hasStory ? `${a.author.name} এর স্টোরি দেখুন` : a.author.name}
             >
               <Avatar src={a.author.avatar} name={a.author.name} size="size-9" hasStory={hasStory} />
             </button>

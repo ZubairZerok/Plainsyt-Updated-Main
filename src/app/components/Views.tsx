@@ -308,7 +308,7 @@ export function ExploreView({
       />
 
       {/* Topic Dropdown - Accessible, Modern SaaS Component */}
-      <div className="relative z-40 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
+      <div className="relative z-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
         <div className="flex items-center gap-2">
           <ExploreTopicDropdown
             articles={articles}
@@ -318,13 +318,13 @@ export function ExploreView({
         </div>
         <div className="text-xs text-slate-500 dark:text-slate-400 font-bangla flex items-center gap-1.5 self-end sm:self-center">
           <span>প্রদর্শন করা হচ্ছে:</span>
-          <span className="font-bangla font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/10">
+          <span className="font-bangla font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/10 border border-transparent dark:border-[#03EF62]/30 dark:text-[#03EF62]">
             {pillar ? (PILLAR_DEFS.find((p) => p.key === pillar)?.bn ?? 'নির্দিষ্ট বিষয়') : 'সকল বিষয়'}
           </span>
         </div>
       </div>
 
-      <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>
+      <section className={cn(FEED_CARD, 'relative z-10 p-4 sm:p-5')}>
         <div className="mb-3">
           <div className="flex items-center justify-between gap-2">
             <span className="font-bangla text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1099,7 +1099,7 @@ export function ProfileView({
                   className={cn(
                     'inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition shadow-xs',
                     isFollowing
-                      ? 'bg-slate-100 text-slate-700'
+                      ? 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/15'
                       : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
                   )}
                 >
