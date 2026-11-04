@@ -698,7 +698,43 @@ export function Header(p: Props) {
                 </span>
               </button>
 
-              {/* 6. Editorial Standards & Guidelines */}
+              {/* 6. Marketplace / Store */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/store');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                    <ShoppingBag className="size-4" />
+                  </span>
+                  <span className="truncate">কৃষি বাজার ও স্টোর</span>
+                </div>
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+              </button>
+
+              {/* 7. Innovation Ideas Board */}
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  p.onNavigate('/ideas');
+                }}
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                    <Lightbulb className="size-4" />
+                  </span>
+                  <span className="truncate">উদ্ভাবনী আইডিয়া</span>
+                </div>
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+              </button>
+
+              {/* 8. Editorial Standards & Guidelines */}
               <button
                 type="button"
                 onClick={() => {

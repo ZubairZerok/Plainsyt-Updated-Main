@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, ExternalLink, User } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import type { LightboxPayload } from '../types';
 import { cn } from './Primitives';
+import { toBengaliNumerals } from '../utils/pureLogic';
 
 export function PhotoLightboxModal({
   payload,
@@ -60,68 +61,66 @@ export function PhotoLightboxModal({
       aria-label={payload.title || 'Photo viewer'}
     >
       {/* Top Toolbar */}
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <span className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-[11px]">
-            {index + 1} / {total}
-          </span>
-          {payload.authorName && (
+      <div className="relative flex items-center justify-between border-b border-white/10 px-3 py-2 sm:px-4">
+        {/* Left spacer for centering balance */}
+        <div className="w-9 sm:w-10" />
+
+        {/* Center: Zoom controls with Serial counter directly below, centered in middle alignment */}
+        <div className="flex flex-col items-center justify-center gap-1">
+          <div className="flex items-center gap-1 sm:gap-1.5">
             <button
               type="button"
-              onClick={() => {
-                if (payload.authorId && onNavigateProfile) {
-                  onClose();
-                  onNavigateProfile(payload.authorId);
-                }
-              }}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white/90 hover:text-white hover:underline"
+              onClick={() => setZoom((z) => Math.max(0.75, +(z - 0.25).toFixed(2)))}
+              aria-label="Zoom out"
+              className="flex size-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"
             >
-              <User className="size-3.5 text-white/80" />
-              {payload.authorName}
+              <ZoomOut className="size-4" />
             </button>
-          )}
+            <span className="min-w-[42px] text-center font-bangla font-bold text-xs text-white/90">
+              {toBengaliNumerals(Math.round(zoom * 100))}%
+            </span>
+            <button
+              type="button"
+              onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
+              aria-label="Zoom in"
+              className="flex size-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"
+            >
+              <ZoomIn className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setZoom(1)}
+              aria-label="Reset zoom"
+              className="flex size-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"
+            >
+              <RotateCcw className="size-4" />
+            </button>
+            <a
+              href={currentSrc}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open original image in new tab"
+              className="flex size-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"
+            >
+              <ExternalLink className="size-4" />
+            </a>
+          </div>
+
+          {/* Photo serial counter directly below zoom controls, centered in middle alignment */}
+          <div className="flex items-center justify-center">
+            <span className="rounded-full border border-white/20 bg-white/10 px-3 py-0.5 font-bangla text-xs font-bold text-white shadow-sm">
+              {toBengaliNumerals(index + 1)} / {toBengaliNumerals(total)}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setZoom((z) => Math.max(0.75, +(z - 0.25).toFixed(2)))}
-            aria-label="Zoom out"
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-          >
-            <ZoomOut className="size-4" />
-          </button>
-          <span className="min-w-[46px] text-center font-mono text-[11px]">{Math.round(zoom * 100)}%</span>
-          <button
-            type="button"
-            onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
-            aria-label="Zoom in"
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-          >
-            <ZoomIn className="size-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setZoom(1)}
-            aria-label="Reset zoom"
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-          >
-            <RotateCcw className="size-4" />
-          </button>
-          <a
-            href={currentSrc}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open original image in new tab"
-            className="flex size-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-          >
-            <ExternalLink className="size-4" />
-          </a>
+        {/* Right: Close button */}
+        <div className="flex items-center justify-end w-9 sm:w-10">
           <button
             type="button"
             onClick={onClose}
             aria-label="Close photo popup"
-            className="ml-1 flex size-9 items-center justify-center rounded-full bg-white/15 hover:bg-white/25"
+            className="flex size-9 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition"
           >
             <X className="size-5" />
           </button>

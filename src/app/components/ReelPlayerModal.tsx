@@ -498,8 +498,13 @@ export function ReelPlayerModal({
                       <Avatar src={c.avatar} name={c.author} size="size-8" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline justify-between gap-1">
-                          <span className="font-bangla text-[13px] font-bold text-white truncate">{c.author}</span>
-                          <span className="font-bangla text-[11.5px] font-medium text-emerald-300 shrink-0">
+                          <div className="flex items-baseline gap-1.5 min-w-0">
+                            <span className="font-bangla text-[13px] font-bold text-white truncate">{c.author}</span>
+                            <span className="text-[11px] font-bangla text-[#03EF62] font-medium truncate">
+                              · {c.role || 'গবেষক ও লেখক'}
+                            </span>
+                          </div>
+                          <span className="font-bangla text-[11px] font-medium text-emerald-300 shrink-0">
                             {c.timestampLabel || 'এখন'}
                           </span>
                         </div>

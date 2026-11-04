@@ -38,6 +38,8 @@ interface Props {
   onFollow: () => void;
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto?: (src: string, title?: string, authorName?: string, authorId?: string) => void;
+  hasStory?: boolean;
+  onOpenStory?: () => void;
 }
 
 export function IntegratedReelCard({
@@ -55,6 +57,8 @@ export function IntegratedReelCard({
   onShare,
   onFollow,
   onNavigateProfile,
+  hasStory,
+  onOpenStory,
 }: Props) {
   const photo = reel.mediaUrl;
   const rxTotal = totalReactions(reel.reactionCounts, reel.likes);
@@ -204,8 +208,17 @@ export function IntegratedReelCard({
     <article ref={cardRef} className={cn(FEED_CARD, 'overflow-hidden')}>
       {/* Header: account + follow only */}
       <header className="relative z-20 flex items-center gap-3 px-3.5 py-3 sm:px-4 bg-white dark:bg-[#071f2d] border-b border-slate-200/90 dark:border-white/10">
-        <button type="button" onClick={() => onNavigateProfile(reel.creatorId)} className="shrink-0">
-          <Avatar src={reel.creatorAvatar} name={reel.creator} size="size-10" ring online />
+        <button
+          type="button"
+          onClick={() => {
+            if (hasStory && onOpenStory) onOpenStory();
+            else onNavigateProfile(reel.creatorId);
+          }}
+          className="shrink-0"
+          aria-label={`View ${reel.creator}'s story or profile`}
+          title={hasStory ? `${reel.creator} এর স্টোরি দেখুন` : reel.creator}
+        >
+          <Avatar src={reel.creatorAvatar} name={reel.creator} size="size-10" hasStory={hasStory} online />
         </button>
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[15px] font-bold text-slate-900 dark:text-white leading-tight">

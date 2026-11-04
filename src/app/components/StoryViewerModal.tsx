@@ -133,7 +133,7 @@ export function StoryViewerModal({
   const pointerStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const isDragging = useRef(false);
 
-  // Position at initialStoryId on open
+  // Position at initialStoryId or authorId on open
   useEffect(() => {
     if (!open || accountGroups.length === 0) return;
     if (initialStoryId) {
@@ -142,6 +142,14 @@ export function StoryViewerModal({
         if (sIndex !== -1) {
           setAccountIdx(a);
           setStoryIdx(sIndex);
+          setProgress(0);
+          setCubeAngle(0);
+          setIsCaptionExpanded(false);
+          return;
+        }
+        if (accountGroups[a].authorId === initialStoryId) {
+          setAccountIdx(a);
+          setStoryIdx(0);
           setProgress(0);
           setCubeAngle(0);
           setIsCaptionExpanded(false);
@@ -252,7 +260,7 @@ export function StoryViewerModal({
     progressTimer.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 1) {
-          advanceToNext(false);
+          setTimeout(() => advanceToNext(false), 0);
           return 0;
         }
         return prev + step;
@@ -920,8 +928,13 @@ export function StoryViewerModal({
                   <Avatar src={c.avatar} name={c.author} size="size-7" />
                   <div className="flex-1 min-w-0 bg-white/5 rounded-2xl p-2.5 border border-white/5">
                     <div className="flex items-baseline justify-between gap-1">
-                      <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
-                      <span className="font-bangla text-[10.5px] text-emerald-400">
+                      <div className="flex items-baseline gap-1.5 min-w-0">
+                        <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
+                        <span className="text-[10px] font-bangla text-[#03EF62] font-medium truncate">
+                          · {c.role || 'গবেষক ও লেখক'}
+                        </span>
+                      </div>
+                      <span className="font-bangla text-[10px] text-emerald-400 shrink-0">
                         {c.timestampLabel || 'এখন'}
                       </span>
                     </div>

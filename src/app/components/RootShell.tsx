@@ -46,7 +46,7 @@ import { EventDetailPage } from './EventDetailPage';
 import { AuthModal } from './AuthModal';
 import { FEED_CARD, cn } from './Primitives';
 
-const MAIN_TABS = ['/', '/explore', '/events', '/store', '/ideas', '/notifications'];
+const MAIN_TABS = ['/', '/explore', '/events', '/notifications'];
 
 export function RootShell() {
   const location = useLocation();

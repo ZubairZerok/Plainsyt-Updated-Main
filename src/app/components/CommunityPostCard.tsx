@@ -301,11 +301,12 @@ export function CommunityPostCard({
                   <button
                     type="button"
                     onClick={() => onNavigateProfile(c.authorId)}
-                    className="text-left text-[12.5px] font-semibold text-pine-900 hover:underline"
+                    className="inline-flex flex-wrap items-baseline gap-1.5 font-bangla text-left hover:underline"
                   >
-                    {c.author} <span className="font-normal text-emerald-700/80 dark:text-emerald-400">· {c.role}</span>
+                    <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
+                    <span className="text-[11px] font-medium text-emerald-700 dark:text-[#03EF62]">· {c.role || 'গবেষক'}</span>
                   </button>
-                  <p className="font-bangla text-[13.5px] leading-snug text-pine-900/85">{c.text}</p>
+                  <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">{c.text}</p>
                 </div>
                 <div className="ml-2 mt-0.5 flex items-center gap-2 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
                   <span className="font-semibold">{c.timestamp}</span>

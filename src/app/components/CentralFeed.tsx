@@ -104,6 +104,9 @@ export function CentralFeed(f: FeedApi) {
 
   const [leadArticle, ...restArticles] = f.articles;
   const firstReel = f.reels[0];
+  const firstReelStory = firstReel && storyAuthorIds.has(firstReel.creatorId)
+    ? f.stories.find((s) => s.authorId === firstReel.creatorId)
+    : null;
 
   // Interleave articles and community posts cleanly
   const stream: ReactElement[] = [];
@@ -119,6 +122,8 @@ export function CentralFeed(f: FeedApi) {
         isOwnCreator={Boolean(f.currentUser?.id) && firstReel.creatorId === f.currentUser?.id}
         hasPrev={false}
         hasNext={f.reels.length > 1}
+        hasStory={storyAuthorIds.has(firstReel.creatorId)}
+        onOpenStory={firstReelStory ? () => f.onOpenStory(firstReelStory.id) : undefined}
         onPlay={() => f.onPlayReel(0)}
         onPrev={() => f.onPlayReel(0)}
         onNext={() => f.onPlayReel(1)}
@@ -137,6 +142,9 @@ export function CentralFeed(f: FeedApi) {
     if (f.reels[i + 1]) {
       const extraReel = f.reels[i + 1];
       const reelIdx = i + 1;
+      const extraReelStory = storyAuthorIds.has(extraReel.creatorId)
+        ? f.stories.find((s) => s.authorId === extraReel.creatorId)
+        : null;
       stream.push(
         <IntegratedReelCard
           key={extraReel.id}
@@ -146,6 +154,8 @@ export function CentralFeed(f: FeedApi) {
           isOwnCreator={Boolean(f.currentUser?.id) && extraReel.creatorId === f.currentUser?.id}
           hasPrev={reelIdx > 0}
           hasNext={reelIdx < f.reels.length - 1}
+          hasStory={storyAuthorIds.has(extraReel.creatorId)}
+          onOpenStory={extraReelStory ? () => f.onOpenStory(extraReelStory.id) : undefined}
           onPlay={() => f.onPlayReel(reelIdx)}
           onPrev={() => f.onPlayReel(Math.max(0, reelIdx - 1))}
           onNext={() => f.onPlayReel(Math.min(f.reels.length - 1, reelIdx + 1))}
