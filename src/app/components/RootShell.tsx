@@ -45,6 +45,8 @@ import { EventDetailPage } from './EventDetailPage';
 import { AuthModal } from './AuthModal';
 import { FEED_CARD, cn } from './Primitives';
 
+const MAIN_TABS = ['/', '/explore', '/events', '/store', '/ideas', '/notifications'];
+
 export function RootShell() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -217,21 +219,42 @@ export function RootShell() {
       })
       .subscribe();
 
-    // 1. Audit URL for Google OAuth errors or code
+    // 1. Handle Google OAuth tokens, PKCE codes, and errors
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       const hashClean = window.location.hash.replace(/^#/, '');
       const hashParams = new URLSearchParams(hashClean);
 
-      const oauthError =
-        searchParams.get('error_description') ||
-        searchParams.get('error') ||
-        hashParams.get('error_description') ||
-        hashParams.get('error');
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const authCode = searchParams.get('code');
 
-      if (oauthError) {
-        toast.error('গুগল সাইন-ইন সম্পন্ন হয়নি: ' + decodeURIComponent(oauthError));
+      // Instantly wipe raw tokens/codes from the browser address bar
+      if (accessToken || authCode || hashClean.includes('access_token=')) {
         window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      if (accessToken) {
+        supabase.auth
+          .setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          })
+          .then(async ({ data, error }) => {
+            if (data?.session?.user && !error) {
+              await syncUserSession(data.session.user);
+            }
+          })
+          .catch(() => {});
+      } else if (authCode) {
+        supabase.auth
+          .exchangeCodeForSession(authCode)
+          .then(async ({ data, error }) => {
+            if (data?.session?.user && !error) {
+              await syncUserSession(data.session.user);
+            }
+          })
+          .catch(() => {});
       }
     }
 
@@ -255,9 +278,6 @@ export function RootShell() {
         commit((prev) => ({ ...prev, currentUserId: '' }));
       } else if (session?.user) {
         await syncUserSession(session.user);
-        if (event === 'SIGNED_IN') {
-          toast.success('সফলভাবে প্রবেশ করা হয়েছে!');
-        }
         if (
           window.location.hash.includes('access_token') ||
           window.location.search.includes('code=')
@@ -430,14 +450,6 @@ export function RootShell() {
 
   // Global popstate navigation & back button guard
   useEffect(() => {
-    // Initial root state guard for mobile apps
-    if (typeof window !== 'undefined') {
-      if (!window.history.state?.plainsytRoot) {
-        window.history.replaceState({ plainsytRoot: true }, '');
-        window.history.pushState({ plainsytActive: true }, '');
-      }
-    }
-
     const handlePopState = () => {
       // If close was triggered by UI button, history is already popped
       if (isClosingViaUiRef.current) {
@@ -454,31 +466,97 @@ export function RootShell() {
         return;
       }
 
-      // If on subroute and no modals open: navigate back towards home '/'
-      if (location.pathname !== '/') {
-        if (window.history.length <= 2) {
-          navigate('/');
-        }
-        return;
-      }
-
-      // If at root '/' with no modals open: double-back to exit guard
-      const now = Date.now();
-      if (now - lastBackPressRef.current < 2200) {
-        // User confirmed exit
-        window.history.back();
-      } else {
-        lastBackPressRef.current = now;
-        toast('অ্যাপ্লিকেশন বন্ধ করতে আবার ব্যাক বাটনে চাপুন', {
-          duration: 2000,
-        });
-        window.history.pushState({ plainsytActive: true }, '');
+      // If on subroute and at start of entry history: navigate back towards home '/'
+      if (location.pathname !== '/' && window.history.length <= 2) {
+        navigate('/', { replace: true });
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [activeModals.length, closeTopModal, location.pathname, navigate]);
+
+  // Mobile horizontal swipe between top-level tabs (Facebook/Twitter style)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let isTracking = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (activeModals.length > 0) return;
+      if (e.touches.length !== 1) return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const tag = target.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || target.isContentEditable) return;
+
+      const scrollable = target.closest(
+        '[data-swipe-ignore], [role="tablist"], .overflow-x-auto, .overflow-x-scroll, .embla, pre'
+      );
+      if (scrollable) return;
+
+      let el: HTMLElement | null = target;
+      while (el && el !== document.body) {
+        if (
+          el.scrollWidth > el.clientWidth &&
+          (window.getComputedStyle(el).overflowX === 'auto' || window.getComputedStyle(el).overflowX === 'scroll')
+        ) {
+          return;
+        }
+        el = el.parentElement;
+      }
+
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+      isTracking = true;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!isTracking) return;
+      isTracking = false;
+      if (e.changedTouches.length !== 1) return;
+
+      const deltaX = e.changedTouches[0].clientX - touchStartX;
+      const deltaY = e.changedTouches[0].clientY - touchStartY;
+      const deltaTime = Date.now() - touchStartTime;
+
+      if (deltaTime > 600) return;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+
+      if (absX < 65 || absX < absY * 1.8 || absY > 80) return;
+
+      const currentPath = location.pathname;
+      const currentIndex = MAIN_TABS.indexOf(currentPath);
+      if (currentIndex === -1) return;
+
+      if (deltaX < 0) {
+        // Swiped Left -> Advance to next tab
+        if (currentIndex < MAIN_TABS.length - 1) {
+          navigate(MAIN_TABS[currentIndex + 1]);
+        }
+      } else {
+        // Swiped Right -> Go back to previous tab
+        if (currentIndex > 0) {
+          navigate(MAIN_TABS[currentIndex - 1]);
+        }
+      }
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [activeModals.length, location.pathname, navigate]);
 
   const requestAuth = useCallback((reason: string, onAuthed?: () => void) => {
     setAuthPromptReason(reason);
@@ -500,7 +578,6 @@ export function RootShell() {
         currentUserId: profile.id,
       }));
       setAuthModalOpen(false);
-      toast.success(`স্বাগতম, ${profile.name}!`);
       if (pendingAction) {
         setTimeout(() => {
           pendingAction();
@@ -514,7 +591,6 @@ export function RootShell() {
   const handleLogout = useCallback(async () => {
     await logoutUser();
     commit((prev) => ({ ...prev, currentUserId: '' }));
-    toast.success('সফলভাবে সাইন আউট হয়েছে');
   }, [commit]);
 
   const activeView: View = useMemo(() => {
@@ -561,7 +637,7 @@ export function RootShell() {
       if (selection) {
         toast.success('লেখা কপি করা হয়েছে', {
           description: selection.length > 35 ? `${selection.slice(0, 32)}...` : selection,
-          duration: 2200,
+          duration: 1600,
         });
       }
     };
@@ -643,7 +719,6 @@ export function RootShell() {
         ...prev,
         bookmarkedArticleIds: toggleBookmarkId(prev.bookmarkedArticleIds, articleId),
       }));
-      toast(was ? 'সংরক্ষিত তালিকা থেকে সরানো হয়েছে' : 'সংরক্ষিত তালিকায় যোগ হয়েছে');
     },
     [currentUser, snap.bookmarkedArticleIds, commit, requestAuth],
   );
@@ -770,7 +845,6 @@ export function RootShell() {
         ...prev,
         posts: prev.posts.map((p) => (p.id === postId ? { ...p, userSaved: !p.userSaved } : p)),
       }));
-      toast('পোস্ট সংরক্ষণ আপডেট হয়েছে');
     },
     [currentUser, commit, requestAuth],
   );
@@ -789,7 +863,6 @@ export function RootShell() {
         comments: [newComment, ...prev.comments],
       }));
       dbInsertComment(newComment);
-      toast.success('মন্তব্য প্রকাশ করা হয়েছে');
     },
     [commit, currentUser, requestAuth],
   );
@@ -811,7 +884,6 @@ export function RootShell() {
         requestAuth('স্টোরি সংরক্ষণ করতে অনুগ্রহ করে লগইন করুন।');
         return;
       }
-      toast.success('স্টোরিটি সংরক্ষিত তালিকায় যুক্ত হয়েছে');
     },
     [currentUser, requestAuth],
   );
@@ -837,7 +909,6 @@ export function RootShell() {
         notifications: prev.notifications.filter((n) => n.id !== id),
       }));
       dbDeleteNotification(id);
-      toast.success('বিজ্ঞপ্তিটি মুছে ফেলা হয়েছে');
     },
     [commit],
   );
@@ -850,7 +921,6 @@ export function RootShell() {
     if (currentUser) {
       dbMarkAllNotificationsRead(currentUser.id);
     }
-    toast.success('সকল বিজ্ঞপ্তি পড়া হয়েছে চিহ্নিত করা হলো');
   }, [commit, currentUser]);
 
   // Content deletion operations
@@ -862,7 +932,6 @@ export function RootShell() {
       }
       const post = snap.posts.find((p) => p.id === postId);
       if (post && post.authorId !== currentUser.id && currentUser.id !== 'usr-plainsyt-admin') {
-        toast.error('আপনি শুধুমাত্র নিজের পোস্ট মুছতে পারবেন');
         return;
       }
       commit((prev) => ({
@@ -871,7 +940,6 @@ export function RootShell() {
         comments: prev.comments.filter((c) => !(c.targetType === 'post' && c.targetId === postId)),
       }));
       dbDeletePost(postId);
-      toast.success('পোস্টটি মুছে ফেলা হয়েছে');
     },
     [commit, currentUser, requestAuth, snap.posts],
   );
@@ -884,7 +952,6 @@ export function RootShell() {
       }
       const story = snap.stories.find((s) => s.id === storyId);
       if (story && story.authorId !== currentUser.id && currentUser.id !== 'usr-plainsyt-admin') {
-        toast.error('আপনি শুধুমাত্র নিজের স্টোরি মুছতে পারবেন');
         return;
       }
       commit((prev) => ({
@@ -892,7 +959,6 @@ export function RootShell() {
         stories: prev.stories.filter((s) => s.id !== storyId),
       }));
       dbDeleteStory(storyId);
-      toast.success('স্টোরিটি মুছে ফেলা হয়েছে');
     },
     [commit, currentUser, requestAuth, snap.stories],
   );
@@ -905,7 +971,6 @@ export function RootShell() {
       }
       const art = snap.articles.find((a) => a.id === articleId);
       if (art && art.authorId !== currentUser.id && currentUser.id !== 'usr-plainsyt-admin') {
-        toast.error('আপনি শুধুমাত্র নিজের প্রতিবেদন মুছতে পারবেন');
         return;
       }
       commit((prev) => ({
@@ -914,7 +979,6 @@ export function RootShell() {
         comments: prev.comments.filter((c) => !(c.targetType === 'article' && c.targetId === articleId)),
       }));
       dbDeleteArticle(articleId);
-      toast.success('প্রতিবেদনটি মুছে ফেলা হয়েছে');
     },
     [commit, currentUser, requestAuth, snap.articles],
   );
@@ -922,7 +986,7 @@ export function RootShell() {
   const handleShare = useCallback((label: string) => {
     const shareUrl = window.location.href;
     navigator.clipboard?.writeText(shareUrl).catch(() => {});
-    toast.success('লিংক কপি হয়েছে', { description: label });
+    toast.success('লিংক কপি হয়েছে', { description: label, duration: 1600 });
   }, []);
 
   const handleOpenArticlePopup = useCallback(
@@ -992,7 +1056,6 @@ export function RootShell() {
         };
       });
       dbUpsertProfile(profile);
-      toast.success('প্রোফাইল সফলভাবে আপডেট হয়েছে', { description: profile.name });
     },
     [commit],
   );
@@ -1023,6 +1086,7 @@ export function RootShell() {
       goNavigate('/');
       toast.success('প্রতিবেদন সফলভাবে প্রকাশিত হয়েছে', {
         description: `${toBengaliNumerals(enriched.readTimeMinutes)} মিনিট পড়া · ${enriched.category}`,
+        duration: 1800,
       });
     },
     [currentUser, requestAuth, commit, goNavigate],
@@ -1050,7 +1114,7 @@ export function RootShell() {
       dbUpsertReel(enrichedReel);
       if (story) dbUpsertStory({ ...story, authorId: actor.id, authorName: actor.name, authorAvatar: actor.avatar });
       if (feedPost) dbUpsertPost({ ...feedPost, authorId: actor.id });
-      toast.success('রিল ও স্টোরি সফলভাবে প্রকাশিত হয়েছে');
+      toast.success('রিল ও স্টোরি সফলভাবে প্রকাশিত হয়েছে', { duration: 1800 });
     },
     [currentUser, requestAuth, commit],
   );
@@ -1065,7 +1129,6 @@ export function RootShell() {
       }
       if (!targetUserId) return;
       if (currentUser.id === targetUserId) {
-        toast.error('আপনি নিজেকে অনুসরণ করতে পারবেন না');
         return;
       }
       const was = (snap.followingIds ?? []).includes(targetUserId);
@@ -1076,7 +1139,7 @@ export function RootShell() {
       }));
       dbToggleFollow(currentUser.id, targetUserId, !was);
       const targetProfile = snap.profiles.find((p) => p.id === targetUserId);
-      toast(was ? 'আনফলো করা হয়েছে' : `${targetProfile?.name || 'গবেষক'}-কে ফলো করছেন`);
+      toast(was ? 'আনফলো করা হয়েছে' : `${targetProfile?.name || 'গবেষক'}-কে ফলো করছেন`, { duration: 1600 });
 
       if (!was) {
         const notif: NotificationItem = {
@@ -1114,7 +1177,6 @@ export function RootShell() {
           : [...prev.cart, { productId: product.id, quantity: 1 }];
         return { ...prev, cart: nextCart };
       });
-      toast.success('কার্টে যোগ হয়েছে', { description: product.name });
     },
     [commit],
   );
@@ -1150,9 +1212,6 @@ export function RootShell() {
         };
       });
       dbInsertOrder(order);
-      toast.success(`বিকাশ পেমেন্ট (${order.receiverBkash}) ও অর্ডার সম্পন্ন!`, {
-        description: `Order #${order.orderNumber} · TrxID: ${order.trxId}`,
-      });
     },
     [commit],
   );
@@ -1444,7 +1503,6 @@ export function RootShell() {
                 votedIdeaIds: [...prev.votedIdeaIds, idea.id],
               }));
               dbUpsertIdea(idea);
-              toast.success('আপনার আইডিয়া সফলভাবে জমা হয়েছে');
             }}
             onToggleVote={(id) => {
               if (!currentUser) {
@@ -1864,7 +1922,6 @@ export function RootShell() {
         onSaveProfile={handleSaveProfile}
         onSwitchUser={(userId) => {
           commit((prev) => ({ ...prev, currentUserId: userId }));
-          toast.success('অ্যাক্টিভ প্রোফাইল পরিবর্তন হয়েছে');
         }}
       />
 
@@ -1878,7 +1935,6 @@ export function RootShell() {
             storeProducts: [product, ...prev.storeProducts],
           }));
           dbUpsertProduct(product);
-          toast.success('পণ্যটি সফলভাবে স্টোরে যুক্ত হয়েছে', { description: product.name });
         }}
       />
 
@@ -1907,7 +1963,6 @@ export function RootShell() {
               e.id === eventId ? { ...e, isRegistered: true } : e,
             ),
           }));
-          toast.success('রেজিস্ট্রেশন সম্পন্ন হয়েছে! আপনার আসন নিশ্চিত।');
         }}
       />
 
@@ -1926,7 +1981,9 @@ export function RootShell() {
 
       <Toaster
         position="bottom-center"
+        duration={1800}
         toastOptions={{
+          duration: 1800,
           className:
             'font-bangla !rounded-xl !border !border-[#04301f] !shadow-[3px_3px_0_#04301f] !bg-[#fdfaf5] !text-[#04301f]',
         }}

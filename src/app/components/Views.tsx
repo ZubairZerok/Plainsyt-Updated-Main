@@ -9,7 +9,7 @@ import type {
   Article, BkashOrder, CartItem, CommunityIdea, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionTargetType, StoreProduct, TopicStory, UpcomingEvent, UserProfile,
 } from '../types';
-import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, cn } from './Primitives';
+import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, Num, cn } from './Primitives';
 import { PILLAR_DEFS } from './LeftSidebar';
 import { TrendingList } from './RightSidebar';
 import { ImageGraphic } from './ImageGraphic';
@@ -89,7 +89,7 @@ export function ExploreTopicDropdown({
   const ActiveIcon = activePillarDef ? activePillarDef.icon : Sparkles;
 
   return (
-    <div className="relative inline-block w-full sm:w-auto" ref={dropdownRef}>
+    <div className="relative z-40 inline-block w-full sm:w-auto" ref={dropdownRef}>
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -163,7 +163,7 @@ export function ExploreTopicDropdown({
       {open && (
         <div
           role="listbox"
-          className="absolute left-0 sm:right-auto top-full z-50 mt-2 w-full sm:w-[320px] origin-top-left rounded-2xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#071f2d]/95 p-2 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
+          className="absolute left-0 sm:right-auto top-full z-[100] mt-2 w-full sm:w-[320px] origin-top-left rounded-2xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#071f2d]/95 p-2 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
         >
           <div className="px-3 py-2 border-b border-slate-100 dark:border-white/10 mb-1 flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 font-bangla">
@@ -306,7 +306,7 @@ export function ExploreView({
       />
 
       {/* Topic Dropdown - Accessible, Modern SaaS Component */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
+      <div className="relative z-40 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
         <div className="flex items-center gap-2">
           <ExploreTopicDropdown
             articles={articles}
@@ -323,9 +323,9 @@ export function ExploreView({
       </div>
 
       <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>
-        <SectionLabel className="mb-3">
-          {pillar ? 'ফিল্টার করা প্রবন্ধসমূহ' : 'সকল প্রতিবেদন'} · {toBengaliNumerals(list.length)}
-        </SectionLabel>
+        <div className="mb-3">
+          <div className="flex items-center justify-between gap-2"><span className="font-sans text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{pillar ? 'ফিল্টার করা প্রবন্ধসমূহ' : 'সকল প্রকাশিত প্রতিবেদন'}</span><span className="inline-flex items-center gap-1 rounded-full bg-[#03EF62]/15 px-2.5 py-0.5 font-bangla text-xs text-[#006f30] dark:text-[#03EF62]"><Num>{toBengaliNumerals(list.length)}</Num> টি</span></div>
+        </div>
         {list.length === 0 ? (
           <p className="py-8 text-center font-sans text-sm text-slate-500">
             এই বিষয়ে এখনো কোনো প্রতিবেদন প্রকাশিত হয়নি।
