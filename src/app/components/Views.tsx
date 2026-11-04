@@ -281,6 +281,7 @@ export function ExploreView({
   onPillar,
   onOpenArticlePopup,
   onOpenPhoto,
+  onOpenStory,
 }: {
   articles: Article[];
   currentUser: UserProfile | null;
@@ -289,6 +290,7 @@ export function ExploreView({
   onOpenArticlePopup: (id: string) => void;
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, authorName?: string, authorId?: string) => void;
+  onOpenStory?: (id: string) => void;
 }) {
   const list = useMemo(() => {
     if (!pillar) return articles;
@@ -485,6 +487,7 @@ export function StoreView({
   onOpenCreateProduct,
   onNavigateProfile,
   onOpenPhoto,
+  onOpenStory,
 }: {
   products: StoreProduct[];
   cart: CartItem[];
@@ -494,6 +497,7 @@ export function StoreView({
   onOpenCreateProduct: () => void;
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
+  onOpenStory?: (id: string) => void;
 }) {
   const totalCartQty = cart.reduce((s, c) => s + c.quantity, 0);
 
@@ -924,6 +928,7 @@ export function ProfileView({
   onRemoveSavedPost,
   onNavigateProfile,
   onOpenPhoto,
+  onOpenStory,
 }: {
   profile: UserProfile | null;
   isOwnProfile: boolean;
