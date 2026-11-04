@@ -1071,6 +1071,13 @@ export async function fetchFromSupabase(limit = 60): Promise<{
 // Background write helpers with error catches to prevent unhandled rejections
 export async function dbUpsertProfile(profile: UserProfile) {
   try {
+    if (!profile.id || profile.id === 'usr-plainsyt-admin' || profile.id === 'usr-zubair') {
+      return;
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user || session.user.id !== profile.id) {
+      return;
+    }
     await supabase.from('profiles').upsert(toProfileRow(profile));
   } catch {
     // local-first fallback

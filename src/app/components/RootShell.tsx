@@ -51,6 +51,8 @@ export function RootShell() {
   const params = useParams<{ userId?: string; articleId?: string; eventId?: string }>();
 
   const [snap, setSnap] = useState<DatabaseSnapshot>(() => readSnapshot());
+  const snapRef = useRef(snap);
+  snapRef.current = snap;
   const [supaStatus, setSupaStatus] = useState<SupabaseConnectionStatus>('checking');
   const [supaError, setSupaError] = useState<string | undefined>();
   const [dark, setDark] = useState<boolean>(() => {
@@ -115,8 +117,10 @@ export function RootShell() {
         // Non-blocking fetch
       }
 
+      const currentProfiles = snapRef.current.profiles;
+
       if (alias.isAdmin) {
-        const existingAdmin = snap.profiles.find((pr) => pr.id === 'usr-plainsyt-admin') || getStoredAuthUser();
+        const existingAdmin = currentProfiles.find((pr) => pr.id === 'usr-plainsyt-admin') || getStoredAuthUser();
         profile = {
           ...ADMIN_PROFILE,
           ...existingAdmin,
@@ -132,7 +136,7 @@ export function RootShell() {
           email: userEmail || ADMIN_PROFILE.email,
         };
       } else if (alias.canonicalUserId === 'usr-zubair') {
-        const existingZubair = snap.profiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
+        const existingZubair = currentProfiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
         profile = {
           ...ZUBAIR_PROFILE,
           ...existingZubair,
@@ -151,7 +155,7 @@ export function RootShell() {
         };
       } else {
         const existing =
-          snap.profiles.find((pr) => pr.id === u.id || (userEmail && pr.email === userEmail)) || getStoredAuthUser();
+          currentProfiles.find((pr) => pr.id === u.id || (userEmail && pr.email === userEmail)) || getStoredAuthUser();
         const metaName = u.user_metadata?.full_name || u.user_metadata?.name || u.user_metadata?.user_name;
         const avatarFromMeta = u.user_metadata?.avatar_url || u.user_metadata?.picture;
         const fallbackName = userEmail ? userEmail.split('@')[0] : 'PLAiNSYT Member';
@@ -185,6 +189,11 @@ export function RootShell() {
           followingCount: dbProfile?.following_count || existing?.followingCount || 0,
           createdAt: dbProfile?.created_at || existing?.createdAt || new Date().toISOString(),
         };
+
+        // Only insert if it is a brand-new user without an existing row in Supabase profiles
+        if (!dbProfile && !alias.isAdmin && alias.canonicalUserId !== 'usr-zubair') {
+          dbUpsertProfile(profile);
+        }
       }
 
       setStoredAuth(profile, userEmail || null);
@@ -195,9 +204,8 @@ export function RootShell() {
           : [profile, ...prev.profiles];
         return { ...prev, profiles, currentUserId: profile.id };
       });
-      dbUpsertProfile(profile);
     },
-    [commit, snap.profiles],
+    [commit],
   );
 
   useEffect(() => {
