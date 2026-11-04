@@ -11,7 +11,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import type { LinkedInReactionType, StoryReel } from '../types';
-import { Avatar, FEED_CARD, VerifiedBadge, cn } from './Primitives';
+import { Avatar, FEED_CARD, VerifiedBadge, FollowIconButton, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
 import { getYouTubeEmbedInfo } from './ReelPlayerModal';
@@ -220,18 +220,14 @@ export function IntegratedReelCard({
             {!isOwnCreator && (
               <>
                 <span className="text-slate-400 dark:text-slate-500 font-bold">·</span>
-                <button
-                  type="button"
-                  onClick={onFollow}
-                  className={cn(
-                    'text-[13px] font-bold transition-colors',
-                    following
-                      ? 'text-slate-400 dark:text-slate-500'
-                      : 'text-emerald-600 dark:text-[#03EF62] hover:underline',
-                  )}
-                >
-                  {following ? 'Following' : 'Follow'}
-                </button>
+                <FollowIconButton
+                  isFollowing={following}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onFollow();
+                  }}
+                  className="size-6 shrink-0"
+                />
               </>
             )}
           </p>

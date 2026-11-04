@@ -41,22 +41,21 @@ export function ArticleReaderContent({
   const touchStartY = useRef<number | null>(null);
   const rxTotal = totalReactions(a.reactionCounts, a.stats.likes);
 
-  // Pull-to-dismiss gesture for mobile view
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
+  // Pull-to-dismiss gesture for mobile view (handles touch and pointer gestures)
+  const handleDragStart = (clientY: number) => {
+    touchStartY.current = clientY;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleDragMove = (clientY: number) => {
     if (touchStartY.current === null) return;
-    const currentY = e.touches[0].clientY;
-    const diff = currentY - touchStartY.current;
+    const diff = clientY - touchStartY.current;
     if (diff > 0) {
       setDragOffsetY(diff);
     }
   };
 
-  const handleTouchEnd = () => {
-    if (dragOffsetY > 110 && !isStandalonePage) {
+  const handleDragEnd = () => {
+    if (dragOffsetY > 90 && !isStandalonePage) {
       onClose();
     }
     setDragOffsetY(0);
@@ -69,18 +68,25 @@ export function ArticleReaderContent({
         transform: dragOffsetY > 0 ? `translateY(${dragOffsetY}px)` : undefined,
         transition: dragOffsetY > 0 ? 'none' : 'transform 200ms ease-out',
       }}
-      className="rounded-t-3xl border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden animate-in slide-in-from-bottom-6 duration-300 ease-out"
+      className="rounded-t-3xl border border-slate-200/80 dark:border-[#03EF62]/60 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden animate-in slide-in-from-bottom-6 duration-300 ease-out"
     >
       {/* Sticky top header with mobile drag-down handle */}
       <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="sticky top-0 z-10 flex flex-col border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md"
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientY)}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientY)}
+        onTouchEnd={handleDragEnd}
+        onPointerDown={(e) => {
+          if ((e.target as HTMLElement).closest('button, a, input, textarea')) return;
+          handleDragStart(e.clientY);
+        }}
+        onPointerMove={(e) => handleDragMove(e.clientY)}
+        onPointerUp={handleDragEnd}
+        onPointerCancel={handleDragEnd}
+        className="sticky top-0 z-10 flex flex-col border-b border-slate-100 dark:border-white/10 bg-canvas-card/95 backdrop-blur-md cursor-grab active:cursor-grabbing"
       >
         {!isStandalonePage && (
-          <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing w-full select-none">
-            <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-[#03EF62]/50" />
+          <div className="sm:hidden flex items-center justify-center pt-2.5 pb-1 w-full select-none">
+            <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-[#03EF62]" />
           </div>
         )}
 
@@ -91,7 +97,7 @@ export function ArticleReaderContent({
               href={`/article/${a.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62]/50 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 hover:text-slate-900 dark:hover:text-[#03EF62] transition shadow-2xs hover:scale-105 active:scale-95"
+              className="inline-flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 hover:text-slate-900 dark:hover:text-[#03EF62] transition shadow-2xs hover:scale-105 active:scale-95"
               title="নতুন ট্যাবে পড়ুন (Open in new tab)"
               aria-label="নতুন ট্যাবে পড়ুন"
             >
@@ -105,7 +111,7 @@ export function ArticleReaderContent({
             aria-label="Bookmark"
             title="সংরক্ষণ করুন"
             className={cn(
-              'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62]/50 bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 transition shadow-2xs hover:scale-105 active:scale-95',
+              'flex size-9 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 transition shadow-2xs hover:scale-105 active:scale-95',
               bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-slate-600 dark:text-[#03EF62]',
             )}
           >
@@ -114,7 +120,7 @@ export function ArticleReaderContent({
           {!isStandalonePage && (
             <CloseButton
               onClick={onClose}
-              className="border border-slate-200/80 dark:border-[#03EF62]/50 dark:text-[#03EF62] dark:hover:bg-[#03EF62]/10"
+              className="border border-slate-200/80 dark:border-[#03EF62] dark:text-[#03EF62] dark:hover:bg-[#03EF62]/10"
             />
           )}
         </div>
@@ -231,14 +237,14 @@ export function ArticleReaderContent({
         )}
 
         {a.researchBasis && (
-          <div className="mt-7 grid gap-3 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50/60 dark:bg-white/5 p-4 font-mono text-[11.5px] text-slate-700 dark:text-slate-200 sm:grid-cols-[auto_1fr_auto] sm:items-center">
-            <FlaskConical className="size-5 text-emerald-600" />
+          <div className="mt-7 grid gap-3 rounded-2xl border border-slate-200/80 dark:border-[#03EF62]/40 bg-slate-50/60 dark:bg-white/5 p-4 font-mono text-[11.5px] text-slate-700 dark:text-slate-200 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+            <FlaskConical className="size-5 text-emerald-600 dark:text-[#03EF62]" />
             <div>
-              <p className="uppercase tracking-wider text-emerald-600 font-semibold text-[10px]">Research basis</p>
+              <p className="uppercase tracking-wider text-emerald-600 dark:text-[#03EF62] font-semibold text-[10px]">Research basis</p>
               <p className="mt-0.5 font-medium">{a.researchBasis.journalOrInst}</p>
               <p className="text-slate-500 dark:text-slate-400">{a.researchBasis.doiOrSource}</p>
             </div>
-            <span className="rounded-full border border-emerald-200/80 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-[12px] font-semibold text-emerald-800 dark:text-emerald-300">
+            <span className="rounded-full border border-emerald-200/80 dark:border-[#03EF62]/50 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-[12px] font-semibold text-emerald-800 dark:text-[#03EF62]">
               {a.researchBasis.keyMetric}
             </span>
           </div>
@@ -254,7 +260,7 @@ export function ArticleReaderContent({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <div className="rounded-full border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card shadow-sm">
+          <div className="rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card shadow-sm">
             <LinkedInReactionPickerButton
               userReaction={a.userReaction}
               onSelect={onReact}
@@ -264,7 +270,7 @@ export function ArticleReaderContent({
           <button
             type="button"
             onClick={onShare}
-            className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62]/40 bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition"
+            className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition"
           >
             <Share2 className="size-[18px] text-[#03EF62]" />
             Share
@@ -273,7 +279,7 @@ export function ArticleReaderContent({
 
         <section className="mt-8 border-t border-slate-100 dark:border-white/10 pt-5">
           <h2 className="font-display text-[22px] font-semibold text-slate-900 dark:text-white">
-            আলোচনা <span className="font-bangla font-bold text-[14px] text-emerald-600">({toBengaliNumerals(a.stats.commentsCount)})</span>
+            আলোচনা <span className="font-bangla font-bold text-[14px] text-emerald-600 dark:text-[#03EF62]">({toBengaliNumerals(a.stats.commentsCount)})</span>
           </h2>
           <form
             onSubmit={(e) => {
@@ -286,7 +292,7 @@ export function ArticleReaderContent({
             className="mt-3 flex items-start gap-2.5"
           >
             <Avatar src={currentUser?.avatar || 'PS'} name={currentUser?.name || 'User'} size="size-9" />
-            <div className="flex-1 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 focus-within:border-emerald-500 focus-within:bg-white dark:focus-within:bg-canvas-card transition p-2">
+            <div className="flex-1 rounded-2xl border border-slate-200/80 dark:border-[#03EF62]/50 bg-slate-50/50 dark:bg-white/5 focus-within:border-[#03EF62] focus-within:bg-white dark:focus-within:bg-canvas-card transition p-2">
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -298,9 +304,9 @@ export function ArticleReaderContent({
                 <button
                   type="submit"
                   disabled={!text.trim()}
-                  className="flex h-8 items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 px-4 text-[12.5px] font-semibold text-white shadow-sm disabled:opacity-40 transition"
+                  className="flex h-8 items-center gap-1.5 rounded-full bg-[#03EF62] hover:bg-[#02d857] text-[#061621] px-4 text-[12.5px] font-bold shadow-sm disabled:opacity-40 transition"
                 >
-                  <Send className="size-3.5" />
+                  <Send className="size-3.5 text-[#061621]" />
                   Post Comment
                 </button>
               </div>

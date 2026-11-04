@@ -73,11 +73,13 @@ export function FollowIconButton({
   onClick,
   className,
   title,
+  showLabel,
 }: {
   isFollowing: boolean;
   onClick: (e: React.MouseEvent) => void;
   className?: string;
   title?: string;
+  showLabel?: boolean;
 }) {
   return (
     <button
@@ -86,9 +88,10 @@ export function FollowIconButton({
       title={title || (isFollowing ? 'অনুসরণ করছেন' : 'ফলো করুন')}
       aria-label={title || (isFollowing ? 'অনুসরণ করছেন' : 'ফলো করুন')}
       className={cn(
-        'group relative inline-flex size-7 items-center justify-center rounded-full transition-all active:scale-90 shadow-sm shrink-0',
+        'group relative inline-flex items-center justify-center rounded-full transition-all active:scale-90 shadow-sm shrink-0',
+        showLabel ? 'h-8 px-3.5 gap-1.5 text-xs font-bold' : 'size-7',
         isFollowing
-          ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
+          ? 'bg-slate-100 dark:bg-white/15 text-slate-800 dark:text-white border border-slate-200 dark:border-white/20 hover:bg-slate-200 dark:hover:bg-white/25'
           : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d857] hover:scale-105',
         className,
       )}
@@ -97,6 +100,9 @@ export function FollowIconButton({
         <Check className="size-3.5 stroke-[2.8]" />
       ) : (
         <UserPlus className="size-3.5 stroke-[2.8]" />
+      )}
+      {showLabel && (
+        <span className="font-bangla font-bold">{isFollowing ? 'অনুসরণ করছেন' : 'ফলো করুন'}</span>
       )}
     </button>
   );

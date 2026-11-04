@@ -9,7 +9,7 @@ import type {
   Article, BkashOrder, CartItem, CommunityIdea, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionTargetType, StoreProduct, TopicStory, UpcomingEvent, UserProfile,
 } from '../types';
-import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, Num, cn } from './Primitives';
+import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, FollowIconButton, Num, cn } from './Primitives';
 import { PILLAR_DEFS } from './LeftSidebar';
 import { TrendingList } from './RightSidebar';
 import { ImageGraphic } from './ImageGraphic';
@@ -308,7 +308,7 @@ export function ExploreView({
       />
 
       {/* Topic Dropdown - Accessible, Modern SaaS Component */}
-      <div className="relative z-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs">
+      <div className="relative z-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/70 dark:bg-[#071f2d]/70 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-slate-200/80 dark:border-[#03EF62]/30 shadow-xs">
         <div className="flex items-center gap-2">
           <ExploreTopicDropdown
             articles={articles}
@@ -324,7 +324,7 @@ export function ExploreView({
         </div>
       </div>
 
-      <section className={cn(FEED_CARD, 'relative z-10 p-4 sm:p-5')}>
+      <section className={cn(FEED_CARD, 'relative z-10 p-4 sm:p-5 dark:border-[#03EF62]/30')}>
         <div className="mb-3">
           <div className="flex items-center justify-between gap-2">
             <span className="font-bangla text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -380,7 +380,7 @@ export function ExploreView({
         )}
       </section>
 
-      <section className={cn(FEED_CARD, 'px-4 pb-2 pt-4 lg:hidden')}>
+      <section className={cn(FEED_CARD, 'px-4 pb-2 pt-4 lg:hidden dark:border-[#03EF62]/30')}>
         <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white mb-2">ট্রেন্ডিং প্রতিবেদন</h3>
         <TrendingList
           articles={articles}
@@ -1092,27 +1092,12 @@ export function ProfileView({
                   </button>
                 </>
               ) : (
-                <button
-                  type="button"
+                <FollowIconButton
+                  isFollowing={isFollowing}
                   onClick={onToggleFollow}
-                  aria-pressed={isFollowing}
-                  className={cn(
-                    'inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition shadow-xs',
-                    isFollowing
-                      ? 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/15'
-                      : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
-                  )}
-                >
-                  {isFollowing ? (
-                    <>
-                      <Check className="size-3.5" /> ফলো করছেন
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="size-3.5" /> ফলো করুন
-                    </>
-                  )}
-                </button>
+                  showLabel
+                  className="h-8 px-4"
+                />
               )}
             </div>
           </div>
@@ -1160,8 +1145,8 @@ export function ProfileView({
                 key={String(k)}
                 className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50/90 dark:bg-white/5 px-3 py-1 font-bangla text-xs transition hover:bg-slate-100 dark:hover:bg-white/10 shadow-2xs"
               >
-                <span className="font-bold text-black dark:text-white font-mono text-[13px]">
-                  {toBengaliNumerals(Number(v))}
+                <span className="font-bold text-black dark:text-white font-bangla text-[13px]">
+                  <Num>{toBengaliNumerals(Number(v))}</Num>
                 </span>
                 <span className="text-slate-600 dark:text-slate-300 text-[12px] font-medium">
                   {k}
@@ -1172,16 +1157,16 @@ export function ProfileView({
         </div>
 
         {/* Profile Navigation Tabs */}
-        <div className="flex border-t border-slate-200 px-4">
+        <div className="flex border-t border-slate-200 dark:border-white/10 px-4">
           {(
             [
-              { key: 'articles', label: `প্রতিবেদন (${authorArticles.length})` },
-              { key: 'posts', label: `পোস্ট (${authorPosts.length})` },
-              { key: 'stories', label: `স্টোরি (${authorStories.length})` },
+              { key: 'articles', label: `প্রতিবেদন (${toBengaliNumerals(authorArticles.length)})` },
+              { key: 'posts', label: `পোস্ট (${toBengaliNumerals(authorPosts.length)})` },
+              { key: 'stories', label: `স্টোরি (${toBengaliNumerals(authorStories.length)})` },
               ...(isSelf
                 ? [
-                    { key: 'saved', label: `সংরক্ষিত (${savedArticles.length + savedPosts.length})` },
-                    { key: 'orders', label: `অর্ডারসমূহ (${orders.length})` },
+                    { key: 'saved', label: `সংরক্ষিত (${toBengaliNumerals(savedArticles.length + savedPosts.length)})` },
+                    { key: 'orders', label: `অর্ডারসমূহ (${toBengaliNumerals(orders.length)})` },
                   ]
                 : []),
             ] as const

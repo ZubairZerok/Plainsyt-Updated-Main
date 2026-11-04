@@ -461,6 +461,19 @@ export function RootShell() {
     }
   }, []);
 
+  // Mobile history sentinel to prevent mobile browser back button from abruptly closing the website
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (!window.history.state?.plainsytApp) {
+        window.history.replaceState({ plainsytApp: true, root: true }, '', window.location.href);
+        window.history.pushState({ plainsytApp: true, active: true }, '', window.location.href);
+      }
+    } catch {
+      // Safe fallback
+    }
+  }, []);
+
   // Global popstate navigation & back button guard
   useEffect(() => {
     const handlePopState = () => {
@@ -476,12 +489,22 @@ export function RootShell() {
           modalHistoryDepthRef.current -= 1;
         }
         closeTopModal();
+        try {
+          window.history.pushState({ plainsytApp: true, active: true }, '', window.location.href);
+        } catch {
+          // ignore
+        }
         return;
       }
 
-      // If on subroute: navigate back towards home '/'
-      if (location.pathname !== '/') {
+      // If on subroute: navigate back towards home '/' and stay inside website
+      if (window.location.pathname !== '/' || location.pathname !== '/') {
         navigate('/', { replace: false });
+        try {
+          window.history.pushState({ plainsytApp: true, active: true }, '', '/');
+        } catch {
+          // ignore
+        }
         return;
       }
     };
@@ -2032,9 +2055,9 @@ export function RootShell() {
 
       <Toaster
         position="bottom-center"
-        duration={1800}
+        duration={1600}
         toastOptions={{
-          duration: 1800,
+          duration: 1600,
           className:
             'font-bangla !rounded-xl !border !border-[#04301f] !shadow-[3px_3px_0_#04301f] !bg-[#fdfaf5] !text-[#04301f]',
         }}

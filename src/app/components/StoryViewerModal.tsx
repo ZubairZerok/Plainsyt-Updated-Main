@@ -638,39 +638,41 @@ export function StoryViewerModal({
                 </button>
 
                 <div className="flex flex-col min-w-0 leading-tight">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-bangla font-bold text-sm truncate text-white drop-shadow">
-                      {currentGroup.authorName}
-                    </span>
-                    {/* Follow Icon Button (Icon Only, No Text) */}
-                    {currentGroup.authorId !== currentUser?.id && (
-                      <FollowIconButton
-                        isFollowing={isFollowing}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!currentUser) {
-                            onOpenAuth();
-                            return;
-                          }
-                          onToggleFollow(currentGroup.authorId);
-                        }}
-                        className="size-6 shrink-0"
-                      />
-                    )}
-                  </div>
-                  {/* Smaller tags / designations in a single line */}
-                  <div className="flex items-center gap-1.5 text-[10.5px] font-bangla text-white/70 drop-shadow truncate mt-0.5">
-                    <span className="truncate max-w-[120px] text-emerald-300 font-medium">
-                      {currentStory.category || 'প্রতিবেদন'}
-                    </span>
-                    <span>·</span>
-                    <span className="truncate text-white/60">
-                      {currentGroup.authorHandle ? `@${currentGroup.authorHandle}` : 'লেখক ও গবেষক'}
-                    </span>
-                    <span>·</span>
-                    <span className="text-emerald-400 font-bold shrink-0">
-                      <Num>{toBengaliNumerals(storyIdx + 1)}/{toBengaliNumerals(totalAccountStories)}</Num>
-                    </span>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+                      <span className="font-bangla font-bold text-sm truncate text-white drop-shadow">
+                        {currentGroup.authorName}
+                      </span>
+                      {/* Follow Icon Button (Icon Only, No Text) */}
+                      {currentGroup.authorId !== currentUser?.id && (
+                        <FollowIconButton
+                          isFollowing={isFollowing}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!currentUser) {
+                              onOpenAuth();
+                              return;
+                            }
+                            onToggleFollow(currentGroup.authorId);
+                          }}
+                          className="size-6 shrink-0"
+                        />
+                      )}
+                    </div>
+                    {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
+                    <div className="flex items-center gap-1 text-[10.5px] font-bangla text-white/75 drop-shadow truncate shrink-0">
+                      <span className="truncate max-w-[110px] text-emerald-300 font-medium">
+                        {currentStory.category || 'প্রতিবেদন'}
+                      </span>
+                      <span>·</span>
+                      <span className="truncate text-white/60">
+                        {currentGroup.authorHandle ? `@${currentGroup.authorHandle}` : 'লেখক ও গবেষক'}
+                      </span>
+                      <span>·</span>
+                      <span className="text-emerald-400 font-bold shrink-0">
+                        <Num>{toBengaliNumerals(storyIdx + 1)}/{toBengaliNumerals(totalAccountStories)}</Num>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -729,13 +731,13 @@ export function StoryViewerModal({
               </p>
 
               {/* Expand / Collapse Button */}
-              {currentStory.title && currentStory.title.length > 40 && (
+              {currentStory.title && currentStory.title.length > 20 && (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsCaptionExpanded((prev) => !prev);
-                    setPaused((p) => !isCaptionExpanded);
+                    setPaused(!isCaptionExpanded);
                   }}
                   className="mt-1 font-bangla text-xs font-bold text-[#03EF62] hover:underline cursor-pointer inline-flex items-center gap-1"
                 >
@@ -812,12 +814,15 @@ export function StoryViewerModal({
                 )}
               </button>
 
-              {/* Comments drawer button */}
+              {/* Comments drawer button (Pops down when unpressed) */}
               <button
                 type="button"
                 onClick={() => {
-                  setShowComments(true);
-                  setPaused(true);
+                  setShowComments((prev) => {
+                    const next = !prev;
+                    setPaused(next);
+                    return next;
+                  });
                 }}
                 className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90 relative"
                 title="মন্তব্য দেখুন"

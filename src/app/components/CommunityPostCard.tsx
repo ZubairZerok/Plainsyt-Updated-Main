@@ -258,9 +258,9 @@ export function CommunityPostCard({
           onClick={() => setShowComments((s) => !s)}
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <MessageCircle className="size-4 sm:size-[19px] shrink-0" />
+          <MessageCircle className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
           <span className="truncate">
-            <span className="hidden xs:inline">Comment</span> ({toBengaliNumerals(post.comments.length)})
+            <span className="hidden xs:inline">Comment</span> (<span className="font-bangla font-bold">{toBengaliNumerals(post.comments.length)}</span>)
           </span>
         </button>
         <button
@@ -268,7 +268,7 @@ export function CommunityPostCard({
           onClick={onShare}
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <Share2 className="size-4 sm:size-[19px] shrink-0" />
+          <Share2 className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
           <span className="truncate">Share</span>
         </button>
         <button
@@ -281,7 +281,7 @@ export function CommunityPostCard({
             post.userSaved ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/60 dark:text-slate-300',
           )}
         >
-          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', post.userSaved && 'fill-current')} />
+          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]', post.userSaved && 'fill-current')} />
           <span className="truncate">{post.userSaved ? 'Saved' : 'Save'}</span>
         </button>
       </div>

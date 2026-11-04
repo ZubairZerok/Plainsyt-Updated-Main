@@ -189,6 +189,33 @@ assert(fs.existsSync(distIndexPath), 'dist/index.html exists from production bui
 const distIndex = fs.readFileSync(distIndexPath, 'utf-8');
 assert(distIndex.includes('assets/index-'), 'Production bundle references minified assets');
 
+// ----------------------------------------------------
+// SUITE 7: STORIES, EXPLORE & MOBILE BACK STRESS AUDIT
+// ----------------------------------------------------
+console.log('\n▶ Suite 7: Stories, Explore & Mobile Back Stress Audit');
+
+const storyViewerSource = fs.readFileSync(path.join(rootDir, 'src/app/components/StoryViewerModal.tsx'), 'utf-8');
+assert(storyViewerSource.includes('FollowIconButton'), 'StoryViewerModal uses standardized FollowIconButton');
+assert(storyViewerSource.includes('rotateY(${cubeAngle}deg)'), 'StoryViewerModal has 3D cube rotation transition');
+assert(storyViewerSource.includes('isCaptionExpanded ? \'-translate-y-4\''), 'StoryViewerModal has caption Y-axis lift on expansion');
+assert(storyViewerSource.includes('setShowComments((prev) =>'), 'StoryViewerModal comments drawer toggles and pops down');
+
+const carouselSource = fs.readFileSync(path.join(rootDir, 'src/app/components/TopicStoriesCarousel.tsx'), 'utf-8');
+assert(carouselSource.includes('onCreate && currentUser &&'), 'TopicStoriesCarousel hides Add Story card for logged out visitors');
+
+const readerSource = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
+assert(readerSource.includes('handleDragStart') && readerSource.includes('translateY'), 'ArticleReaderModal supports mobile pull-to-dismiss gesture');
+assert(readerSource.includes('dark:border-[#03EF62]'), 'ArticleReaderModal styles borders lime in dark mode');
+
+const authModalSource = fs.readFileSync(path.join(rootDir, 'src/app/components/AuthModal.tsx'), 'utf-8');
+assert(authModalSource.includes('/logos/icon.png'), 'AuthModal displays Plainsyt icon logo instead of star emoji');
+assert(authModalSource.includes('font-bold underline text-[#03EF62]'), 'AuthModal switcher link is bold, underlined and lime');
+
+const viewsSource = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
+assert(viewsSource.includes('ExploreTopicDropdown') && viewsSource.includes('relative z-50'), 'Explore view isolates topic dropdown stacking context with relative z-50');
+
+assert(rootShellSource.includes('plainsytApp') && rootShellSource.includes('closeTopModal'), 'RootShell implements mobile history sentinel and modal interception');
+
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');

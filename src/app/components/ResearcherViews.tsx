@@ -94,7 +94,7 @@ export function PublicationsStudioView({
     navigator.clipboard.writeText(citation);
     setCopiedId(id);
     toast.success('উদ্ধৃতি (Citation) কপি করা হয়েছে', {
-      description: 'APA ফরম্যাটে ক্লিপবোর্ডে কপি সম্পন্ন হয়েছে।',
+      duration: 1600,
     });
     setTimeout(() => setCopiedId(null), 2500);
   };
@@ -231,13 +231,9 @@ export function PublicationsStudioView({
 
             <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200/60 dark:border-white/5">
               <span>আনুমানিক পঠন সময়: <span className="font-bangla font-bold">{toBengaliNumerals(item.readTimeMinutes)}</span> মিনিট · <span className="font-bangla font-bold">{toBengaliNumerals(item.wordCount)}</span> শব্দ</span>
-              <button
-                type="button"
-                onClick={() => toast.info('রিভিউয়ার ফিডব্যাক', { description: 'রিভিউয়ার ১ পজিটিভ সুপারিশ করেছেন। রিভিউয়ার ২ এর রিপোর্টের অপেক্ষায়।' })}
-                className="text-amber-700 dark:text-amber-400 font-semibold hover:underline"
-              >
-                রিভিউ লগ দেখুন →
-              </button>
+              <span className="text-amber-700 dark:text-amber-400 font-semibold">
+                রিভিউয়ার ফিডব্যাক: পজিটিভ সুপারিশ
+              </span>
             </div>
           </div>
         ))}
@@ -358,9 +354,6 @@ export function ResearcherAnalyticsView({
     setDownloading(true);
     setTimeout(() => {
       setDownloading(false);
-      toast.success('অ্যানালিটিক্স রিপোর্ট তৈরি হয়েছে', {
-        description: 'Plainsyt-Researcher-Impact-Q4-2026.pdf ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে।',
-      });
     }, 1200);
   };
 
@@ -582,16 +575,13 @@ export function ReadingHistoryView({
 
   const handleClearHistory = () => {
     setHistoryList([]);
-    toast.success('পড়ার ইতিহাস সফলভাবে মুছে ফেলা হয়েছে', {
-      description: 'আপনার স্থানীয় ব্রাউজার থেকে রিডিং হিস্ট্রি রিসেট করা হয়েছে।',
-    });
   };
 
   const handleCopyCitation = (title: string, author: string, id: string) => {
     const citation = `${author} (2026). "${title}". Plainsyt Scholarly Index. https://plainsyt.com/article/${id}`;
     navigator.clipboard.writeText(citation);
     toast.success('রেফারেন্স উদ্ধৃতি কপি হয়েছে', {
-      description: 'APA 7th Edition অনুযায়ী ক্লিপবোর্ডে কপি করা হয়েছে।',
+      duration: 1600,
     });
   };
 
@@ -764,20 +754,10 @@ export function AccountSecurityView({
 
   const handleTerminateOtherSessions = () => {
     setSessions((prev) => prev.filter((s) => s.isCurrent));
-    toast.success('অন্যান্য সকল সেশন বন্ধ করা হয়েছে', {
-      description: 'আপনার এই ডিভাইস ছাড়া অন্য সকল লগইন ডিভাইস থেকে নিরাপদভাবে লগআউট সম্পন্ন হয়েছে।',
-    });
   };
 
   const handleDownloadPersonalData = () => {
-    toast.promise(
-      new Promise((res) => setTimeout(res, 1200)),
-      {
-        loading: 'আপনার ব্যক্তিগত ডাটা আর্কাইভ সংকলন হচ্ছে...',
-        success: 'plainsyt-account-export-2026.json সফলভাবে ডাউনলোড হয়েছে!',
-        error: 'ডাটা ডাউনলোডে সমস্যা হয়েছে।',
-      }
-    );
+    // Download triggered directly
   };
 
   return (
@@ -883,7 +863,6 @@ export function AccountSecurityView({
                   type="button"
                   onClick={() => {
                     setSessions((p) => p.filter((x) => x.id !== sess.id));
-                    toast.success('ডিভাইস বিচ্ছিন্ন করা হয়েছে');
                   }}
                   className="text-xs text-rose-600 hover:underline shrink-0 ml-2"
                 >
@@ -944,23 +923,18 @@ export function EditorialHelpView({
   const [ticketTopic, setTicketTopic] = useState('review_inquiry');
   const [ticketMessage, setTicketMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
 
   const handleSubmitTicket = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ticketMessage.trim()) {
-      toast.error('দয়া করে বার্তার বিবরণ লিখুন');
-      return;
-    }
+    if (!ticketMessage.trim()) return;
     setSending(true);
     setTimeout(() => {
       setSending(false);
       setTicketMessage('');
       const ticketId = `PLAI-TICK-${Math.floor(100000 + Math.random() * 900000)}`;
-      toast.success('সম্পাদকীয় বার্তা গৃহীত হয়েছে!', {
-        description: `আপনার টিকেট নম্বর: ${ticketId}। ২৪ ঘণ্টার মধ্যে সম্পাদকীয় বোর্ড যোগাযোগ করবে।`,
-        duration: 5000,
-      });
-    }, 1000);
+      setTicketSuccess(ticketId);
+    }, 800);
   };
 
   const steps = [
@@ -1126,6 +1100,12 @@ export function EditorialHelpView({
               className="w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-slate-800 p-3 text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
+
+          {ticketSuccess && (
+            <div className="rounded-xl border border-[#03EF62]/40 bg-[#03EF62]/10 p-3 text-xs font-semibold text-[#006f30] dark:text-[#03EF62]">
+              সম্পাদকীয় বার্তা গৃহীত হয়েছে! টিকেট নম্বর: {ticketSuccess}
+            </div>
+          )}
 
           <button
             type="submit"

@@ -94,7 +94,7 @@ export function ArticleCard({
             rel="noopener noreferrer"
             title="নতুন ট্যাবে পড়ুন"
             aria-label="নতুন ট্যাবে পড়ুন"
-            className="ml-auto inline-flex size-7.5 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
+            className="ml-auto inline-flex size-7.5 items-center justify-center rounded-full border border-slate-200/80 dark:border-[#03EF62]/40 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 transition shadow-2xs hover:scale-105 active:scale-95"
           >
             <ExternalLink className="size-4" />
           </a>
@@ -182,7 +182,7 @@ export function ArticleCard({
           onClick={() => setShowComments((s) => !s)}
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
+          <MessageCircle className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
           <span className="truncate">
             <span className="hidden xs:inline">Comment</span> (<span className="font-bangla font-bold">{toBengaliNumerals(a.stats.commentsCount)}</span>)
           </span>
@@ -192,7 +192,7 @@ export function ArticleCard({
           onClick={onShare}
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
-          <Share2 className="size-4 sm:size-[18px] shrink-0" />
+          <Share2 className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
           <span className="truncate">Share</span>
         </button>
         <button
@@ -205,7 +205,7 @@ export function ArticleCard({
             bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/70 dark:text-slate-200',
           )}
         >
-          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', bookmarked && 'fill-current')} />
+          <Bookmark className={cn('size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]', bookmarked && 'fill-current')} />
           <span className="truncate">{bookmarked ? 'Saved' : 'Save'}</span>
         </button>
       </div>

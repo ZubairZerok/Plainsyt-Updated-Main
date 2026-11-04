@@ -82,7 +82,7 @@ export function TrendingList({
               rel="noopener noreferrer"
               title="নতুন ট্যাবে পড়ুন"
               aria-label="নতুন ট্যাবে পড়ুন"
-              className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-white/10 transition shadow-2xs hover:scale-105 active:scale-95"
+              className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200/80 dark:border-[#03EF62]/40 bg-slate-50 dark:bg-white/5 text-slate-500 hover:text-slate-900 dark:text-[#03EF62] hover:bg-slate-100 dark:hover:bg-[#03EF62]/10 transition shadow-2xs hover:scale-105 active:scale-95"
             >
               <ExternalLink className="size-3.5" />
             </a>
