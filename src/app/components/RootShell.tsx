@@ -163,9 +163,10 @@ export function RootShell() {
         const metaName = u.user_metadata?.full_name || u.user_metadata?.name || u.user_metadata?.user_name;
         const avatarFromMeta = u.user_metadata?.avatar_url || u.user_metadata?.picture;
         const fallbackName = userEmail ? userEmail.split('@')[0] : 'PLAiNSYT Member';
-        const cleanHandle = (userEmail ? userEmail.split('@')[0] : 'user')
+        const rawHandle = (userEmail ? userEmail.split('@')[0] : 'user')
           .toLowerCase()
           .replace(/[^a-z0-9_]/g, '_');
+        const cleanHandle = `${rawHandle}_${u.id.replace(/-/g, '').slice(0, 4)}`;
 
         profile = {
           id: u.id,
@@ -231,20 +232,16 @@ export function RootShell() {
       const refreshToken = hashParams.get('refresh_token');
       const authCode = searchParams.get('code');
 
-      // Instantly wipe raw tokens/codes from the browser address bar
-      if (accessToken || authCode || hashClean.includes('access_token=')) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
       if (accessToken) {
         supabase.auth
           .setSession({
             access_token: accessToken,
-            refresh_token: refreshToken || '',
+            refresh_token: refreshToken || accessToken,
           })
           .then(async ({ data, error }) => {
             if (data?.session?.user && !error) {
               await syncUserSession(data.session.user);
+              window.history.replaceState({}, document.title, window.location.pathname);
             }
           })
           .catch(() => {});
@@ -254,9 +251,14 @@ export function RootShell() {
           .then(async ({ data, error }) => {
             if (data?.session?.user && !error) {
               await syncUserSession(data.session.user);
+              window.history.replaceState({}, document.title, window.location.pathname);
             }
           })
           .catch(() => {});
+      } else if (hashClean.includes('access_token=')) {
+        setTimeout(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 1000);
       }
     }
 
@@ -1183,10 +1185,24 @@ export function RootShell() {
       }
       const was = (snap.followingIds ?? []).includes(targetUserId);
       const nextFollowingIds = toggleBookmarkId(snap.followingIds, targetUserId);
-      commit((prev) => ({
-        ...prev,
-        followingIds: nextFollowingIds,
-      }));
+      commit((prev) => {
+        const nextProfiles = (prev.profiles || []).map((p) => {
+          if (p.id === targetUserId) {
+            const cur = p.followersCount || 0;
+            return { ...p, followersCount: was ? Math.max(0, cur - 1) : cur + 1 };
+          }
+          if (currentUser && p.id === currentUser.id) {
+            const cur = p.followingCount || 0;
+            return { ...p, followingCount: was ? Math.max(0, cur - 1) : cur + 1 };
+          }
+          return p;
+        });
+        return {
+          ...prev,
+          followingIds: nextFollowingIds,
+          profiles: nextProfiles,
+        };
+      });
       dbToggleFollow(currentUser.id, targetUserId, !was);
       const targetProfile = snap.profiles.find((p) => p.id === targetUserId);
       toast(was ? 'আনফলো করা হয়েছে' : `${targetProfile?.name || 'গবেষক'}-কে ফলো করছেন`, { duration: 1600 });
@@ -1606,6 +1622,7 @@ export function RootShell() {
             savedPosts={savedPosts}
             orders={userOrders}
             bookmarkIds={snap.bookmarkedArticleIds}
+            followingIdsCount={(snap.followingIds ?? []).length}
             dark={dark}
             onToggleDark={toggleDark}
             onToggleFollow={() => handleToggleFollow(targetId)}

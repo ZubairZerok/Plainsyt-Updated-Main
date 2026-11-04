@@ -213,8 +213,19 @@ assert(authModalSource.includes('font-bold underline text-[#03EF62]'), 'AuthModa
 
 const viewsSource = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
 assert(viewsSource.includes('ExploreTopicDropdown') && viewsSource.includes('relative z-50'), 'Explore view isolates topic dropdown stacking context with relative z-50');
+assert(viewsSource.includes("'অনুসারী'") && viewsSource.includes("'অনুসরণ'"), 'ProfileView displays both followers and following counts');
+assert(!viewsSource.includes('hidden sm:flex flex-wrap items-center gap-2 sm:gap-2.5'), 'ProfileView stats are visible on mobile and desktop');
 
 assert(rootShellSource.includes('plainsytApp') && rootShellSource.includes('closeTopModal'), 'RootShell implements mobile history sentinel and modal interception');
+assert(rootShellSource.includes('followersCount: was ? Math.max(0, cur - 1) : cur + 1'), 'RootShell updates followers count reactively on toggle follow');
+
+const viteConfigSource = fs.readFileSync(path.join(rootDir, 'vite.config.ts'), 'utf-8');
+assert(viteConfigSource.includes('port3000BridgePlugin'), 'Vite dev server includes port 3000 bridge forwarder');
+
+const triggerMigrationPath = path.join(rootDir, 'supabase/migrations/20261105_google_oauth_auto_profile_trigger.sql');
+assert(fs.existsSync(triggerMigrationPath), 'Google OAuth auto profile trigger migration exists');
+const triggerMigrationSource = fs.readFileSync(triggerMigrationPath, 'utf-8');
+assert(triggerMigrationSource.includes('handle_new_user') && triggerMigrationSource.includes('on_auth_user_created'), 'Trigger migration creates handle_new_user and attaches to auth.users');
 
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);

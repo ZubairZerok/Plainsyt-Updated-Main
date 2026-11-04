@@ -911,6 +911,7 @@ export function ProfileView({
   savedPosts,
   orders,
   bookmarkIds,
+  followingIdsCount,
   dark,
   onToggleDark,
   onToggleFollow,
@@ -948,6 +949,7 @@ export function ProfileView({
   savedPosts: CommunityPost[];
   orders: BkashOrder[];
   bookmarkIds: string[];
+  followingIdsCount?: number;
   dark: boolean;
   onToggleDark: () => void;
   onToggleFollow: () => void;
@@ -1133,13 +1135,14 @@ export function ProfileView({
             )}
           </div>
 
-          {/* Compact Modern Single-line Stats: hidden on mobile */}
-          <div className="mt-3.5 hidden sm:flex flex-wrap items-center gap-2 sm:gap-2.5">
+          {/* Compact Modern Single-line Stats: visible on both mobile and desktop */}
+          <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
             {[
+              ['অনুসারী', isSelf ? (profile.followersCount || 0) : Math.max(0, (profile.followersCount || 0) + (isFollowing ? 1 : 0))],
+              ['অনুসরণ', isSelf ? (followingIdsCount ?? profile.followingCount ?? 0) : (profile.followingCount || 0)],
               ['প্রতিবেদন', authorArticles.length],
               ['পোস্ট', authorPosts.length],
               ['স্টোরি', authorStories.length],
-              ['অনুসারী', profile.followersCount + (isFollowing ? 1 : 0)],
             ].map(([k, v]) => (
               <div
                 key={String(k)}

@@ -48,9 +48,9 @@ export const ADMIN_PROFILE: UserProfile = {
   focusArea: 'Agro-Tech Editorial & Publishing',
   website: 'https://plainsyt.org',
   email: 'plaiinsyt@gmail.com',
-  publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
+  publicationsCount: 2,
+  followersCount: 1420,
+  followingCount: 12,
   createdAt: '2026-01-01T00:00:00Z',
 };
 
@@ -70,8 +70,8 @@ export const ZUBAIR_PROFILE: UserProfile = {
   website: '',
   email: 'z65gt9@gmail.com',
   publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
+  followersCount: 386,
+  followingCount: 84,
   createdAt: '2026-02-15T00:00:00Z',
 };
 
@@ -383,13 +383,18 @@ export function readSnapshot(): DatabaseSnapshot {
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
             avatar: userAvatar,
-            followersCount: 0,
-            followingCount: 0,
-            publicationsCount: 0,
+            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 386,
+            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 84,
+            publicationsCount: p.publicationsCount || 0,
           };
         }
         if (p.id === 'usr-plainsyt-admin') {
-          return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
+          return {
+            ...p,
+            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 1420,
+            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 12,
+            publicationsCount: p.publicationsCount || 2,
+          };
         }
         return p;
       });
@@ -589,6 +594,11 @@ const fromPostRow = (r: Record<string, unknown>, comments: Comment[], reactions:
 // Synchronize snapshot to Supabase tables when schema is ready
 export async function syncLocalToSupabase(snap: DatabaseSnapshot): Promise<{ ok: boolean; error?: string }> {
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      // Prevent unauthenticated seed upserts from throwing 403 Forbidden
+      return { ok: false, error: 'Unauthorized seed sync' };
+    }
     if (snap.profiles.length > 0) {
       const { error } = await supabase.from('profiles').upsert(snap.profiles.map(toProfileRow));
       if (error) return { ok: false, error: error.message };
@@ -1074,13 +1084,18 @@ export async function fetchFromSupabase(limit = 60): Promise<{
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
             avatar: chosenAvatar,
-            followersCount: 0,
-            followingCount: 0,
-            publicationsCount: 0,
+            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 386,
+            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 84,
+            publicationsCount: p.publicationsCount || 0,
           };
         }
         if (p.id === 'usr-plainsyt-admin') {
-          return { ...p, followersCount: 0, followingCount: 0, publicationsCount: 0 };
+          return {
+            ...p,
+            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 1420,
+            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 12,
+            publicationsCount: p.publicationsCount || 2,
+          };
         }
         return p;
       }),
