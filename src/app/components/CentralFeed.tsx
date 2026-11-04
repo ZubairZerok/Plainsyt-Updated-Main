@@ -23,7 +23,7 @@ export interface FeedApi {
   onUploadVideo: () => void;
   onAskAI: () => void;
   onOpenProfileSettings: () => void;
-  onOpenStory: (i: number) => void;
+  onOpenStory: (storyIdOrIndex: string | number) => void;
   onCreateStory: () => void;
   onOpenArticlePopup: (id: string) => void;
   onReact: (targetType: ReactionTargetType, targetId: string, type: LinkedInReactionType) => void;

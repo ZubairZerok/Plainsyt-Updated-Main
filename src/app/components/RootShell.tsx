@@ -28,6 +28,7 @@ import { FacebookCreatePostModal } from './FacebookCreatePostModal';
 import { AskAIModal } from './AskAIModal';
 import { ArticleReaderModal, ArticleReaderContent } from './ArticleReaderModal';
 import { ReelPlayerModal, type PlayerItem } from './ReelPlayerModal';
+import { StoryViewerModal } from './StoryViewerModal';
 import { SavedArticlesModal } from './SavedArticlesModal';
 import { CreatePostModal } from './CreatePostModal';
 import { ExploreView, EventsView, StoreView, IdeasView, NotificationsView, ProfileView } from './Views';
@@ -82,6 +83,7 @@ export function RootShell() {
   const [registrationEvent, setRegistrationEvent] = useState<UpcomingEvent | null>(null);
   const [readerId, setReaderId] = useState<string | null>(null);
   const [player, setPlayer] = useState<{ items: PlayerItem[]; start: number } | null>(null);
+  const [storyViewerId, setStoryViewerId] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<LightboxPayload | null>(null);
   const [rxBreakdown, setRxBreakdown] = useState<{ targetType: ReactionTargetType; targetId: string } | null>(null);
   const [pillar, setPillar] = useState<string | null>(null);
@@ -316,6 +318,7 @@ export function RootShell() {
   const activeModals = useMemo(() => {
     const list: string[] = [];
     if (readerId) list.push('reader');
+    if (storyViewerId) list.push('storyViewer');
     if (player) list.push('player');
     if (writeOpen) list.push('write');
     if (reelUploadOpen) list.push('reelUpload');
@@ -331,6 +334,7 @@ export function RootShell() {
     return list;
   }, [
     readerId,
+    storyViewerId,
     player,
     writeOpen,
     reelUploadOpen,
@@ -368,6 +372,10 @@ export function RootShell() {
 
   // Unified function to close the foreground modal
   const closeTopModal = useCallback(() => {
+    if (storyViewerId) {
+      setStoryViewerId(null);
+      return true;
+    }
     if (lightbox) {
       setLightbox(null);
       return true;
@@ -436,6 +444,7 @@ export function RootShell() {
     writeOpen,
     player,
     readerId,
+    storyViewerId,
   ]);
 
   // When user clicks UI "X" or backdrop to close modal:
@@ -1598,6 +1607,7 @@ export function RootShell() {
             onDeletePost={handleDeletePost}
             onDeleteStory={handleDeleteStory}
             onDeleteArticle={handleDeleteArticle}
+            onOpenStory={(id) => setStoryViewerId(id)}
           />
         );
       }
@@ -1680,8 +1690,12 @@ export function RootShell() {
               }
             }}
             onOpenSupabaseConsole={() => setSupaConsoleOpen(true)}
-            onOpenStory={(i) => {
-              if (storyPlayerItems.length > 0) setPlayer({ items: storyPlayerItems, start: i });
+            onOpenStory={(target) => {
+              if (typeof target === 'string') {
+                setStoryViewerId(target);
+              } else if (typeof target === 'number' && snap.stories[target]) {
+                setStoryViewerId(snap.stories[target].id);
+              }
             }}
             onCreateStory={() => {
               if (!currentUser) {
@@ -1885,6 +1899,24 @@ export function RootShell() {
         onOpenPhoto={(src, title, subtitle, authorName, authorId) =>
           openPhotoPopup([src], 0, title, subtitle, authorName, authorId)
         }
+      />
+
+      <StoryViewerModal
+        open={!!storyViewerId}
+        initialStoryId={storyViewerId}
+        stories={snap.stories ?? []}
+        currentUser={currentUser}
+        followingIds={snap.followingIds ?? []}
+        comments={snap.comments ?? []}
+        savedStoryIds={snap.savedPostIds ?? []}
+        onClose={() => handleUiCloseModal(() => setStoryViewerId(null))}
+        onToggleFollow={handleToggleFollow}
+        onReact={handleReact}
+        onComment={handleCommentStoryOrReel}
+        onShare={handleShare}
+        onSave={(id) => setSavedReelIds((s) => toggleBookmarkId(s, id))}
+        onOpenAuth={() => requestAuth('স্টোরি প্রতিক্রিয়া বা মন্তব্যের জন্য অনুগ্রহ করে লগইন করুন')}
+        onNavigateProfile={navigateToProfile}
       />
 
       <ReelPlayerModal

@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu, UserRound } from 'lucide-react';
 import type { TopicStory, UserProfile } from '../types';
-import { Avatar } from './Primitives';
+import { Avatar, Num } from './Primitives';
 import { YouTubeMark } from './YouTubeMark';
+import { toBengaliNumerals } from '../utils/pureLogic';
 
 const ICONS = {
   drone: Plane,
@@ -24,12 +25,41 @@ export function TopicStoriesCarousel({
 }: {
   stories: TopicStory[];
   currentUser: UserProfile | null;
-  onOpen: (i: number) => void;
+  onOpen: (storyIdOrIndex: string | number) => void;
   onCreate: () => void;
   onNavigateProfile?: (userId: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroll = (d: number) => ref.current?.scrollBy({ left: d * 320, behavior: 'smooth' });
+
+  // Stories from one account grouped together (Facebook / Instagram stories tray)
+  const accountGroups = useMemo(() => {
+    const groups: {
+      authorId: string;
+      authorName: string;
+      authorAvatar: string;
+      stories: TopicStory[];
+      latestStory: TopicStory;
+    }[] = [];
+
+    for (const story of stories) {
+      const authorId = story.authorId || 'usr-plainsyt-admin';
+      let g = groups.find((grp) => grp.authorId === authorId);
+      if (!g) {
+        g = {
+          authorId,
+          authorName: story.authorName || 'PLAiNSYT',
+          authorAvatar: story.authorAvatar || '/logos/icon.png',
+          stories: [],
+          latestStory: story,
+        };
+        groups.push(g);
+      }
+      g.stories.push(story);
+      g.latestStory = story;
+    }
+    return groups;
+  }, [stories]);
 
   return (
     <section className="group/car relative" aria-label="Topic stories">
@@ -37,12 +67,12 @@ export function TopicStoriesCarousel({
         ref={ref}
         className="no-scrollbar flex snap-x gap-2 overflow-x-auto px-3 py-1 sm:px-0.5 md:gap-3 md:pb-2"
       >
-        {/* Create Story Card (always available to add a Story/Reel to Supabase) */}
+        {/* Create Story Card (Always available to add a Story/Reel) */}
         {onCreate && (
           <button
             type="button"
             onClick={onCreate}
-            className="relative flex aspect-[9/16] w-[104px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-sm hover:shadow-md transition-all md:aspect-[3/4.4] md:w-[138px]"
+            className="relative flex aspect-[9/16] w-[106px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas-card shadow-xs hover:shadow-md transition-all active:scale-[0.98] md:aspect-[3/4.4] md:w-[138px]"
           >
             <div
               style={{
@@ -50,9 +80,8 @@ export function TopicStoriesCarousel({
                   currentUser?.coverGradient ||
                   'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
               }}
-              className="flex h-[68%] w-full items-center justify-center"
+              className="flex h-[68%] w-full items-center justify-center relative overflow-hidden"
             >
-              {/* Logged-out must NOT fall back to name="User" → Avatar initials "U" */}
               {currentUser ? (
                 <Avatar src={currentUser.avatar} name={currentUser.name} size="size-12" />
               ) : (
@@ -64,25 +93,29 @@ export function TopicStoriesCarousel({
                 </span>
               )}
             </div>
-            <span className="absolute left-1/2 top-[68%] flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-canvas-card bg-pine-600 text-white">
-              <Plus className="size-5" strokeWidth={3} />
+            <span className="absolute left-1/2 top-[68%] flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-canvas-card bg-[#03EF62] text-[#061621] shadow-sm font-bold">
+              <Plus className="size-5 stroke-[2.8]" />
             </span>
-            <span className="flex flex-1 items-end justify-center pb-2 text-[12px] font-semibold text-pine-900">
-              Create story
+            <span className="flex flex-1 items-end justify-center pb-2.5 font-bangla text-[12px] font-bold text-slate-800 dark:text-slate-200">
+              স্টোরি যোগ করুন
             </span>
           </button>
         )}
 
-        {stories.map((s, i) => {
+        {/* Account Story Cards — Grouped by Account */}
+        {accountGroups.map((g) => {
+          const s = g.latestStory;
           const Icon = ICONS[s.iconName] ?? Sprout;
+          const storyCount = g.stories.length;
+
           return (
             <div
-              key={s.id}
-              className="group relative aspect-[9/16] w-[104px] shrink-0 snap-start overflow-hidden rounded-2xl bg-pine-800 text-left md:aspect-[3/4.4] md:w-[138px] md:border md:border-slate-200/80 dark:md:border-white/10 md:shadow-sm md:hover:shadow-md transition-all"
+              key={g.authorId}
+              className="group relative aspect-[9/16] w-[106px] shrink-0 snap-start overflow-hidden rounded-2xl bg-[#061621] text-left md:aspect-[3/4.4] md:w-[138px] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md hover:scale-[1.01] transition-all"
             >
               <button
                 type="button"
-                onClick={() => onOpen(i)}
+                onClick={() => onOpen(s.id)}
                 className="absolute inset-0 size-full text-left"
               >
                 {s.imageUrl ? (
@@ -94,48 +127,58 @@ export function TopicStoriesCarousel({
                 ) : (
                   <div className="absolute inset-0 bg-gradient-to-br from-pine-900 via-pine-700 to-pine-500" />
                 )}
-                <span className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
-                {s.videoUrl && (s.videoUrl.includes('youtube.com') || s.videoUrl.includes('youtu.be')) && (
-                  <span className="absolute top-2 right-2 md:top-2 md:left-2 z-10 rounded bg-black/60 px-1.5 py-0.5 backdrop-blur-xs">
+                <span className="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/85" />
+
+                {/* Multiple stories indicator badge */}
+                {storyCount > 1 && (
+                  <span className="absolute top-2 right-2 z-10 rounded-full bg-black/60 backdrop-blur-md px-1.5 py-0.5 font-bangla text-[10px] font-bold text-[#03EF62] border border-[#03EF62]/40 shadow-xs">
+                    <Num>{toBengaliNumerals(storyCount)}</Num> টি
+                  </span>
+                )}
+
+                {s.videoUrl && (s.videoUrl.includes('youtube.com') || s.videoUrl.includes('youtu.be')) && storyCount <= 1 && (
+                  <span className="absolute top-2 right-2 z-10 rounded bg-black/60 px-1.5 py-0.5 backdrop-blur-xs">
                     <YouTubeMark size="sm" />
                   </span>
                 )}
-                <span className="absolute left-2 top-2 hidden size-8 items-center justify-center rounded-lg border border-white/50 bg-black/30 text-white backdrop-blur-sm md:flex">
-                  <Icon className="size-4" />
-                </span>
+
+                {/* Category kicker */}
                 <span className="absolute inset-x-2 bottom-2">
-                  <span className="mb-1 hidden truncate font-mono text-[9px] uppercase tracking-wider text-[#bbf0d8] md:block">
+                  <span className="mb-0.5 hidden truncate font-bangla text-[9.5px] font-semibold text-[#03EF62] drop-shadow md:block">
                     {s.category}
                   </span>
-                  <span className="line-clamp-3 text-[12px] font-semibold leading-tight text-white md:text-[12.5px]">
+                  <span className="line-clamp-2 font-bangla text-[12px] font-bold leading-tight text-white drop-shadow md:text-[12.5px]">
                     {s.title}
                   </span>
                 </span>
               </button>
-              {s.authorName && (
+
+              {/* Author Avatar with Facebook/IG styled multi-color gradient ring */}
+              {g.authorName && (
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (s.authorId && onNavigateProfile) onNavigateProfile(s.authorId);
+                    if (g.authorId && onNavigateProfile) onNavigateProfile(g.authorId);
                   }}
-                  className="absolute left-2 top-2 z-10 md:right-2 md:left-auto"
-                  title={s.authorName}
+                  className="absolute left-2.5 top-2.5 z-20 rounded-full p-0.5 bg-gradient-to-tr from-[#03EF62] via-[#00b4d8] to-[#f72585] shadow-md transition hover:scale-105"
+                  title={g.authorName}
                 >
-                  <Avatar src={s.authorAvatar ?? 'PS'} name={s.authorName} size="size-8" ring />
+                  <Avatar src={g.authorAvatar} name={g.authorName} size="size-7.5" />
                 </button>
               )}
             </div>
           );
         })}
       </div>
-      {stories.length > 2 && (
+
+      {accountGroups.length > 2 && (
         <>
           <button
             type="button"
             onClick={() => scroll(-1)}
             aria-label="Previous"
-            className="absolute left-1 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0b1e15]/95 text-slate-800 dark:text-white opacity-0 shadow-md transition group-hover/car:opacity-100 md:flex"
+            className="absolute left-1 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0b1e15]/95 text-slate-800 dark:text-white opacity-0 shadow-md transition group-hover/car:opacity-100 md:flex active:scale-95"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -143,7 +186,7 @@ export function TopicStoriesCarousel({
             type="button"
             onClick={() => scroll(1)}
             aria-label="Next"
-            className="absolute right-1 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0b1e15]/95 text-slate-800 dark:text-white opacity-0 shadow-md transition group-hover/car:opacity-100 md:flex"
+            className="absolute right-1 top-1/2 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0b1e15]/95 text-slate-800 dark:text-white opacity-0 shadow-md transition group-hover/car:opacity-100 md:flex active:scale-95"
           >
             <ChevronRight className="size-5" />
           </button>

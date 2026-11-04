@@ -1363,7 +1363,7 @@ export function ProfileView({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {authorStories.map((s) => (
                 <div key={s.id} className={cn(FEED_CARD, 'overflow-hidden group relative flex flex-col')}>
-                  <div className="relative aspect-[9/14] w-full overflow-hidden bg-slate-900">
+                  <div onClick={() => onOpenStory?.(s.id)} className="relative aspect-[9/14] w-full overflow-hidden bg-slate-900 cursor-pointer">
                     <img
                       src={s.imageUrl}
                       alt={s.title}

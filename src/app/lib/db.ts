@@ -226,10 +226,59 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
       iconName: 'tech',
       readsCount: '০',
       authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT',
+      authorName: 'PLAiNSYT Editorial',
       authorAvatar: '/logos/icon.png',
       articleId: 'art-japan-cucumber-robot-2026',
-      createdAt: '2026-11-02T10:00:00+06:00',
+      createdAt: '2026-11-03T10:00:00+06:00',
+    },
+    {
+      id: 'story-bina-gamma-lab-2026',
+      title: 'বিনার গামা সেন্টারে সংরক্ষিত আম ও শাকসবজির নতুন শেলফ-লাইফ টেস্ট 🥭',
+      category: 'খাদ্য ও কোল্ড চেইন',
+      imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop',
+      iconName: 'food',
+      readsCount: '১২',
+      authorId: 'usr-plainsyt-admin',
+      authorName: 'PLAiNSYT Editorial',
+      authorAvatar: '/logos/icon.png',
+      articleId: 'art-bina-gamma-2026',
+      createdAt: '2026-11-03T11:30:00+06:00',
+    },
+    {
+      id: 'story-zubair-iot-sensors-2026',
+      title: 'বাকৃবি এগ্রো-আইওটি ল্যাবে মাটির আদ্রতা পরিমাপক স্মার্ট সেন্সর নোড ট্রায়াল 📡',
+      category: 'স্টার্টআপ ও উদ্ভাবন',
+      imageUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop',
+      iconName: 'soil',
+      readsCount: '৮',
+      authorId: 'usr-zubair',
+      authorName: 'Hasan Zubair',
+      authorAvatar: '/images/hasan_zubair.png',
+      createdAt: '2026-11-03T14:15:00+06:00',
+    },
+    {
+      id: 'story-zubair-drone-spray-2026',
+      title: 'মাঠপর্যায়ে স্বয়ংক্রিয় ন্যানো-ফার্টিলাইজার স্প্রে ড্রোনের লাইভ টেস্ট 🛸',
+      category: 'এগ্রি-টেক ও ড্রোন',
+      imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop',
+      iconName: 'drone',
+      readsCount: '১৫',
+      authorId: 'usr-zubair',
+      authorName: 'Hasan Zubair',
+      authorAvatar: '/images/hasan_zubair.png',
+      createdAt: '2026-11-03T15:45:00+06:00',
+    },
+    {
+      id: 'story-bau-summit-2026',
+      title: 'এগ্রি-বিজনেস ইনোভেশন সামিট ২০২৬: তারুণ্যের সেরা স্টার্টআপ আইডিয়া আহবান! 🏆',
+      category: 'স্টার্টআপ ও উদ্ভাবন',
+      imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop',
+      iconName: 'seedling',
+      readsCount: '২১',
+      authorId: '0cc70e58-7ba8-4ea0-8e59-252e3e36461d',
+      authorName: 'Business Club of BAU',
+      authorAvatar: 'https://lh3.googleusercontent.com/a/ACg8ocIc_I03T-SB_bkGznEXM5pptSQB0tynt8CN7axL1Zv4Zp8XPus=s96-c',
+      createdAt: '2026-11-03T16:00:00+06:00',
     },
   ],
   events: [],
@@ -317,8 +366,10 @@ export function readSnapshot(): DatabaseSnapshot {
       const cleanEvents = (parsed.events ?? []).filter(
         (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
       );
-      // Keep only YouTube video reel story
-      const mergedStories = [DEFAULT_SEED_SNAPSHOT.stories[0]];
+      const userCreatedStories = (parsed.stories ?? []).filter(
+        (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+      );
+      const mergedStories = [...DEFAULT_SEED_SNAPSHOT.stories, ...userCreatedStories];
 
       const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
         if (p.id === 'usr-zubair') {
@@ -985,8 +1036,13 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     const cleanEvents = (events.length > 0 ? events : local.events).filter(
       (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
     );
-    // Keep only the YouTube reel video story
-    const mergedStories = [DEFAULT_SEED_SNAPSHOT.stories[0]];
+    const userCreatedStories = (local.stories ?? []).filter(
+      (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+    );
+    const remoteNewStories = (stories.length > 0 ? stories : []).filter(
+      (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+    );
+    const mergedStories = [...DEFAULT_SEED_SNAPSHOT.stories, ...userCreatedStories, ...remoteNewStories];
 
     let userFollows = local.followingIds || [];
     if (currentUserId) {
