@@ -75,24 +75,33 @@ export function CommunityPostCard({
         >
           <Avatar src={post.author.avatar} name={post.author.name} size="size-10" online hasStory={hasStory} />
         </button>
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1 text-[14.5px] font-semibold text-pine-900">
-            <button
-              type="button"
-              onClick={() => onNavigateProfile(post.authorId)}
-              className="truncate text-left hover:underline"
-            >
-              {post.author.name}
-            </button>
-            {post.author.isVerified && <VerifiedBadge />}
-          </p>
-          <p className="flex items-center gap-1 text-[12px] text-pine-900/55">
-            <span className="truncate">{post.author.role}</span>
-            <span>·</span>
-            <span className="shrink-0 font-bangla">{post.timestamp}</span>
-            <span>·</span>
-            <Globe2 className="size-3 shrink-0" aria-label="Public" />
-          </p>
+        <div className="min-w-0 flex-1 leading-tight">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
+            <div className="inline-flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => onNavigateProfile(post.authorId)}
+                className="truncate text-left font-bangla text-[14.5px] font-semibold text-pine-900 hover:underline"
+              >
+                {post.author.name}
+              </button>
+              {post.author.isVerified && <VerifiedBadge />}
+            </div>
+            {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
+            <div className="inline-flex items-center gap-1 text-[11px] font-bangla text-slate-500 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
+              {post.author.role && (
+                <>
+                  <span className="truncate max-w-[130px] font-medium text-emerald-700 dark:text-[#03EF62]">
+                    {post.author.role}
+                  </span>
+                  <span>·</span>
+                </>
+              )}
+              <span className="shrink-0">{post.timestamp}</span>
+              <span>·</span>
+              <Globe2 className="size-3 shrink-0 text-slate-400" aria-label="Public" />
+            </div>
+          </div>
         </div>
         <button
           type="button"

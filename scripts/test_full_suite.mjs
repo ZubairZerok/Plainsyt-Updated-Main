@@ -256,6 +256,24 @@ assert(updatedCentralFeedSource.includes('FeedPageSkeleton') && updatedCentralFe
 assert(viewsSource.includes('ExplorePageSkeleton') && viewsSource.includes('ProfilePageSkeleton'), 'Views.tsx integrates dedicated page skeletons');
 assert(rootShellSource.includes('isPageLoading') && rootShellSource.includes('FeedPageSkeleton'), 'RootShell triggers page skeleton during transitions and initial load');
 
+console.log('\n▶ Suite 9: Story Backdrop Esc, Single-line Designation & Profile Followers/Following Invariants');
+const storyViewerSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/components/StoryViewerModal.tsx'), 'utf-8');
+assert(storyViewerSourceUpdated.includes('Close story viewer') && storyViewerSourceUpdated.includes('!cardRef.current.contains(e.target as Node)'), 'StoryViewerModal implements backdrop click-to-close behaving like Esc key');
+assert(storyViewerSourceUpdated.includes('whitespace-nowrap overflow-hidden text-ellipsis') && storyViewerSourceUpdated.includes('text-[10px] sm:text-[10.5px]'), 'StoryViewerModal renders smaller author tags/designations in a single line');
+
+const commPostSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+assert(commPostSourceUpdated.includes('whitespace-nowrap overflow-hidden text-ellipsis') && commPostSourceUpdated.includes('text-[11px] font-bangla'), 'CommunityPostCard renders smaller author tags/designations in a single line');
+
+const articleCardSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+assert(articleCardSourceUpdated.includes('whitespace-nowrap overflow-hidden text-ellipsis') && articleCardSourceUpdated.includes('text-[11px] font-bangla'), 'ArticleCard renders smaller author designations in a single line beside author name');
+
+const viewsSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
+assert(viewsSourceUpdated.includes("setTab(tabKey as typeof tab)") && viewsSourceUpdated.includes("'followers'") && viewsSourceUpdated.includes("'following'"), 'ProfileView stats badges are clickable buttons opening following and followers lists');
+assert(viewsSourceUpdated.includes("tab === 'following'") && viewsSourceUpdated.includes('displayedFollowing.map'), 'ProfileView displays list of accounts being followed with avatars and follow controls');
+assert(viewsSourceUpdated.includes("tab === 'followers'") && viewsSourceUpdated.includes('displayedFollowers.map'), 'ProfileView displays list of followers and follower count');
+
+assert(rootShellSource.includes('allKnownProfiles') && rootShellSource.includes('allProfiles={allKnownProfiles}'), 'RootShell passes allKnownProfiles directory to ProfileView');
+
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');

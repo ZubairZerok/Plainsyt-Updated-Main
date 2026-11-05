@@ -127,18 +127,27 @@ export function ArticleCard({
             >
               <Avatar src={a.author.avatar} name={a.author.name} size="size-9" hasStory={hasStory} />
             </button>
-            <span className="min-w-0">
+            <div className="min-w-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
               <button
                 type="button"
                 onClick={() => onNavigateProfile(a.authorId)}
-                className="block truncate text-left font-bangla text-[13.5px] font-semibold text-pine-900 hover:underline"
+                className="shrink-0 text-left font-bangla text-[13.5px] font-semibold text-pine-900 hover:underline"
               >
                 {a.author.name}
               </button>
-              <span className="block truncate font-bangla text-[12px] text-slate-600 dark:text-slate-400">
-                {a.author.designation} {a.author.organization ? `· ${a.author.organization}` : ''}
-              </span>
-            </span>
+              {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
+              {(a.author.designation || a.author.organization) && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bangla text-slate-500 dark:text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis max-w-[220px]">
+                  <span className="truncate text-emerald-700 dark:text-[#03EF62] font-medium">{a.author.designation}</span>
+                  {a.author.organization && (
+                    <>
+                      <span>·</span>
+                      <span className="truncate">{a.author.organization}</span>
+                    </>
+                  )}
+                </span>
+              )}
+            </div>
           </div>
           <button
             type="button"

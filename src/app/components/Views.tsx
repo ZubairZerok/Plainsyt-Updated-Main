@@ -1013,14 +1013,48 @@ export function ProfileView({
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (images: string[], index: number, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
   isLoading?: boolean;
+  allProfiles?: UserProfile[];
+  followingIds?: string[];
+  onToggleFollowUser?: (userId: string) => void;
 }) {
-  const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'saved' | 'orders'>('articles');
+  const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'following' | 'followers' | 'saved' | 'orders'>('articles');
   const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile?.id);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: 'post' | 'story' | 'article';
     id: string;
     title: string;
   } | null>(null);
+
+  const effectiveFollowingCount = isSelf
+    ? (followingIdsCount ?? profile?.followingCount ?? 0)
+    : (profile?.followingCount || 0);
+
+  const effectiveFollowersCount = isSelf
+    ? (profile?.followersCount || 0)
+    : Math.max(0, (profile?.followersCount || 0) + (isFollowing ? 1 : 0));
+
+  // Determine who you / the profile are following
+  const displayedFollowing = useMemo(() => {
+    if (!profile) return [];
+    if (isSelf) {
+      return (allProfiles || []).filter((p) => p.id !== profile.id && (followingIds || []).includes(p.id));
+    }
+    return (allProfiles || []).filter((p) => p.id !== profile.id).slice(0, Math.max(1, profile.followingCount || 2));
+  }, [allProfiles, profile, isSelf, followingIds]);
+
+  // Determine who follows this profile
+  const displayedFollowers = useMemo(() => {
+    if (!profile) return [];
+    const list: UserProfile[] = [];
+    if (!isSelf && currentUser && isFollowing) {
+      list.push(currentUser);
+    }
+    const others = (allProfiles || []).filter(
+      (p) => p.id !== profile.id && (!currentUser || p.id !== currentUser.id),
+    );
+    list.push(...others.slice(0, Math.max(0, effectiveFollowersCount - list.length)));
+    return list;
+  }, [allProfiles, profile, isSelf, currentUser, isFollowing, effectiveFollowersCount]);
 
   if (isLoading || (!profile && !isOwnProfile)) {
     return <ProfilePageSkeleton />;
@@ -1178,18 +1212,26 @@ export function ProfileView({
             )}
           </div>
 
-          {/* Compact Modern Single-line Stats: visible on both mobile and desktop */}
+          {/* Compact Modern Single-line Stats: clickable buttons to view followers/following/articles/posts */}
           <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
             {[
-              ['অনুসারী', isSelf ? (profile.followersCount || 0) : Math.max(0, (profile.followersCount || 0) + (isFollowing ? 1 : 0))],
-              ['অনুসরণ', isSelf ? (followingIdsCount ?? profile.followingCount ?? 0) : (profile.followingCount || 0)],
-              ['প্রতিবেদন', authorArticles.length],
-              ['পোস্ট', authorPosts.length],
-              ['স্টোরি', authorStories.length],
-            ].map(([k, v]) => (
-              <div
+              ['অনুসারী', effectiveFollowersCount, 'followers'],
+              ['অনুসরণ', isSelf ? displayedFollowing.length : effectiveFollowingCount, 'following'],
+              ['প্রতিবেদন', authorArticles.length, 'articles'],
+              ['পোস্ট', authorPosts.length, 'posts'],
+              ['স্টোরি', authorStories.length, 'stories'],
+            ].map(([k, v, tabKey]) => (
+              <button
+                type="button"
                 key={String(k)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50/90 dark:bg-white/5 px-3 py-1 font-bangla text-xs transition hover:bg-slate-100 dark:hover:bg-white/10 shadow-2xs"
+                onClick={() => setTab(tabKey as typeof tab)}
+                title={`${k} তালিকা দেখুন`}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-bangla text-xs transition active:scale-95 shadow-2xs cursor-pointer',
+                  tab === tabKey
+                    ? 'border-[#03EF62] bg-[#03EF62]/15 text-[#006f30] dark:text-[#03EF62] font-bold'
+                    : 'border-slate-200/80 dark:border-white/10 bg-slate-50/90 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
+                )}
               >
                 <span className="font-bold text-black dark:text-white font-bangla text-[13px]">
                   <Num>{toBengaliNumerals(Number(v))}</Num>
@@ -1197,18 +1239,20 @@ export function ProfileView({
                 <span className="text-slate-600 dark:text-slate-300 text-[12px] font-medium">
                   {k}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
         {/* Profile Navigation Tabs */}
-        <div className="flex border-t border-slate-200 dark:border-white/10 px-4">
+        <div className="flex border-t border-slate-200 dark:border-white/10 px-4 overflow-x-auto no-scrollbar">
           {(
             [
               { key: 'articles', label: `প্রতিবেদন (${toBengaliNumerals(authorArticles.length)})` },
               { key: 'posts', label: `পোস্ট (${toBengaliNumerals(authorPosts.length)})` },
               { key: 'stories', label: `স্টোরি (${toBengaliNumerals(authorStories.length)})` },
+              { key: 'following', label: `অনুসরণ (${toBengaliNumerals(isSelf ? displayedFollowing.length : effectiveFollowingCount)})` },
+              { key: 'followers', label: `অনুসারী (${toBengaliNumerals(effectiveFollowersCount)})` },
               ...(isSelf
                 ? [
                     { key: 'saved', label: `সংরক্ষিত (${toBengaliNumerals(savedArticles.length + savedPosts.length)})` },
@@ -1222,8 +1266,8 @@ export function ProfileView({
               type="button"
               onClick={() => setTab(t.key as typeof tab)}
               className={cn(
-                'relative py-2.5 px-3 text-xs font-semibold transition',
-                tab === t.key ? 'text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-800',
+                'relative py-2.5 px-3 text-xs font-semibold transition shrink-0 whitespace-nowrap',
+                tab === t.key ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200',
               )}
             >
               {t.label}
@@ -1442,6 +1486,171 @@ export function ProfileView({
             </div>
           )}
         </div>
+      )}
+
+      {tab === 'following' && (
+        <section className={cn(FEED_CARD, 'p-4 sm:p-5 space-y-4 animate-in fade-in duration-200')}>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-white/10 pb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <Users className="size-4 text-[#03EF62]" />
+                <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white">
+                  অনুসরণ করা অ্যাকাউন্টসমূহ (<Num>{toBengaliNumerals(displayedFollowing.length)}</Num>)
+                </h3>
+              </div>
+              <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {isSelf
+                  ? 'আপনি যাদের অনুসরণ করছেন — তাদের সাম্প্রতিক গবেষণা, স্টোরি ও প্রকাশনা ফিডে দেখতে পাবেন।'
+                  : `${profile.name} যাদের অনুসরণ করছেন।`}
+              </p>
+            </div>
+            <span className="rounded-full bg-[#03EF62]/10 text-[#006f30] dark:text-[#03EF62] px-3 py-0.5 font-bangla text-xs font-bold border border-[#03EF62]/30">
+              মোট <Num>{toBengaliNumerals(displayedFollowing.length)}</Num> টি
+            </span>
+          </div>
+
+          {displayedFollowing.length === 0 ? (
+            <div className="p-8 text-center space-y-3">
+              <Users className="mx-auto size-10 text-slate-300 dark:text-slate-600" />
+              <p className="font-bangla text-sm text-slate-500 dark:text-slate-400">
+                {isSelf
+                  ? 'আপনি এখনো কোনো অ্যাকাউন্ট বা গবেষককে অনুসরণ করছেন না।'
+                  : 'এই সদস্য এখনো কাউকে অনুসরণ করছেন না।'}
+              </p>
+              {isSelf && (
+                <p className="font-bangla text-xs text-slate-400">
+                  হোম ফিড ও এক্সপ্লোর থেকে নতুন লেখক ও গবেষকদের ফলো করুন!
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {displayedFollowing.map((u) => {
+                const isUserFollowed = (followingIds || []).includes(u.id);
+                return (
+                  <div
+                    key={u.id}
+                    className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 hover:border-[#03EF62]/50 hover:bg-slate-100/60 dark:hover:bg-white/10 transition group"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onNavigateProfile(u.id)}
+                      className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                    >
+                      <Avatar src={u.avatar} name={u.name} size="size-11" online ring={u.isVerified} className="shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <span className="font-bangla font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
+                            {u.name}
+                          </span>
+                          {u.isVerified && <VerifiedBadge />}
+                        </div>
+                        <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 truncate">
+                          {u.role} {u.organization ? `· ${u.organization}` : ''}
+                        </p>
+                        <span className="font-mono text-[10.5px] text-slate-400">
+                          @{u.handle}
+                        </span>
+                      </div>
+                    </button>
+
+                    {onToggleFollowUser && u.id !== currentUser?.id && (
+                      <FollowIconButton
+                        isFollowing={isUserFollowed}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleFollowUser(u.id);
+                        }}
+                        showLabel
+                        className="shrink-0"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {tab === 'followers' && (
+        <section className={cn(FEED_CARD, 'p-4 sm:p-5 space-y-4 animate-in fade-in duration-200')}>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-white/10 pb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <Users className="size-4 text-[#03EF62]" />
+                <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white">
+                  অনুসারী তালিকা (<Num>{toBengaliNumerals(effectiveFollowersCount)}</Num>)
+                </h3>
+              </div>
+              <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {isSelf
+                  ? `আপনাকে মোট ${toBengaliNumerals(effectiveFollowersCount)} জন সদস্য ও গবেষক অনুসরণ করছেন।`
+                  : `${profile.name}-কে মোট ${toBengaliNumerals(effectiveFollowersCount)} জন অনুসরণ করছেন।`}
+              </p>
+            </div>
+            <span className="rounded-full bg-[#03EF62]/10 text-[#006f30] dark:text-[#03EF62] px-3 py-0.5 font-bangla text-xs font-bold border border-[#03EF62]/30">
+              <Num>{toBengaliNumerals(effectiveFollowersCount)}</Num> জন
+            </span>
+          </div>
+
+          {displayedFollowers.length === 0 && effectiveFollowersCount === 0 ? (
+            <div className="p-8 text-center space-y-2">
+              <Users className="mx-auto size-10 text-slate-300 dark:text-slate-600" />
+              <p className="font-bangla text-sm text-slate-500 dark:text-slate-400">
+                {isSelf
+                  ? 'আপনার এখনো কোনো অনুসারী নেই। আপনার প্রতিবেদন ও মতামত শেয়ার করে পাঠকদের যুক্ত করুন।'
+                  : 'এই সদস্যের এখনো কোনো অনুসারী নেই। আপনিই প্রথম ফলো করতে পারেন!'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {displayedFollowers.map((u) => {
+                const isUserFollowed = (followingIds || []).includes(u.id);
+                return (
+                  <div
+                    key={u.id}
+                    className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 hover:border-[#03EF62]/50 hover:bg-slate-100/60 dark:hover:bg-white/10 transition group"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onNavigateProfile(u.id)}
+                      className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                    >
+                      <Avatar src={u.avatar} name={u.name} size="size-11" online ring={u.isVerified} className="shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <span className="font-bangla font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
+                            {u.name}
+                          </span>
+                          {u.isVerified && <VerifiedBadge />}
+                        </div>
+                        <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 truncate">
+                          {u.role} {u.organization ? `· ${u.organization}` : ''}
+                        </p>
+                        <span className="font-mono text-[10.5px] text-slate-400">
+                          @{u.handle}
+                        </span>
+                      </div>
+                    </button>
+
+                    {onToggleFollowUser && u.id !== currentUser?.id && (
+                      <FollowIconButton
+                        isFollowing={isUserFollowed}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleFollowUser(u.id);
+                        }}
+                        showLabel
+                        className="shrink-0"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
       )}
 
       {tab === 'saved' && isOwnProfile && (

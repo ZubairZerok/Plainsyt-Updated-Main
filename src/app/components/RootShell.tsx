@@ -1384,6 +1384,54 @@ export function RootShell() {
     return null;
   }, [params.userId, currentUser, snap.profiles, snap.articles]);
 
+  // Comprehensive directory of all platform profiles (seed + author articles + posts)
+  const allKnownProfiles = useMemo(() => {
+    const map = new Map<string, UserProfile>();
+    for (const p of snap.profiles) {
+      if (p && p.id) map.set(p.id, p);
+    }
+    for (const a of snap.articles) {
+      const aid = a.authorId || a.author.id;
+      if (aid && !map.has(aid)) {
+        map.set(aid, {
+          id: aid,
+          name: a.author.name,
+          nameBn: a.author.name,
+          handle: aid.replace('usr-', ''),
+          role: a.author.designation || 'গবেষক',
+          organization: a.author.organization || 'PLAiNSYT Platform',
+          location: 'বাংলাদেশ',
+          bio: `${a.author.name} — এগ্রি-টেক ও বিজ্ঞান গবেষক।`,
+          avatar: a.author.avatar,
+          isVerified: true,
+          followersCount: 142,
+          followingCount: 18,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+    for (const p of snap.posts) {
+      if (p.authorId && !map.has(p.authorId)) {
+        map.set(p.authorId, {
+          id: p.authorId,
+          name: p.author.name,
+          nameBn: p.author.name,
+          handle: p.authorId.replace('usr-', ''),
+          role: p.author.role || 'সদস্য',
+          organization: 'PLAiNSYT Community',
+          location: 'বাংলাদেশ',
+          bio: 'কৃষি ও প্রযুক্তি চিন্তক',
+          avatar: p.author.avatar,
+          isVerified: p.author.isVerified,
+          followersCount: 85,
+          followingCount: 12,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+    return Array.from(map.values());
+  }, [snap.profiles, snap.articles, snap.posts]);
+
   // User's strictly received notifications (prevents self-notifications completely)
   const userNotifications = useMemo(() => {
     if (!currentUser) return [];
@@ -1684,6 +1732,9 @@ export function RootShell() {
             orders={userOrders}
             bookmarkIds={snap.bookmarkedArticleIds}
             followingIdsCount={(snap.followingIds ?? []).length}
+            allProfiles={allKnownProfiles}
+            followingIds={snap.followingIds ?? []}
+            onToggleFollowUser={(uId) => handleToggleFollow(uId)}
             dark={dark}
             onToggleDark={toggleDark}
             isLoading={isPageLoading}

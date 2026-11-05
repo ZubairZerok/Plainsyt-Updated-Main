@@ -499,11 +499,24 @@ export function StoryViewerModal({
 
   return (
     <div
+      onClick={(e) => {
+        if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+          onClose();
+        }
+      }}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md select-none overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Story Viewer"
     >
+      {/* Click outside to close backdrop button (behaves like Esc key) */}
+      <button
+        type="button"
+        aria-label="Close story viewer"
+        onClick={onClose}
+        className="absolute inset-0 size-full cursor-default -z-10 focus:outline-none bg-transparent"
+      />
+
       {/* Background ambient blur */}
       <img
         src={currentStory.imageUrl}
@@ -527,12 +540,18 @@ export function StoryViewerModal({
 
       {/* 3D Perspective Scene Container */}
       <div
+        onClick={(e) => {
+          if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+            onClose();
+          }
+        }}
         className="relative flex h-full w-full items-center justify-center max-w-[500px] px-2 sm:px-4"
         style={{ perspective: '1200px' }}
       >
         {/* The 3D Rotating Cube Box */}
         <div
           ref={cardRef}
+          onClick={(e) => e.stopPropagation()}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -646,8 +665,8 @@ export function StoryViewerModal({
                 </button>
 
                 <div className="flex flex-col min-w-0 leading-tight">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
-                    <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
+                    <div className="inline-flex items-center gap-1.5 min-w-0 shrink-0">
                       <span className="font-bangla font-bold text-sm truncate text-white drop-shadow">
                         {currentGroup.authorName}
                       </span>
@@ -668,12 +687,12 @@ export function StoryViewerModal({
                       )}
                     </div>
                     {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
-                    <div className="flex items-center gap-1 text-[10.5px] font-bangla text-white/75 drop-shadow truncate shrink-0">
-                      <span className="truncate max-w-[110px] text-emerald-300 font-medium">
+                    <div className="inline-flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bangla text-white/80 drop-shadow whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
+                      <span className="truncate max-w-[100px] text-emerald-300 font-medium">
                         {currentStory.category || 'প্রতিবেদন'}
                       </span>
                       <span>·</span>
-                      <span className="truncate text-white/60">
+                      <span className="truncate max-w-[90px] text-white/60">
                         {currentGroup.authorHandle ? `@${currentGroup.authorHandle}` : 'লেখক ও গবেষক'}
                       </span>
                       <span>·</span>
