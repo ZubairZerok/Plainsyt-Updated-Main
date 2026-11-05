@@ -89,11 +89,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vite": "6.3.5",
-      "esbuild": "0.25.12"
+      "vite": "6.3.5"
     }
-  },
-  "overrides": {
-    "esbuild": "0.25.12"
   }
 }
