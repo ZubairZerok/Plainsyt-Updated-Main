@@ -274,6 +274,16 @@ assert(viewsSourceUpdated.includes("tab === 'followers'") && viewsSourceUpdated.
 
 assert(rootShellSource.includes('allKnownProfiles') && rootShellSource.includes('allProfiles={allKnownProfiles}'), 'RootShell passes allKnownProfiles directory to ProfileView');
 
+console.log('\n▶ Suite 10: Comments Designation/Role Tag Removal Invariants');
+const articleReaderSource = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
+const reelPlayerSource = fs.readFileSync(path.join(rootDir, 'src/app/components/ReelPlayerModal.tsx'), 'utf-8');
+assert(!storyViewerSourceUpdated.includes('c.role'), 'StoryViewerModal has removed role tags beside commenter names');
+assert(!commPostSourceUpdated.includes('c.role'), 'CommunityPostCard has removed role tags beside commenter names');
+assert(!articleCardSourceUpdated.includes('c.role'), 'ArticleCard has removed role tags beside commenter names');
+assert(!articleReaderSource.includes('c.role'), 'ArticleReaderModal has removed role tags beside commenter names');
+assert(!reelPlayerSource.includes('c.role'), 'ReelPlayerModal has removed role tags beside commenter names');
+
+
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');

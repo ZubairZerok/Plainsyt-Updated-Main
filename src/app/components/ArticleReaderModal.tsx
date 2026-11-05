@@ -332,10 +332,9 @@ export function ArticleReaderContent({
                       if (!isStandalonePage) onClose();
                       onNavigateProfile(c.authorId);
                     }}
-                    className="inline-flex flex-wrap items-baseline gap-1.5 font-bangla text-left hover:underline"
+                    className="block font-bangla text-left hover:underline"
                   >
                     <span className="text-[13.5px] font-semibold text-pine-900 dark:text-white">{c.author}</span>
-                    <span className="text-[11.5px] font-medium text-emerald-700 dark:text-[#03EF62]">· {c.role || 'গবেষক'}</span>
                   </button>
                   <p className="font-bangla text-[14.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">{c.text}</p>
                   <div className="mt-1 flex items-center gap-2 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">

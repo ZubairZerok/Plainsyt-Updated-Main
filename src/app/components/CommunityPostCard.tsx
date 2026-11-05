@@ -310,10 +310,9 @@ export function CommunityPostCard({
                   <button
                     type="button"
                     onClick={() => onNavigateProfile(c.authorId)}
-                    className="inline-flex flex-wrap items-baseline gap-1.5 font-bangla text-left hover:underline"
+                    className="block font-bangla text-left hover:underline"
                   >
                     <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
-                    <span className="text-[11px] font-medium text-emerald-700 dark:text-[#03EF62]">· {c.role || 'গবেষক'}</span>
                   </button>
                   <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">{c.text}</p>
                 </div>

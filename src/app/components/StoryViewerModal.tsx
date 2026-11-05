@@ -947,12 +947,7 @@ export function StoryViewerModal({
                   <Avatar src={c.avatar} name={c.author} size="size-7" />
                   <div className="flex-1 min-w-0 bg-white/5 rounded-2xl p-2.5 border border-white/5">
                     <div className="flex items-baseline justify-between gap-1">
-                      <div className="flex items-baseline gap-1.5 min-w-0">
-                        <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
-                        <span className="text-[10px] font-bangla text-[#03EF62] font-medium truncate">
-                          · {c.role || 'গবেষক ও লেখক'}
-                        </span>
-                      </div>
+                      <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
                       <span className="font-bangla text-[10px] text-emerald-400 shrink-0">
                         {c.timestampLabel || 'এখন'}
                       </span>
