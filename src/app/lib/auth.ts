@@ -272,7 +272,7 @@ export async function signupWithEmail(email: string, pass: string, name: string)
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
   try {
-    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:5173/';
+    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : 'https://pla.insyt.bd/';
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

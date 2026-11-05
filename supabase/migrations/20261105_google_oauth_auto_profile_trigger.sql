@@ -146,3 +146,4 @@ select
 from auth.users u
 where not exists (select 1 from public.profiles p where p.id = u.id::text)
 on conflict (id) do nothing;
+

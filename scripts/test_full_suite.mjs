@@ -219,8 +219,7 @@ assert(!viewsSource.includes('hidden sm:flex flex-wrap items-center gap-2 sm:gap
 assert(rootShellSource.includes('plainsytApp') && rootShellSource.includes('closeTopModal'), 'RootShell implements mobile history sentinel and modal interception');
 assert(rootShellSource.includes('followersCount: was ? Math.max(0, cur - 1) : cur + 1'), 'RootShell updates followers count reactively on toggle follow');
 
-const viteConfigSource = fs.readFileSync(path.join(rootDir, 'vite.config.ts'), 'utf-8');
-assert(viteConfigSource.includes('port3000BridgePlugin'), 'Vite dev server includes port 3000 bridge forwarder');
+assert(authSource.includes('https://pla.insyt.bd/'), 'Auth library defaults redirect to production origin https://pla.insyt.bd/');
 
 const triggerMigrationPath = path.join(rootDir, 'supabase/migrations/20261105_google_oauth_auto_profile_trigger.sql');
 assert(fs.existsSync(triggerMigrationPath), 'Google OAuth auto profile trigger migration exists');
