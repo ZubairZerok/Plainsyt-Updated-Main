@@ -489,3 +489,55 @@ button.text-white svg.lucide,
 .dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: #1a3c2c !important;
 }
+
+/* ==========================================================================
+   SUPERIOR SKELETON SHIMMER SYSTEM
+   Zero Cumulative Layout Shift (CLS), silky smooth shimmer wave
+   ========================================================================== */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.45) 0%,
+    rgba(241, 245, 249, 0.85) 35%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(241, 245, 249, 0.85) 65%,
+    rgba(226, 232, 240, 0.45) 100%
+  ) !important;
+  background-size: 250% 100% !important;
+  animation: skeleton-shimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+}
+
+.dark .skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.08) 65%,
+    rgba(255, 255, 255, 0.03) 100%
+  ) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+@keyframes skeleton-pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.82;
+  }
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse-soft 2.2s ease-in-out infinite;
+}
+

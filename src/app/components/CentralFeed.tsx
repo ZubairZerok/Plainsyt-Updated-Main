@@ -8,6 +8,7 @@ import { TopicStoriesCarousel } from './TopicStoriesCarousel';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
 import { IntegratedReelCard } from './IntegratedReelCard';
+import { FeedPageSkeleton } from './Skeletons';
 import { FEED_CARD, cn } from './Primitives';
 
 export interface FeedApi {
@@ -19,6 +20,7 @@ export interface FeedApi {
   savedReelIds?: string[];
   followingIds?: string[];
   bookmarkIds?: string[];
+  isLoading?: boolean;
   onWriteArticle: () => void;
   onUploadVideo: () => void;
   onAskAI: () => void;
@@ -170,10 +172,14 @@ export function CentralFeed(f: FeedApi) {
     if (restArticles[i]) stream.push(renderArticle(restArticles[i], false));
   }
 
+  if (f.isLoading) {
+    return <FeedPageSkeleton />;
+  }
+
   const isEmpty = f.articles.length === 0 && f.posts.length === 0 && f.reels.length === 0;
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-5">
+    <div className="flex flex-col gap-3 sm:gap-5 animate-in fade-in duration-300">
       <div className="bg-canvas-card py-2.5 sm:bg-transparent sm:py-0">
         <TopicStoriesCarousel
           stories={f.stories ?? []}

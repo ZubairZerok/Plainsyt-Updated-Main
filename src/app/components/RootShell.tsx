@@ -44,6 +44,17 @@ import { SiteLoader } from './SiteLoader';
 import { EventRegistrationModal } from './EventRegistrationModal';
 import { EventDetailPage } from './EventDetailPage';
 import { AuthModal } from './AuthModal';
+import {
+  FeedPageSkeleton,
+  ExplorePageSkeleton,
+  EventsPageSkeleton,
+  StorePageSkeleton,
+  IdeasPageSkeleton,
+  NotificationsPageSkeleton,
+  ProfilePageSkeleton,
+  ResearcherStudioSkeleton,
+  ArticleReaderSkeleton,
+} from './Skeletons';
 import { FEED_CARD, cn } from './Primitives';
 
 const MAIN_TABS = ['/', '/explore', '/events', '/notifications'];
@@ -646,6 +657,20 @@ export function RootShell() {
     if (p.startsWith('/me/security')) return 'security';
     if (p.startsWith('/help')) return 'help';
     return 'home';
+  }, [location.pathname]);
+
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    if (prevPathRef.current !== location.pathname) {
+      prevPathRef.current = location.pathname;
+      setIsPageLoading(true);
+      const timer = setTimeout(() => {
+        setIsPageLoading(false);
+      }, 260);
+      return () => clearTimeout(timer);
+    }
   }, [location.pathname]);
 
   const goNavigate = useCallback(
@@ -1400,8 +1425,39 @@ export function RootShell() {
   );
 
   const mainContent = (() => {
+    if (isPageLoading || (supaStatus === 'checking' && snap.articles.length === 0)) {
+      if (location.pathname.startsWith('/article/')) {
+        return <ArticleReaderSkeleton />;
+      }
+      switch (activeView) {
+        case 'explore':
+          return <ExplorePageSkeleton />;
+        case 'events':
+          return <EventsPageSkeleton />;
+        case 'store':
+          return <StorePageSkeleton />;
+        case 'ideas':
+          return <IdeasPageSkeleton />;
+        case 'notifications':
+          return <NotificationsPageSkeleton />;
+        case 'profile':
+          return <ProfilePageSkeleton />;
+        case 'publications':
+        case 'analytics':
+        case 'reading-history':
+        case 'security':
+        case 'help':
+          return <ResearcherStudioSkeleton />;
+        default:
+          return <FeedPageSkeleton />;
+      }
+    }
+
     if (location.pathname.startsWith('/article/')) {
       if (!standaloneArticle) {
+        if (snap.articles.length === 0) {
+          return <ArticleReaderSkeleton />;
+        }
         return (
           <section className={cn(FEED_CARD, 'p-8 text-center')}>
             <h1 className="font-display text-[24px] font-bold text-pine-950">
@@ -1501,6 +1557,7 @@ export function RootShell() {
             onPillar={setPillar}
             onOpenArticlePopup={handleOpenArticlePopup}
             onNavigateProfile={navigateToProfile}
+            isLoading={isPageLoading}
             onOpenPhoto={(src, title, authorName, authorId) =>
               openPhotoPopup([src], 0, title, undefined, authorName, authorId)
             }
@@ -1511,6 +1568,7 @@ export function RootShell() {
           <EventsView
             events={snap.events}
             onNavigate={goNavigate}
+            isLoading={isPageLoading}
             onOpenRegister={(ev) => setRegistrationEvent(ev)}
           />
         );
@@ -1521,6 +1579,7 @@ export function RootShell() {
             cart={snap.cart}
             ordersCount={snap.orders.length}
             onAddToCart={handleAddToCart}
+            isLoading={isPageLoading}
             onOpenCheckout={() => {
               if (!currentUser) {
                 requestAuth('অর্ডার সম্পন্ন করতে দয়া করে আপনার অ্যাকাউন্টে লগইন করুন।', () => setCheckoutOpen(true));
@@ -1545,6 +1604,7 @@ export function RootShell() {
         return (
           <IdeasView
             ideas={snap.ideas}
+            isLoading={isPageLoading}
             onSubmitIdea={(title, body, tag) => {
               if (!currentUser) {
                 requestAuth('নতুন আইডিয়া জমা দিতে দয়া করে অ্যাকাউন্টে লগইন করুন।');
@@ -1598,6 +1658,7 @@ export function RootShell() {
             onToggleRead={handleToggleNotificationRead}
             onDelete={handleDeleteNotification}
             onNavigate={goNavigate}
+            isLoading={isPageLoading}
             onOpenArticle={handleOpenArticlePopup}
             onNavigateProfile={navigateToProfile}
           />
@@ -1625,6 +1686,7 @@ export function RootShell() {
             followingIdsCount={(snap.followingIds ?? []).length}
             dark={dark}
             onToggleDark={toggleDark}
+            isLoading={isPageLoading}
             onToggleFollow={() => handleToggleFollow(targetId)}
             onOpenProfileSettings={() => setProfileSettingsOpen(true)}
             onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
@@ -1725,6 +1787,7 @@ export function RootShell() {
             savedReelIds={savedReelIds ?? []}
             followingIds={snap.followingIds ?? []}
             bookmarkIds={snap.bookmarkedArticleIds ?? []}
+            isLoading={isPageLoading}
             onWriteArticle={() => {
               if (!currentUser) {
                 requestAuth('প্রতিবেদন লিখতে দয়া করে অ্যাকাউন্টে লগইন করুন।', () => setWriteOpen(true));

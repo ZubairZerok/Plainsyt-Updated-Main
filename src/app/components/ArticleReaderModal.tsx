@@ -5,6 +5,7 @@ import { Modal, CloseButton, Avatar, SectionLabel, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
+import { ArticleReaderSkeleton } from './Skeletons';
 
 interface Props {
   article: Article | null;
@@ -358,11 +359,16 @@ export function ArticleReaderContent({
   );
 }
 
-export function ArticleReaderModal(props: Props) {
-  if (!props.article) return null;
+export function ArticleReaderModal(props: Props & { isOpen?: boolean }) {
+  const isOpen = props.isOpen !== undefined ? props.isOpen : !!props.article;
+  if (!isOpen) return null;
   return (
-    <Modal open={!!props.article} onClose={props.onClose} className="max-w-[760px]" labelledBy="reader-title">
-      <ArticleReaderContent {...props} article={props.article} />
+    <Modal open={isOpen} onClose={props.onClose} className="max-w-[760px]" labelledBy="reader-title">
+      {props.article ? (
+        <ArticleReaderContent {...props} article={props.article} />
+      ) : (
+        <ArticleReaderSkeleton />
+      )}
     </Modal>
   );
 }

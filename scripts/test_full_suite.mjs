@@ -226,6 +226,36 @@ assert(fs.existsSync(triggerMigrationPath), 'Google OAuth auto profile trigger m
 const triggerMigrationSource = fs.readFileSync(triggerMigrationPath, 'utf-8');
 assert(triggerMigrationSource.includes('handle_new_user') && triggerMigrationSource.includes('on_auth_user_created'), 'Trigger migration creates handle_new_user and attaches to auth.users');
 
+console.log('\n▶ Suite 8: Loading Screen & Skeleton System Invariants');
+const skeletonsPath = path.join(rootDir, 'src/app/components/Skeletons.tsx');
+assert(fs.existsSync(skeletonsPath), 'Skeletons.tsx component file exists');
+const skeletonsSource = fs.readFileSync(skeletonsPath, 'utf-8');
+assert(skeletonsSource.includes('export function SkeletonBox'), 'Skeletons.tsx exports reusable SkeletonBox');
+assert(skeletonsSource.includes('export function ArticleCardSkeleton'), 'Skeletons.tsx exports 1:1 dimensional ArticleCardSkeleton');
+assert(skeletonsSource.includes('export function CommunityPostSkeleton'), 'Skeletons.tsx exports CommunityPostSkeleton');
+assert(skeletonsSource.includes('export function IntegratedReelSkeleton'), 'Skeletons.tsx exports IntegratedReelSkeleton');
+assert(skeletonsSource.includes('export function StoriesCarouselSkeleton'), 'Skeletons.tsx exports StoriesCarouselSkeleton');
+assert(skeletonsSource.includes('export function FeedPageSkeleton'), 'Skeletons.tsx exports FeedPageSkeleton');
+assert(skeletonsSource.includes('export function ExplorePageSkeleton'), 'Skeletons.tsx exports ExplorePageSkeleton');
+assert(skeletonsSource.includes('export function EventsPageSkeleton'), 'Skeletons.tsx exports EventsPageSkeleton');
+assert(skeletonsSource.includes('export function StorePageSkeleton'), 'Skeletons.tsx exports StorePageSkeleton');
+assert(skeletonsSource.includes('export function IdeasPageSkeleton'), 'Skeletons.tsx exports IdeasPageSkeleton');
+assert(skeletonsSource.includes('export function NotificationsPageSkeleton'), 'Skeletons.tsx exports NotificationsPageSkeleton');
+assert(skeletonsSource.includes('export function ProfilePageSkeleton'), 'Skeletons.tsx exports ProfilePageSkeleton');
+assert(skeletonsSource.includes('export function ResearcherStudioSkeleton'), 'Skeletons.tsx exports ResearcherStudioSkeleton');
+assert(skeletonsSource.includes('export function ArticleReaderSkeleton'), 'Skeletons.tsx exports ArticleReaderSkeleton');
+assert(skeletonsSource.includes('export function PageLoadingIndicator'), 'Skeletons.tsx exports PageLoadingIndicator');
+
+const themeCssSource = fs.readFileSync(path.join(rootDir, 'src/styles/theme.css'), 'utf-8');
+assert(themeCssSource.includes('@keyframes skeleton-shimmer'), 'theme.css defines GPU-accelerated skeleton-shimmer keyframes');
+assert(themeCssSource.includes('.skeleton-shimmer') && themeCssSource.includes('.dark .skeleton-shimmer'), 'theme.css provides light and dark mode shimmer styles');
+
+const updatedCentralFeedSource = fs.readFileSync(path.join(rootDir, 'src/app/components/CentralFeed.tsx'), 'utf-8');
+assert(updatedCentralFeedSource.includes('FeedPageSkeleton') && updatedCentralFeedSource.includes('f.isLoading'), 'CentralFeed integrates FeedPageSkeleton for loading states');
+
+assert(viewsSource.includes('ExplorePageSkeleton') && viewsSource.includes('ProfilePageSkeleton'), 'Views.tsx integrates dedicated page skeletons');
+assert(rootShellSource.includes('isPageLoading') && rootShellSource.includes('FeedPageSkeleton'), 'RootShell triggers page skeleton during transitions and initial load');
+
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');

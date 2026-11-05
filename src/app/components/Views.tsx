@@ -16,6 +16,14 @@ import { ImageGraphic } from './ImageGraphic';
 import { SavedList } from './SavedArticlesModal';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
+import {
+  ExplorePageSkeleton,
+  EventsPageSkeleton,
+  StorePageSkeleton,
+  IdeasPageSkeleton,
+  NotificationsPageSkeleton,
+  ProfilePageSkeleton,
+} from './Skeletons';
 import { toBengaliNumerals } from '../utils/pureLogic';
 
 function ViewHeader({
@@ -282,6 +290,7 @@ export function ExploreView({
   onOpenArticlePopup,
   onOpenPhoto,
   onOpenStory,
+  isLoading,
 }: {
   articles: Article[];
   currentUser: UserProfile | null;
@@ -291,6 +300,7 @@ export function ExploreView({
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, authorName?: string, authorId?: string) => void;
   onOpenStory?: (id: string) => void;
+  isLoading?: boolean;
 }) {
   const list = useMemo(() => {
     if (!pillar) return articles;
@@ -299,8 +309,12 @@ export function ExploreView({
     return articles.filter((a) => (def.cats as readonly string[]).includes(a.category));
   }, [articles, pillar]);
 
+  if (isLoading) {
+    return <ExplorePageSkeleton />;
+  }
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
       <ViewHeader
         kicker="বিষয়ভিত্তিক অন্বেষণ"
         title="এক্সপ্লোর ও অনুসন্ধান"
@@ -396,13 +410,19 @@ export function EventsView({
   events,
   onNavigate,
   onOpenRegister,
+  isLoading,
 }: {
   events: UpcomingEvent[];
   onNavigate: (path: string) => void;
   onOpenRegister: (ev: UpcomingEvent) => void;
+  isLoading?: boolean;
 }) {
+  if (isLoading) {
+    return <EventsPageSkeleton />;
+  }
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
       <ViewHeader
         kicker="ইভেন্ট ও সম্মেলন"
         title="আসন্ন ইভেন্ট ও সেমিনার"
@@ -495,6 +515,7 @@ export function StoreView({
   onNavigateProfile,
   onOpenPhoto,
   onOpenStory,
+  isLoading,
 }: {
   products: StoreProduct[];
   cart: CartItem[];
@@ -505,11 +526,16 @@ export function StoreView({
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (src: string, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
   onOpenStory?: (id: string) => void;
+  isLoading?: boolean;
 }) {
   const totalCartQty = cart.reduce((s, c) => s + c.quantity, 0);
 
+  if (isLoading) {
+    return <StorePageSkeleton />;
+  }
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
       <ViewHeader
         kicker="বই ও প্রকাশনা"
         title="প্লেইনসাইট প্রকাশনী ও স্টোর"
@@ -613,19 +639,25 @@ export function IdeasView({
   onSubmitIdea,
   onToggleVote,
   onNavigateProfile,
+  isLoading,
 }: {
   ideas: CommunityIdea[];
   onSubmitIdea: (title: string, body: string, tag: string) => void;
   onToggleVote: (id: string) => void;
   onNavigateProfile: (userId: string) => void;
+  isLoading?: boolean;
 }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [tag, setTag] = useState('সাধারণ');
   const sorted = [...ideas].sort((a, b) => b.votes - a.votes);
 
+  if (isLoading) {
+    return <IdeasPageSkeleton />;
+  }
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
       <ViewHeader
         kicker="কমিউনিটি আইডিয়া বোর্ড"
         title="ভাবনার খাতা"
@@ -724,6 +756,7 @@ export function NotificationsView({
   onNavigate,
   onOpenArticle,
   onNavigateProfile,
+  isLoading,
 }: {
   items: NotificationItem[];
   onRead: () => void;
@@ -732,6 +765,7 @@ export function NotificationsView({
   onNavigate: (path: string) => void;
   onOpenArticle?: (id: string) => void;
   onNavigateProfile?: (userId: string) => void;
+  isLoading?: boolean;
 }) {
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
 
@@ -746,8 +780,12 @@ export function NotificationsView({
 
   const unreadCount = items.filter((n) => (n.isRead !== undefined ? !n.isRead : n.unread)).length;
 
+  if (isLoading) {
+    return <NotificationsPageSkeleton />;
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 animate-in fade-in duration-300">
       <div className="flex flex-wrap items-end justify-between gap-3 px-3 sm:px-0">
         <div>
           <SectionLabel>রিয়েলটাইম বিজ্ঞপ্তি ও কার্যকলাপ</SectionLabel>
@@ -974,14 +1012,19 @@ export function ProfileView({
   onRemoveSavedPost: (id: string) => void;
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (images: string[], index: number, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
+  isLoading?: boolean;
 }) {
   const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'saved' | 'orders'>('articles');
-  const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile.id);
+  const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile?.id);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: 'post' | 'story' | 'article';
     id: string;
     title: string;
   } | null>(null);
+
+  if (isLoading || (!profile && !isOwnProfile)) {
+    return <ProfilePageSkeleton />;
+  }
 
   if (!profile) {
     return (
@@ -1005,7 +1048,7 @@ export function ProfileView({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 animate-in fade-in duration-300">
       <section className={cn(FEED_CARD, 'overflow-hidden')}>
         {/* Custom Cover Background Gradient */}
         <div
