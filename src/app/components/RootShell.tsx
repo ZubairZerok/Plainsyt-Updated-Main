@@ -1353,37 +1353,6 @@ export function RootShell() {
     [snap.articles, readerId],
   );
 
-  // Determine profile target for /profile or /profile/:userId
-  const viewedProfile = useMemo(() => {
-    const targetId = params.userId || currentUser?.id;
-    if (!targetId) return null;
-    const found = snap.profiles.find((p) => p.id === targetId);
-    if (found) return found;
-    // Synthesize profile from authored articles/posts if not yet in profiles array
-    const fromArt = snap.articles.find((a) => a.authorId === targetId);
-    if (fromArt) {
-      return {
-        id: targetId,
-        name: fromArt.author.name,
-        nameBn: fromArt.author.name,
-        handle: targetId.toLowerCase(),
-        role: fromArt.author.designation,
-        organization: fromArt.author.organization,
-        location: 'Bangladesh',
-        bio: '',
-        avatar: fromArt.author.avatar,
-        coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
-        isVerified: true,
-        focusArea: fromArt.category,
-        publicationsCount: 1,
-        followersCount: 0,
-        followingCount: 0,
-        createdAt: new Date().toISOString(),
-      };
-    }
-    return null;
-  }, [params.userId, currentUser, snap.profiles, snap.articles]);
-
   // Comprehensive directory of all platform profiles (seed + author articles + posts)
   const allKnownProfiles = useMemo(() => {
     const map = new Map<string, UserProfile>();
@@ -1431,6 +1400,91 @@ export function RootShell() {
     }
     return Array.from(map.values());
   }, [snap.profiles, snap.articles, snap.posts]);
+
+  // Determine profile target for /profile or /profile/:userId (supports userId, handle, or slug)
+  const viewedProfile = useMemo(() => {
+    const rawTarget = params.userId || currentUser?.id;
+    if (!rawTarget) return null;
+    const cleanSlug = rawTarget.toLowerCase().replace(/^@/, '');
+
+    // 1. Exact ID or handle match in snap.profiles
+    const foundInProfiles = snap.profiles.find(
+      (p) => p.id === rawTarget || p.id.toLowerCase() === rawTarget.toLowerCase() || p.handle?.toLowerCase() === cleanSlug
+    );
+    if (foundInProfiles) return foundInProfiles;
+
+    // 2. Match in allKnownProfiles
+    const foundInKnown = allKnownProfiles.find(
+      (p) => p.id === rawTarget || p.id.toLowerCase() === rawTarget.toLowerCase() || p.handle?.toLowerCase() === cleanSlug
+    );
+    if (foundInKnown) return foundInKnown;
+
+    // 3. Synthesize profile from authored articles
+    const fromArt = snap.articles.find(
+      (a) => a.authorId === rawTarget || a.author.id === rawTarget || a.author.name?.toLowerCase() === cleanSlug
+    );
+    if (fromArt) {
+      return {
+        id: fromArt.authorId || rawTarget,
+        name: fromArt.author.name,
+        nameBn: fromArt.author.name,
+        handle: cleanSlug,
+        role: fromArt.author.designation,
+        organization: fromArt.author.organization,
+        location: 'বাংলাদেশ',
+        bio: `${fromArt.author.name} — এগ্রি-টেক ও বিজ্ঞান গবেষক।`,
+        avatar: fromArt.author.avatar,
+        coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
+        isVerified: true,
+        focusArea: fromArt.category,
+        publicationsCount: 1,
+        followersCount: 142,
+        followingCount: 18,
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    // 4. Synthesize profile from authored posts
+    const fromPost = snap.posts.find(
+      (p) => p.authorId === rawTarget || p.author.name?.toLowerCase() === cleanSlug || p.author.handle?.toLowerCase() === cleanSlug
+    );
+    if (fromPost) {
+      return {
+        id: fromPost.authorId || rawTarget,
+        name: fromPost.author.name,
+        nameBn: fromPost.author.name,
+        handle: fromPost.author.handle || cleanSlug,
+        role: fromPost.author.role || 'সদস্য',
+        organization: fromPost.author.organization || 'PLAiNSYT Community',
+        location: 'বাংলাদেশ',
+        bio: 'সদস্য, PLAiNSYT কম্যুনিটি',
+        avatar: fromPost.author.avatar,
+        coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
+        isVerified: fromPost.author.isVerified || false,
+        followersCount: 24,
+        followingCount: 12,
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    // 5. Fallback user profile so route /profile/:slug never crashes
+    return {
+      id: rawTarget,
+      name: cleanSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      nameBn: cleanSlug,
+      handle: cleanSlug,
+      role: 'সদস্য',
+      organization: 'PLAiNSYT Platform',
+      location: 'বাংলাদেশ',
+      bio: 'সদস্য প্রোফাইল',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+      coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
+      isVerified: false,
+      followersCount: 0,
+      followingCount: 0,
+      createdAt: new Date().toISOString(),
+    };
+  }, [params.userId, currentUser, snap.profiles, snap.articles, snap.posts, allKnownProfiles]);
 
   // User's strictly received notifications (prevents self-notifications completely)
   const userNotifications = useMemo(() => {

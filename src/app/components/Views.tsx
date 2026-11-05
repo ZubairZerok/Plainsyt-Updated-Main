@@ -975,6 +975,10 @@ export function ProfileView({
   onNavigateProfile,
   onOpenPhoto,
   onOpenStory,
+  isLoading,
+  allProfiles = [],
+  followingIds = [],
+  onToggleFollowUser,
 }: {
   profile: UserProfile | null;
   isOwnProfile: boolean;

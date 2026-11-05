@@ -273,6 +273,8 @@ assert(viewsSourceUpdated.includes("tab === 'following'") && viewsSourceUpdated.
 assert(viewsSourceUpdated.includes("tab === 'followers'") && viewsSourceUpdated.includes('displayedFollowers.map'), 'ProfileView displays list of followers and follower count');
 
 assert(rootShellSource.includes('allKnownProfiles') && rootShellSource.includes('allProfiles={allKnownProfiles}'), 'RootShell passes allKnownProfiles directory to ProfileView');
+assert(viewsSourceUpdated.includes('allProfiles = []') && viewsSourceUpdated.includes('followingIds = []'), 'ProfileView destructures allProfiles and followingIds with safe defaults');
+assert(rootShellSource.includes('cleanSlug = rawTarget.toLowerCase().replace(/^@/, \'\')'), 'RootShell supports flexible profile slugs, handles and user IDs without crashing');
 
 console.log('\n▶ Suite 10: Comments Designation/Role Tag Removal Invariants');
 const articleReaderSource = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
