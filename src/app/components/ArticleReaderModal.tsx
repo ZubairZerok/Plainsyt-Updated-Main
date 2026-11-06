@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationCap, ShieldCheck, CornerDownRight } from 'lucide-react';
+import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationCap, ShieldCheck, CornerDownRight, ArrowLeft } from 'lucide-react';
 import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
@@ -93,8 +93,23 @@ export function ArticleReaderContent({
           </div>
         )}
 
-        <div className="flex items-center justify-end px-4 sm:px-5 py-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-2">
+          {isStandalonePage ? (
+            <button
+              type="button"
+              onClick={onClose}
+              title="ফিডে ফিরে যান"
+              aria-label="ফিডে ফিরে যান"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200/90 dark:border-white/10 bg-white dark:bg-canvas-card size-9 sm:size-auto sm:px-3 sm:py-1.5 text-xs font-bold text-slate-800 dark:text-slate-100 hover:border-[#03EF62] hover:text-emerald-700 dark:hover:text-[#03EF62] transition shadow-2xs active:scale-95 cursor-pointer"
+            >
+              <ArrowLeft className="size-4 shrink-0" />
+              <span className="hidden sm:inline font-bangla text-[13px]">ফিডে ফিরে যান</span>
+            </button>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center gap-2">
           {!isStandalonePage && (
             <a
               href={`/article/${a.id}`}
