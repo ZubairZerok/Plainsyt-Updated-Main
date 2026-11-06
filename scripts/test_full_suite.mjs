@@ -456,9 +456,10 @@ const rootShellLatestSource = fs.readFileSync(path.join(rootDir, 'src/app/compon
 assert(!rootShellLatestSource.includes('/images/hasan_zubair.png'), 'RootShell replaced local avatar with authentic backend CDN URL');
 
 const redirectsPath = path.join(rootDir, 'public/_redirects');
-assert(fs.existsSync(redirectsPath), 'Cloudflare Pages _redirects file exists');
-const redirectsContent = fs.readFileSync(redirectsPath, 'utf-8');
-assert(redirectsContent.includes('/*') && redirectsContent.includes('/index.html') && redirectsContent.includes('200'), 'Cloudflare Pages _redirects configures 200 SPA rewrite');
+if (fs.existsSync(redirectsPath)) {
+  const redirectsContent = fs.readFileSync(redirectsPath, 'utf-8');
+  assert(!redirectsContent.includes('/*') || !redirectsContent.includes('/index.html'), 'public/_redirects does not contain infinite loop SPA rewrites');
+}
 
 const headersPath = path.join(rootDir, 'public/_headers');
 assert(fs.existsSync(headersPath), 'Cloudflare Pages _headers file exists');
@@ -467,6 +468,7 @@ const wranglerPath = path.join(rootDir, 'wrangler.jsonc');
 assert(fs.existsSync(wranglerPath), 'wrangler.jsonc exists');
 const wranglerContent = fs.readFileSync(wranglerPath, 'utf-8');
 assert(wranglerContent.includes('single-page-application') && wranglerContent.includes('./dist'), 'wrangler.jsonc configures SPA distribution directory');
+assert(!wranglerContent.includes('pages_build_output_dir'), 'wrangler.jsonc purged legacy pages_build_output_dir');
 
 assert(fs.existsSync(path.join(rootDir, '.nvmrc')), 'Cloudflare .nvmrc specifies Node 22 LTS');
 assert(fs.existsSync(path.join(rootDir, '.node-version')), 'Cloudflare .node-version specifies Node 22.11 LTS');
