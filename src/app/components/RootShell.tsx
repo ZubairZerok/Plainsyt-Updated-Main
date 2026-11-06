@@ -7,7 +7,7 @@ import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, ADMIN_
 import {
   readSnapshot, writeSnapshot, fetchFromSupabase, syncLocalToSupabase, mutateSnapshotReaction,
   DEFAULT_SEED_SNAPSHOT,
-  dbUpsertProfile, dbUpsertArticle, dbUpsertPost, dbInsertComment, dbSetReaction,
+  dbUpsertProfile, dbUpsertArticle, dbUpsertPost, dbInsertComment, dbUpdateComment, dbDeleteComment, dbSetReaction,
   dbUpsertReel, dbUpsertStory, dbUpsertProduct, dbInsertOrder, dbUpsertEvent,
   dbUpsertResearchPaper, dbUpsertIdea, dbDeletePost, dbDeleteArticle, dbDeleteStory,
   dbUpdateNotificationRead, dbDeleteNotification, dbMarkAllNotificationsRead, dbInsertNotification, dbToggleFollow,
@@ -34,9 +34,10 @@ import { CreatePostModal } from './CreatePostModal';
 import { ExploreView, EventsView, StoreView, IdeasView, NotificationsView, ProfileView } from './Views';
 import {
   PublicationsStudioView,
-  AccountSecurityView, EditorialHelpView,
+  AccountSecurityView,
 } from './ResearcherViews';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
+import { ShareModal, type SharePayload } from './ShareModal';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
 import { BkashCheckoutModal, CreateProductModal } from './BkashCheckoutModal';
 import { ReactionBreakdownModal } from './LinkedInReactionBar';
@@ -99,6 +100,7 @@ export function RootShell() {
   const [rxBreakdown, setRxBreakdown] = useState<{ targetType: ReactionTargetType; targetId: string } | null>(null);
   const [pillar, setPillar] = useState<string | null>(null);
   const [savedReelIds, setSavedReelIds] = useState<string[]>([]);
+  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
 
   const commit = useCallback((updater: (prev: DatabaseSnapshot) => DatabaseSnapshot) => {
     setSnap((prev) => {
@@ -159,13 +161,13 @@ export function RootShell() {
             ? {
                 name: dbProfile.name || 'Hasan Zubair',
                 nameBn: dbProfile.name_bn || 'হাসান জুবায়ের',
-                avatar: dbProfile.avatar || '/images/hasan_zubair.png',
+                avatar: dbProfile.avatar || 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
                 bio: dbProfile.bio || ZUBAIR_PROFILE.bio,
               }
             : {}),
           name: existingZubair?.name || 'Hasan Zubair',
           nameBn: existingZubair?.nameBn || 'হাসান জুবায়ের',
-          avatar: existingZubair?.avatar || '/images/hasan_zubair.png',
+          avatar: dbProfile?.avatar || existingZubair?.avatar || 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
           email: userEmail || ZUBAIR_PROFILE.email,
         };
       } else {
@@ -653,7 +655,6 @@ export function RootShell() {
     if (p.startsWith('/profile')) return 'profile';
     if (p.startsWith('/me/publications')) return 'publications';
     if (p.startsWith('/me/security')) return 'security';
-    if (p.startsWith('/help')) return 'help';
     return 'home';
   }, [location.pathname]);
 
@@ -895,6 +896,83 @@ export function RootShell() {
     [commit, currentUser, requestAuth, snap.posts],
   );
 
+  const handleEditComment = useCallback(
+    (commentId: string, newText: string) => {
+      if (!currentUser) return;
+      const clean = newText.trim();
+      if (!clean) return;
+
+      commit((prev) => {
+        const updateList = (list: Comment[]) =>
+          list.map((c) => (c.id === commentId ? { ...c, text: clean, isEdited: true } : c));
+
+        const articles = prev.articles.map((a) => ({
+          ...a,
+          comments: updateList(a.comments),
+        }));
+
+        const posts = prev.posts.map((p) => ({
+          ...p,
+          comments: updateList(p.comments),
+        }));
+
+        const comments = updateList(prev.comments);
+
+        return {
+          ...prev,
+          comments,
+          articles,
+          posts,
+        };
+      });
+
+      dbUpdateComment(commentId, clean);
+      toast.success('মন্তব্য সফলভাবে আপডেট করা হয়েছে');
+    },
+    [commit, currentUser],
+  );
+
+  const handleDeleteComment = useCallback(
+    (commentId: string) => {
+      if (!currentUser) return;
+
+      commit((prev) => {
+        const removeMatching = (list: Comment[]) =>
+          list.filter((c) => c.id !== commentId && c.parentId !== commentId);
+
+        const articles = prev.articles.map((a) => {
+          const filtered = removeMatching(a.comments);
+          return {
+            ...a,
+            comments: filtered,
+            stats: { ...a.stats, commentsCount: filtered.length },
+          };
+        });
+
+        const posts = prev.posts.map((p) => {
+          const filtered = removeMatching(p.comments);
+          return {
+            ...p,
+            comments: filtered,
+          };
+        });
+
+        const comments = removeMatching(prev.comments);
+
+        return {
+          ...prev,
+          comments,
+          articles,
+          posts,
+        };
+      });
+
+      dbDeleteComment(commentId);
+      toast.success('মন্তব্য মুছে ফেলা হয়েছে');
+    },
+    [commit, currentUser],
+  );
+
   const handleSavePost = useCallback(
     (postId: string) => {
       if (!currentUser) {
@@ -1058,10 +1136,15 @@ export function RootShell() {
     [commit, currentUser, requestAuth, snap.articles],
   );
 
-  const handleShare = useCallback((label: string) => {
-    const shareUrl = window.location.href;
-    navigator.clipboard?.writeText(shareUrl).catch(() => {});
-    toast.success('লিংক কপি হয়েছে', { description: label, duration: 1600 });
+  const handleShare = useCallback((label: string, customUrl?: string) => {
+    const rawUrl = customUrl || (typeof window !== 'undefined' ? window.location.href : 'https://pla.insyt.bd');
+    const fullUrl = rawUrl.startsWith('http')
+      ? rawUrl
+      : typeof window !== 'undefined'
+        ? `${window.location.origin}${rawUrl}`
+        : `https://pla.insyt.bd${rawUrl}`;
+    navigator.clipboard?.writeText(fullUrl).catch(() => {});
+    setSharePayload({ title: label, url: fullUrl });
   }, []);
 
   const handleOpenArticlePopup = useCallback(
@@ -1209,6 +1292,11 @@ export function RootShell() {
       const was = (snap.followingIds ?? []).includes(targetUserId);
       const nextFollowingIds = toggleBookmarkId(snap.followingIds, targetUserId);
       commit((prev) => {
+        const currentFollows = prev.follows || [];
+        const nextFollows = was
+          ? currentFollows.filter((f) => !(f.followerId === currentUser.id && f.followingId === targetUserId))
+          : [...currentFollows, { followerId: currentUser.id, followingId: targetUserId }];
+
         const nextProfiles = (prev.profiles || []).map((p) => {
           if (p.id === targetUserId) {
             const cur = p.followersCount || 0;
@@ -1223,6 +1311,7 @@ export function RootShell() {
         return {
           ...prev,
           followingIds: nextFollowingIds,
+          follows: nextFollows,
           profiles: nextProfiles,
         };
       });
@@ -1371,8 +1460,8 @@ export function RootShell() {
           bio: `${a.author.name} — এগ্রি-টেক ও বিজ্ঞান গবেষক।`,
           avatar: a.author.avatar,
           isVerified: true,
-          followersCount: 142,
-          followingCount: 18,
+          followersCount: 0,
+          followingCount: 0,
           createdAt: new Date().toISOString(),
         });
       }
@@ -1390,8 +1479,8 @@ export function RootShell() {
           bio: 'কৃষি ও প্রযুক্তি চিন্তক',
           avatar: p.author.avatar,
           isVerified: p.author.isVerified,
-          followersCount: 85,
-          followingCount: 12,
+          followersCount: 0,
+          followingCount: 0,
           createdAt: new Date().toISOString(),
         });
       }
@@ -1436,8 +1525,8 @@ export function RootShell() {
         isVerified: true,
         focusArea: fromArt.category,
         publicationsCount: 1,
-        followersCount: 142,
-        followingCount: 18,
+        followersCount: 0,
+        followingCount: 0,
         createdAt: new Date().toISOString(),
       };
     }
@@ -1459,8 +1548,8 @@ export function RootShell() {
         avatar: fromPost.author.avatar,
         coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
         isVerified: fromPost.author.isVerified || false,
-        followersCount: 24,
-        followingCount: 12,
+        followersCount: 0,
+        followingCount: 0,
         createdAt: new Date().toISOString(),
       };
     }
@@ -1544,7 +1633,6 @@ export function RootShell() {
           return <ProfilePageSkeleton />;
         case 'publications':
         case 'security':
-        case 'help':
           return <ResearcherStudioSkeleton />;
         default:
           return <FeedPageSkeleton />;
@@ -1615,6 +1703,8 @@ export function RootShell() {
             }
             onBookmark={() => handleBookmarkArticle(standaloneArticle.id)}
             onComment={(t) => handleCommentArticle(standaloneArticle.id, t)}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
             onReactComment={(cid, type) => handleReact('comment', cid, type)}
             onShare={() => handleShare(standaloneArticle.title)}
             onNavigateProfile={navigateToProfile}
@@ -1784,6 +1874,7 @@ export function RootShell() {
             followingIdsCount={(snap.followingIds ?? []).length}
             allProfiles={allKnownProfiles}
             followingIds={snap.followingIds ?? []}
+            allFollows={snap.follows ?? []}
             onToggleFollowUser={(uId) => handleToggleFollow(uId)}
             dark={dark}
             onToggleDark={toggleDark}
@@ -1799,6 +1890,8 @@ export function RootShell() {
             onCommentArticle={handleCommentArticle}
             onSavePost={handleSavePost}
             onCommentPost={handleCommentPost}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
             onShare={handleShare}
             onRemoveSavedArticle={handleBookmarkArticle}
             onRemoveSavedPost={handleSavePost}
@@ -1857,12 +1950,6 @@ export function RootShell() {
             onOpenProfileSettings={() => setProfileSettingsOpen(true)}
           />
         );
-      case 'help':
-        return (
-          <EditorialHelpView
-            onNavigate={goNavigate}
-          />
-        );
       default:
         return (
           <CentralFeed
@@ -1919,6 +2006,8 @@ export function RootShell() {
             onCommentArticle={handleCommentArticle}
             onSavePost={handleSavePost}
             onCommentPost={handleCommentPost}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
             onShare={handleShare}
             onPlayReel={(i) => {
               if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: i });
@@ -2102,6 +2191,8 @@ export function RootShell() {
         }
         onBookmark={() => readerArticle && handleBookmarkArticle(readerArticle.id)}
         onComment={(t) => readerArticle && handleCommentArticle(readerArticle.id, t)}
+        onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
         onReactComment={(cid, type) => handleReact('comment', cid, type)}
         onShare={() => readerArticle && handleShare(readerArticle.title)}
         onNavigateProfile={navigateToProfile}
@@ -2122,6 +2213,8 @@ export function RootShell() {
         onToggleFollow={handleToggleFollow}
         onReact={handleReact}
         onComment={handleCommentStoryOrReel}
+        onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
         onShare={handleShare}
         onSave={(id) => setSavedReelIds((s) => toggleBookmarkId(s, id))}
         onOpenAuth={() => requestAuth('স্টোরি প্রতিক্রিয়া বা মন্তব্যের জন্য অনুগ্রহ করে লগইন করুন')}
@@ -2137,6 +2230,8 @@ export function RootShell() {
         onShare={handleShare}
         onOpenAuth={() => requestAuth('মন্তব্য বা প্রতিক্রিয়া জানাতে অনুগ্রহ করে লগইন করুন')}
         onComment={handleCommentStoryOrReel}
+        onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
         onReactStory={handleReactStoryOrReel}
         onBookmarkStory={handleBookmarkStoryOrReel}
       />
@@ -2205,6 +2300,12 @@ export function RootShell() {
             ),
           }));
         }}
+      />
+
+      <ShareModal
+        open={!!sharePayload}
+        payload={sharePayload}
+        onClose={() => handleUiCloseModal(() => setSharePayload(null))}
       />
 
       <AuthModal

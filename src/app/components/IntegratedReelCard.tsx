@@ -375,11 +375,10 @@ export function IntegratedReelCard({
               <span className="font-bangla font-bold text-[11px] drop-shadow">{formatBengaliNumberCompact(rxTotal)}</span>
             </div>
 
-            <button type="button" onClick={onPlay} className={actionBtn} aria-label="Comment">
+            <button type="button" onClick={onPlay} className={actionBtn} aria-label="Comment" title="মন্তব্য">
               <span className={actionIcon}>
                 <MessageCircle className="size-[18px]" />
               </span>
-              <span className="font-bangla text-[10.5px] font-medium drop-shadow">Comment</span>
             </button>
 
             <button type="button" onClick={onShare} className={actionBtn} aria-label="Share">
@@ -482,10 +481,11 @@ export function IntegratedReelCard({
         <button
           type="button"
           onClick={onPlay}
+          aria-label="মন্তব্য দেখুন"
+          title="মন্তব্য"
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
-          <span className="truncate">Comment</span>
         </button>
         <button
           type="button"

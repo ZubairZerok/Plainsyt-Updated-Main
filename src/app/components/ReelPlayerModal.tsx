@@ -60,6 +60,8 @@ interface Props {
   onShare: (t: string) => void;
   onOpenAuth?: () => void;
   onComment?: (targetId: string, text: string) => void;
+  onEditComment?: (id: string, newText: string) => void;
+  onDeleteComment?: (id: string) => void;
   onReactStory?: (targetId: string) => void;
   onBookmarkStory?: (targetId: string) => void;
 }
@@ -73,6 +75,8 @@ export function ReelPlayerModal({
   onShare,
   onOpenAuth,
   onComment,
+  onEditComment,
+  onDeleteComment,
   onReactStory,
   onBookmarkStory,
 }: Props) {
@@ -82,6 +86,8 @@ export function ReelPlayerModal({
   const [showCenterIcon, setShowCenterIcon] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [commentLikes, setCommentLikes] = useState<Record<string, number>>({});
@@ -493,6 +499,12 @@ export function ReelPlayerModal({
               ) : (
                 itemComments.map((c) => {
                   const likes = (c.likes ?? 0) + (commentLikes[c.id] ?? 0);
+                  const canManage = Boolean(
+                    currentUser &&
+                      (currentUser.id === c.authorId ||
+                        currentUser.name === c.author ||
+                        currentUser.role === 'Admin'),
+                  );
                   return (
                     <div key={c.id} className="pt-3 first:pt-0 flex items-start gap-2.5">
                       <Avatar src={c.avatar} name={c.author} size="size-8" />
@@ -503,7 +515,50 @@ export function ReelPlayerModal({
                             {c.timestampLabel || 'এখন'}
                           </span>
                         </div>
-                        <p className="mt-0.5 font-bangla text-[13px] text-white/85 leading-relaxed break-words">{c.text}</p>
+                        {editingCommentId === c.id ? (
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              const clean = editingText.trim();
+                              if (clean && clean !== c.text) {
+                                onEditComment?.(c.id, clean);
+                              }
+                              setEditingCommentId(null);
+                            }}
+                            className="mt-1 space-y-1.5"
+                          >
+                            <input
+                              type="text"
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
+                              autoFocus
+                              className="w-full rounded-lg border border-white/20 bg-black/40 px-2 py-1 font-bangla text-xs text-white outline-none focus:border-[#03EF62]"
+                            />
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="submit"
+                                disabled={!editingText.trim()}
+                                className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
+                              >
+                                সংরক্ষণ
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingCommentId(null)}
+                                className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
+                              >
+                                বাতিল
+                              </button>
+                            </div>
+                          </form>
+                        ) : (
+                          <p className="mt-0.5 font-bangla text-[13px] text-white/85 leading-relaxed break-words">
+                            {c.text}
+                            {c.isEdited && (
+                              <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
+                            )}
+                          </p>
+                        )}
                         <div className="mt-1 flex items-center gap-3">
                           <button
                             type="button"
@@ -523,6 +578,31 @@ export function ReelPlayerModal({
                           >
                             উত্তর দিন
                           </button>
+                          {canManage && editingCommentId !== c.id && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingCommentId(c.id);
+                                  setEditingText(c.text);
+                                }}
+                                className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition cursor-pointer"
+                              >
+                                এডিট
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
+                                    onDeleteComment?.(c.id);
+                                  }
+                                }}
+                                className="font-bangla text-[11px] font-medium text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                              >
+                                মুছুন
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

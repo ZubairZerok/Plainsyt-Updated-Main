@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PLAINSYT — Ultra Precision Logo Animation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-lime-core: #9ef030;
+      --bg-lime-edge: #3aa629;
+      --bg-white: #ffffff;
+      --neon-lime: #8ce026;
+      --emerald: #38a628;
+      --brand-dark: #142626;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-lime-edge);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Main Stage Container */
+    #stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #5ec428;
+    }
+
+    /* Background Canvas for CAD construction lines, circles, particles, and lighting */
+    #fx-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Vector SVG Stage for razor-sharp infinite resolution logo geometry */
+    #vector-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #main-svg {
+      width: min(88vw, 88vh);
+      height: min(88vw, 88vh);
+      overflow: visible;
+      will-change: transform;
+    }
+
+    /* Subtle film grain & vignette overlay for broadcast polish */
+    .cinema-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 25;
+      background: radial-gradient(circle at center, transparent 62%, rgba(0, 0, 0, 0.08) 100%);
+    }
+
+    /* Studio HUD Controls */
+    #hud-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #hud-bar.hud-hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(16px);
+      pointer-events: none;
+    }
+
+    .glass-panel {
+      background: rgba(10, 24, 25, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 245, 48, 0.22);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 25px rgba(132, 225, 40, 0.08);
+    }
+
+    /* Custom Timeline Range Input */
+    input[type="range"].timeline-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"].timeline-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #a8f530;
+      box-shadow: 0 0 10px #a8f530;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"].timeline-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .mode-btn.active {
+      background: rgba(168, 245, 48, 0.2);
+      color: #b8ff47;
+      border-color: rgba(168, 245, 48, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Animation Stage -->
+  <div id="stage">
+    <!-- High-DPI Canvas for Geometric CAD Construction Lines, Nodes, Sweeps & Volumetric Glow -->
+    <canvas id="fx-canvas"></canvas>
+
+    <!-- Ultra-Crisp Vector Layer for the P Icon & PLAINSYT Wordmark -->
+    <div id="vector-stage">
+      <svg id="main-svg" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Primary Luminous Lime-Green Gradient for Logo & PLAINSYT Text on White BG -->
+          <linearGradient id="plainsyt-green-grad" x1="10%" y1="5%" x2="90%" y2="95%">
+            <stop offset="0%" stop-color="#b4f535" />
+            <stop offset="45%" stop-color="#7ed928" />
+            <stop offset="100%" stop-color="#36a628" />
+          </linearGradient>
+
+          <!-- Pure Crisp White Gradient for Starting Logo on Lime BG -->
+          <linearGradient id="plainsyt-white-grad" x1="15%" y1="10%" x2="85%" y2="90%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="70%" stop-color="#f7fff0" />
+            <stop offset="100%" stop-color="#e6f9d4" />
+          </linearGradient>
+
+          <!-- Dynamic Crossfade Gradient for P Icon & Travelling Square (White -> Lime) -->
+          <linearGradient id="dynamic-logo-grad" x1="12%" y1="8%" x2="88%" y2="92%">
+            <stop id="dyn-stop-1" offset="0%" stop-color="#ffffff" />
+            <stop id="dyn-stop-2" offset="48%" stop-color="#ffffff" />
+            <stop id="dyn-stop-3" offset="100%" stop-color="#f2ffe6" />
+          </linearGradient>
+
+          <!-- 3D Glossy Bevel Highlight Gradient -->
+          <linearGradient id="plainsyt-bevel-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7" />
+            <stop offset="35%" stop-color="#e2ff99" stop-opacity="0.25" />
+            <stop offset="65%" stop-color="#2c8a20" stop-opacity="0.0" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.4" />
+          </linearGradient>
+
+          <!-- Glowing White Core Square Gradient -->
+          <radialGradient id="core-white-glow" cx="50%" cy="50%" r="65%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+            <stop offset="55%" stop-color="#eaffd0" stop-opacity="0.45" />
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+          </radialGradient>
+
+          <!-- Motto Accent Gradient -->
+          <linearGradient id="motto-lime-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4ab82b" />
+            <stop offset="50%" stop-color="#76d327" />
+            <stop offset="100%" stop-color="#38a126" />
+          </linearGradient>
+
+          <!-- White Bloom Filter for Starting Lime Phase -->
+          <filter id="neon-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur id="glow-blur-1" stdDeviation="7" result="blur1" />
+            <feGaussianBlur id="glow-blur-2" stdDeviation="20" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <!-- Soft Studio Drop Shadow for Final White Reveal -->
+          <filter id="studio-shadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#48b828" flood-opacity="0.22" />
+          </filter>
+
+          <!-- Inner 3D Specular Rim Filter -->
+          <filter id="inner-bevel" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur" />
+            <feOffset dx="-4" dy="-4" result="offsetBlur" />
+            <feComposite in="blur" in2="offsetBlur" operator="out" result="specOut" />
+            <feFlood flood-color="#ffffff" flood-opacity="0.5" result="specColor" />
+            <feComposite in="specColor" in2="specOut" operator="in" result="specFinal" />
+            <feMerge>
+              <feMergeNode in="SourceGraphic" />
+              <feMergeNode in="specFinal" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Master Camera Rig Group (Zooms, rotates, and shifts smoothly) -->
+        <g id="camera-rig" transform="translate(500, 500)">
+          <g id="camera-content" transform="translate(-500, -500)">
+
+            <!-- HERO P ICON GROUP -->
+            <g id="p-icon-group">
+              <!-- Ambient White Back-Glow behind the P icon during Lime Phase -->
+              <circle id="icon-back-glow" cx="480" cy="440" r="250" fill="url(#core-white-glow)" opacity="0" style="filter: blur(45px);" />
+
+              <!-- Filled Body of the P Mark (Fades in as White at 00:01.5, transitions to Lime at 00:02.5) -->
+              <g id="p-filled-body" opacity="0">
+                <!-- Main Body Path -->
+                <path id="p-fill-main" fill="url(#dynamic-logo-grad)" filter="url(#inner-bevel)" d="" />
+                <!-- Glossy 3D Bevel Overlay -->
+                <path id="p-bevel-overlay" fill="none" stroke="url(#plainsyt-bevel-grad)" stroke-width="10" opacity="0" d="" style="filter: blur(3px);" />
+              </g>
+
+              <!-- Crisp White Tracing Contours (Active from 00:00 to 00:02.6 on the Lime BG) -->
+              <g id="p-trace-layer" filter="url(#neon-glow)">
+                <!-- Primary P Loop + Stem Contour Trace -->
+                <path id="p-trace-main" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d="" />
+                <!-- Secondary Inner Echo Trace (Matches the 00:00 early loop sketch) -->
+                <path id="p-trace-early" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" d="" />
+              </g>
+
+              <!-- The Travelling Glowing Core Square (Starts in center as White at 00:00, turns Lime on White BG) -->
+              <g id="travelling-square-group">
+                <!-- Outer White Square Frame Seen at 00:01 -->
+                <rect id="square-outer-halo" x="-82" y="-82" width="164" height="164" rx="38" fill="none" stroke="#ffffff" stroke-width="4.5" opacity="0" />
+                <!-- Glowing Core Square -->
+                <rect id="travelling-square" x="-68" y="-68" width="136" height="136" rx="32" fill="url(#dynamic-logo-grad)" stroke="#ffffff" stroke-width="3" filter="url(#neon-glow)" />
+              </g>
+            </g>
+
+            <!-- PLAINSYT FULL WORDMARK GROUP (English.png exact geometry in Lime on White BG) -->
+            <g id="wordmark-group" transform="translate(500, 775) scale(0.24) translate(-2325, -450)" opacity="0" filter="url(#studio-shadow)">
+              <g id="wordmark-letters">
+                <!-- 1. P (Exact English.png unified geometry) -->
+                <path class="wm-letter" data-idx="0" fill="url(#plainsyt-green-grad)" d="M 205 355 A 42 42 0 0 1 247 313 L 343 313 A 35 35 0 0 0 378 278 L 378 189 A 42 42 0 0 1 420 147 L 555 147 A 258.5 258.5 0 0 1 555 664 L 404 664 A 31 31 0 0 0 373 695 L 373 755 A 32 32 0 0 1 341 787 L 243 787 A 32 32 0 0 1 211 755 L 211 668 A 48 48 0 0 1 225.1 634.1 L 361.1 498.1 A 41 41 0 0 1 390.1 486 L 580 486 A 86.5 86.5 0 0 0 580 313 L 434 313 A 57 57 0 0 0 377 370 L 377 445 A 42 42 0 0 1 335 487 L 247 487 A 42 42 0 0 1 205 445 Z" />
+
+                <!-- 2. L (Exact English.png rounded outer elbow & inner fillet) -->
+                <path class="wm-letter" data-idx="1" fill="url(#plainsyt-green-grad)" d="M 865 232 A 28 28 0 0 1 893 204 L 980 204 A 28 28 0 0 1 1008 232 L 1008 486 A 46 46 0 0 0 1054 532 L 1282 532 A 28 28 0 0 1 1310 560 L 1310 636 A 28 28 0 0 1 1282 664 L 1015 664 A 150 150 0 0 1 865 514 Z" />
+
+                <!-- 3. A (Exact English.png open-counter diagonal channel & baseline bar) -->
+                <path class="wm-letter" data-idx="2" fill="url(#plainsyt-green-grad)" d="M 1348 628 L 1510 282 A 142 142 0 0 1 1766 282 L 1928 628 A 26 26 0 0 1 1904 664 L 1562 664 A 18 18 0 0 1 1546 638 L 1586 550 A 22 22 0 0 1 1606 537 L 1736 537 L 1652 348 A 16 16 0 0 0 1624 348 L 1484 648 A 26 26 0 0 1 1460 664 L 1372 664 A 26 26 0 0 1 1348 628 Z" />
+
+                <!-- 4. I (Exact English.png vertical pillar) -->
+                <path class="wm-letter" data-idx="3" fill="url(#plainsyt-green-grad)" d="M 1986 232 A 28 28 0 0 1 2014 204 L 2102 204 A 28 28 0 0 1 2130 232 L 2130 636 A 28 28 0 0 1 2102 664 L 2014 664 A 28 28 0 0 1 1986 636 Z" />
+
+                <!-- 5. N (Exact English.png rounded shoulders & diagonal) -->
+                <path class="wm-letter" data-idx="4" fill="url(#plainsyt-green-grad)" d="M 2202 294 A 90 90 0 0 1 2362 238 L 2592 480 L 2592 232 A 28 28 0 0 1 2620 204 L 2708 204 A 28 28 0 0 1 2736 232 L 2736 574 A 90 90 0 0 1 2576 630 L 2346 388 L 2346 636 A 28 28 0 0 1 2318 664 L 2230 664 A 28 28 0 0 1 2202 636 Z" />
+
+                <!-- 6. S (Exact English.png wide geometric S) -->
+                <path class="wm-letter" data-idx="5" fill="url(#plainsyt-green-grad)" d="M 2945 204 L 3278 204 A 28 28 0 0 1 3306 232 L 3306 292 A 28 28 0 0 1 3278 320 L 2962 320 A 29 29 0 0 0 2933 349 L 2933 351 A 29 29 0 0 0 2962 380 L 3190 380 A 142 142 0 0 1 3332 522 L 3332 522 A 142 142 0 0 1 3190 664 L 2838 664 A 28 28 0 0 1 2810 636 L 2810 576 A 28 28 0 0 1 2838 548 L 3172 548 A 30 30 0 0 0 3202 518 L 3202 516 A 30 30 0 0 0 3172 486 L 2945 486 A 141 141 0 0 1 2804 345 L 2804 345 A 141 141 0 0 1 2945 204 Z" />
+
+                <!-- 7. Y (Exact English.png symmetrical wide Y) -->
+                <path class="wm-letter" data-idx="6" fill="url(#plainsyt-green-grad)" d="M 3364 244 A 26 26 0 0 1 3388 204 L 3482 204 A 32 32 0 0 1 3508 218 L 3638 386 L 3768 218 A 32 32 0 0 1 3794 204 L 3888 204 A 26 26 0 0 1 3912 244 L 3710 492 L 3710 636 A 28 28 0 0 1 3682 664 L 3594 664 A 28 28 0 0 1 3566 636 L 3566 492 Z" />
+
+                <!-- 8. T (Exact English.png wide top bar & pillar) -->
+                <path class="wm-letter" data-idx="7" fill="url(#plainsyt-green-grad)" d="M 3934 232 A 28 28 0 0 1 3962 204 L 4422 204 A 28 28 0 0 1 4450 232 L 4450 302 A 28 28 0 0 1 4422 330 L 4284 330 A 20 20 0 0 0 4264 350 L 4264 636 A 28 28 0 0 1 4236 664 L 4148 664 A 28 28 0 0 1 4120 636 L 4120 350 A 20 20 0 0 0 4100 330 L 3962 330 A 28 28 0 0 1 3934 302 Z" />
+              </g>
+            </g>
+
+            <!-- MOTTO GROUP: "insight hidden in plain sight" -->
+            <g id="motto-group" transform="translate(500, 955)" opacity="0">
+              <!-- Subtle decorative horizontal accent hairlines flanking the motto -->
+              <line id="motto-line-left" x1="-360" y1="-8" x2="-255" y2="-8" stroke="url(#plainsyt-green-grad)" stroke-width="2" stroke-linecap="round" opacity="0.55" />
+              <line id="motto-line-right" x1="255" y1="-8" x2="360" y2="-8" stroke="url(#plainsyt-green-grad)" stroke-width="2" stroke-linecap="round" opacity="0.55" />
+
+              <text
+                id="motto-text"
+                x="0"
+                y="0"
+                text-anchor="middle"
+                fill="url(#motto-lime-grad)"
+                font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+                font-size="25"
+                font-weight="600"
+                letter-spacing="0.32em"
+                style="text-transform: uppercase;"
+              >
+                insight hidden in plain sight
+              </text>
+            </g>
+
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="cinema-overlay"></div>
+  </div>
+
+  <!-- Interactive Studio Control Bar (Auto-hides when cursor is idle) -->
+  <div id="hud-bar" class="glass-panel rounded-2xl px-4 py-3 text-white flex flex-col gap-2.5 w-[92vw] max-w-[700px]">
+    <!-- Top Row: Playback + Scrubber + Timecode -->
+    <div class="flex items-center gap-3">
+      <button id="btn-play" class="w-9 h-9 rounded-xl bg-[#a8f530]/20 hover:bg-[#a8f530]/35 border border-[#a8f530]/40 flex items-center justify-center text-[#b8ff47] transition active:scale-95" title="Play / Pause (Space)">
+        <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+        <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+
+      <button id="btn-restart" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white/80 transition active:scale-95" title="Restart (R)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      </button>
+
+      <div class="flex-1 flex items-center gap-2.5">
+        <input id="timeline-scrubber" type="range" min="0" max="4.8" step="0.005" value="0" class="timeline-slider" />
+      </div>
+
+      <span id="timecode" class="font-mono text-xs text-[#a8f530] w-20 text-right tabular-nums">00:00.00</span>
+    </div>
+
+    <!-- Bottom Row: Variant Modes, Speed, Loop & Sound -->
+    <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 text-xs">
+      <div class="flex items-center gap-1.5">
+        <span class="text-white/45 mr-1 font-medium">Layout:</span>
+        <button data-variant="stacked-english" class="mode-btn active px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 transition">
+          Video Loop + English.png
+        </button>
+        <button data-variant="english-only" class="mode-btn px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 transition">
+          Horizontal English.png
+        </button>
+        <button data-variant="video-split" class="mode-btn px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 transition">
+          3-Piece Video P
+        </button>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button id="btn-theme-lock" class="px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 transition" title="Toggle Lime-to-White vs Original Dark-to-White">
+          Palette: <span id="label-theme" class="text-[#a8f530] font-medium">Lime → White</span>
+        </button>
+
+        <button id="btn-speed" class="px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 font-mono transition" title="Playback Speed">
+          1.0x
+        </button>
+
+        <button id="btn-loop" class="px-2.5 py-1 rounded-lg border border-[#a8f530]/40 bg-[#a8f530]/15 text-[#b8ff47] transition" title="Toggle Auto-Loop">
+          Loop
+        </button>
+
+        <button id="btn-sound" class="px-2.5 py-1 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 flex items-center gap-1 transition" title="Toggle Ambient Synth Audio">
+          <svg id="sound-off-icon" class="w-3.5 h-3.5 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+          <svg id="sound-on-icon" class="w-3.5 h-3.5 text-[#a8f530] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+          <span id="label-sound">Audio</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * PLAINSYT — ULTRA-PRECISION CHOREOGRAPHY & VECTOR/CANVAS ENGINE
+     * ============================================================================
+     * Reconstructs the 4-second PLAINSYT logo animation with mathematical accuracy:
+     * - 0.00s - 1.25s: Genesis, rotated camera zoom-out, glowing lime square flight,
+     *                  green neon path traces, white CAD construction lines & comets.
+     * - 1.25s - 2.45s: Concentric compass circles lock, P contour completes and fills
+     *                  with luminous lime-to-emerald gradient & rim glow.
+     * - 2.45s - 4.20s: Smooth radial light reveal (#051314 -> #f3f3f0), CAD lines fade,
+     *                  P icon elevates with 3D glossy bevel, and PLAINSYT custom
+     *                  wordmark resolves underneath.
+     */
+
+    // --- 1. EXACT MATHEMATICAL SVG PATH DEFINITIONS ---
+    const PATHS = {
+      // Exact unified P icon from icon.png & English.png (single continuous contour)
+      unifiedP:
+        "M 205 355 A 42 42 0 0 1 247 313 L 343 313 A 35 35 0 0 0 378 278 L 378 189 A 42 42 0 0 1 420 147 " +
+        "L 555 147 A 258.5 258.5 0 0 1 555 664 L 404 664 A 31 31 0 0 0 373 695 L 373 795 A 32 32 0 0 1 341 827 " +
+        "L 243 827 A 32 32 0 0 1 211 795 L 211 668 A 48 48 0 0 1 225.1 634.1 L 361.1 498.1 A 41 41 0 0 1 390.1 486 " +
+        "L 580 486 A 86.5 86.5 0 0 0 580 313 L 434 313 A 57 57 0 0 0 377 370 L 377 445 A 42 42 0 0 1 335 487 " +
+        "L 247 487 A 42 42 0 0 1 205 445 Z",
+
+      // Video 00:02 - 00:03 P body (Middle-left square + Right P loop & diagonal stem; top-left square is the travelling core square)
+      videoPFill:
+        "M 205 366 A 34 34 0 0 1 239 332 L 311 332 A 34 34 0 0 1 345 366 L 345 441 A 34 34 0 0 1 311 475 L 239 475 A 34 34 0 0 1 205 441 Z " +
+        "M 382 181 A 34 34 0 0 1 416 147 L 555 147 A 258.5 258.5 0 0 1 555 664 L 404 664 A 31 31 0 0 0 373 695 L 373 795 " +
+        "A 32 32 0 0 1 341 827 L 243 827 A 32 32 0 0 1 211 795 L 211 668 A 48 48 0 0 1 225.1 634.1 L 361.1 498.1 " +
+        "A 41 41 0 0 1 390.1 486 L 580 486 A 86.5 86.5 0 0 0 580 313 L 416 313 A 34 34 0 0 1 382 279 Z",
+
+      // Early sketch loop seen at 00:00.00 - 00:00.75 next to the glowing square
+      earlySketch:
+        "M 490 295 L 330 295 A 38 38 0 0 0 292 333 L 292 475 A 38 38 0 0 1 254 513 L 185 513 A 38 38 0 0 1 147 475 L 147 315 A 38 38 0 0 1 185 277 L 265 277"
+    };
+
+    // --- 2. EASING & INTERPOLATION UTILITIES ---
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const invLerp = (a, b, v) => clamp((v - a) / (b - a), 0, 1);
+
+    const Ease = {
+      inOutCubic: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      outCubic: t => 1 - Math.pow(1 - t, 3),
+      outQuart: t => 1 - Math.pow(1 - t, 4),
+      outQuint: t => 1 - Math.pow(1 - t, 5),
+      inOutQuart: t => t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2,
+      outBack: t => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+      }
+    };
+
+    function lerpColor(hex1, hex2, t) {
+      const c1 = parseInt(hex1.slice(1), 16);
+      const c2 = parseInt(hex2.slice(1), 16);
+      const r = Math.round(lerp((c1 >> 16) & 255, (c2 >> 16) & 255, t));
+      const g = Math.round(lerp((c1 >> 8) & 255, (c2 >> 8) & 255, t));
+      const b = Math.round(lerp(c1 & 255, c2 & 255, t));
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    // --- 3. STATE & DOM REFERENCES ---
+    const state = {
+      time: 0,
+      duration: 4.8,
+      playing: true,
+      loop: true,
+      speed: 1.0,
+      variant: 'stacked-english', // 'stacked-english' | 'english-only' | 'video-split'
+      limeStartPalette: true,     // true = Start Lime BG w/ White Logo -> White BG w/ Lime Logo
+      soundEnabled: false,
+      lastFrameTime: performance.now()
+    };
+
+    const dom = {
+      stage: document.getElementById('stage'),
+      canvas: document.getElementById('fx-canvas'),
+      svg: document.getElementById('main-svg'),
+      cameraRig: document.getElementById('camera-rig'),
+      pIconGroup: document.getElementById('p-icon-group'),
+      iconBackGlow: document.getElementById('icon-back-glow'),
+      pFilledBody: document.getElementById('p-filled-body'),
+      pFillMain: document.getElementById('p-fill-main'),
+      pBevelOverlay: document.getElementById('p-bevel-overlay'),
+      pTraceLayer: document.getElementById('p-trace-layer'),
+      pTraceMain: document.getElementById('p-trace-main'),
+      pTraceEarly: document.getElementById('p-trace-early'),
+      travellingSquareGroup: document.getElementById('travelling-square-group'),
+      travellingSquare: document.getElementById('travelling-square'),
+      squareOuterHalo: document.getElementById('square-outer-halo'),
+      wordmarkGroup: document.getElementById('wordmark-group'),
+      wmLetters: Array.from(document.querySelectorAll('.wm-letter')),
+      mottoGroup: document.getElementById('motto-group'),
+      mottoText: document.getElementById('motto-text'),
+      mottoLineLeft: document.getElementById('motto-line-left'),
+      mottoLineRight: document.getElementById('motto-line-right'),
+      dynStop1: document.getElementById('dyn-stop-1'),
+      dynStop2: document.getElementById('dyn-stop-2'),
+      dynStop3: document.getElementById('dyn-stop-3'),
+      // Controls
+      hudBar: document.getElementById('hud-bar'),
+      btnPlay: document.getElementById('btn-play'),
+      iconPlay: document.getElementById('icon-play'),
+      iconPause: document.getElementById('icon-pause'),
+      btnRestart: document.getElementById('btn-restart'),
+      scrubber: document.getElementById('timeline-scrubber'),
+      timecode: document.getElementById('timecode'),
+      variantBtns: Array.from(document.querySelectorAll('.mode-btn')),
+      btnThemeLock: document.getElementById('btn-theme-lock'),
+      labelTheme: document.getElementById('label-theme'),
+      btnSpeed: document.getElementById('btn-speed'),
+      btnLoop: document.getElementById('btn-loop'),
+      btnSound: document.getElementById('btn-sound'),
+      soundOffIcon: document.getElementById('sound-off-icon'),
+      soundOnIcon: document.getElementById('sound-on-icon')
+    };
+
+    const ctx = dom.canvas.getContext('2d');
+
+    // Initialize SVG paths & measure total lengths for stroke-dashoffset animations
+    let traceMainLength = 2800;
+    let traceEarlyLength = 900;
+
+    function updateVariantGeometry() {
+      // Trace path is always the unified contour from English.png / icon.png
+      dom.pTraceMain.setAttribute('d', PATHS.unifiedP);
+      dom.pTraceEarly.setAttribute('d', PATHS.earlySketch);
+
+      if (state.variant === 'video-split') {
+        dom.pFillMain.setAttribute('d', PATHS.videoPFill);
+        dom.pBevelOverlay.setAttribute('d', PATHS.videoPFill);
+      } else {
+        // Both 'stacked-english' and 'english-only' use the exact unified English.png P geometry
+        dom.pFillMain.setAttribute('d', PATHS.unifiedP);
+        dom.pBevelOverlay.setAttribute('d', PATHS.unifiedP);
+      }
+
+      traceMainLength = dom.pTraceMain.getTotalLength() || 2800;
+      traceEarlyLength = dom.pTraceEarly.getTotalLength() || 900;
+
+      dom.pTraceMain.style.strokeDasharray = `${traceMainLength}`;
+      dom.pTraceEarly.style.strokeDasharray = `${traceEarlyLength}`;
+    }
+
+    updateVariantGeometry();
+
+    // --- 4. WEB AUDIO API FUTURISTIC AMBIENT SYNTHESIZER ---
+    // Recreates the lush warm futuristic pad + harmonic chime resolution from the video
+    class AmbientSoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.hasTriggeredCycle = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioCtx();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      triggerChordSwell() {
+        if (!state.soundEnabled) return;
+        this.init();
+
+        const now = this.ctx.currentTime;
+        const master = this.ctx.createGain();
+        master.gain.setValueAtTime(0.001, now);
+        master.gain.exponentialRampToValueAtTime(0.18, now + 1.2);
+        master.gain.exponentialRampToValueAtTime(0.24, now + 2.6);
+        master.gain.exponentialRampToValueAtTime(0.0008, now + 4.1);
+        master.connect(this.ctx.destination);
+
+        // Warm low-pass filter that opens up at 00:02.5 (the light reveal)
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(280, now);
+        filter.frequency.exponentialRampToValueAtTime(2800, now + 2.6);
+        filter.frequency.exponentialRampToValueAtTime(900, now + 4.0);
+        filter.connect(master);
+
+        // Lush Lydian/Maj9 frequencies matching the video's futuristic swell
+        const freqs = [130.81, 196.00, 246.94, 293.66, 392.00, 493.88, 587.33];
+        freqs.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          const oscGain = this.ctx.createGain();
+          osc.type = idx < 2 ? 'sine' : 'sawtooth';
+          osc.frequency.setValueAtTime(f * 0.996, now);
+          osc.frequency.exponentialRampToValueAtTime(f, now + 0.8);
+
+          oscGain.gain.setValueAtTime(idx < 2 ? 0.35 : 0.08, now);
+          osc.connect(oscGain);
+          oscGain.connect(filter);
+
+          osc.start(now + idx * 0.08);
+          osc.stop(now + 4.15);
+        });
+
+        // Crystalline resolution chime at 2.55s (when PLAINSYT reveals)
+        const chimeOsc = this.ctx.createOscillator();
+        const chimeGain = this.ctx.createGain();
+        chimeOsc.type = 'triangle';
+        chimeOsc.frequency.setValueAtTime(1174.66, now + 2.45);
+        chimeGain.gain.setValueAtTime(0.0001, now + 2.45);
+        chimeGain.gain.linearRampToValueAtTime(0.06, now + 2.55);
+        chimeGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.9);
+        chimeOsc.connect(chimeGain);
+        chimeGain.connect(this.ctx.destination);
+        chimeOsc.start(now + 2.45);
+        chimeOsc.stop(now + 3.95);
+      }
+    }
+
+    const soundEngine = new AmbientSoundEngine();
+
+    // --- 5. CANVAS GEOMETRIC CAD CONSTRUCTION & LIGHTING RENDERER ---
+    let canvasW = window.innerWidth;
+    let canvasH = window.innerHeight;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resizeCanvas() {
+      canvasW = window.innerWidth;
+      canvasH = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dom.canvas.width = canvasW * dpr;
+      dom.canvas.height = canvasH * dpr;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Pre-defined architectural tangent lines & node comets (matching 00:00 and 00:01)
+    // Coordinates are in the 1000x1000 SVG space so they lock 1:1 with the P icon!
+    const CAD_LINES = [
+      // Diagonal tangent along the 45-degree stem of the P
+      { x1: 60, y1: 799, x2: 750, y2: 109, start: 0.05, end: 1.1, hasDot: true, dotStart: 0.1 },
+      // Long upper-right diagonal chord (seen at 00:00 & 00:01)
+      { x1: 410, y1: 147, x2: 1120, y2: 640, start: 0.0, end: 0.95, hasDot: true, dotStart: 0.0 },
+      // Left vertical construction axis along x = 205
+      { x1: 205, y1: -200, x2: 205, y2: 1150, start: 0.35, end: 1.25, hasDot: false },
+      // Inner vertical axis along x = 378
+      { x1: 378, y1: -150, x2: 378, y2: 1100, start: 0.45, end: 1.35, hasDot: false },
+      // Bottom loop horizontal tangent y = 664
+      { x1: -250, y1: 664, x2: 1250, y2: 664, start: 0.50, end: 1.40, hasDot: true, dotStart: 0.55 },
+      // Top horizontal axis y = 147
+      { x1: -200, y1: 147, x2: 1150, y2: 147, start: 0.55, end: 1.45, hasDot: false },
+      // Secondary lower-right tangent line
+      { x1: 220, y1: 890, x2: 980, y2: 490, start: 0.25, end: 1.20, hasDot: true, dotStart: 0.3 }
+    ];
+
+    // Floating micro-particles seen at 00:00 - 00:01
+    const AMBIENT_DOTS = [
+      { x: 185, y: 220, r: 2.8, color: '#ffffff', t0: 0.0 },
+      { x: 140, y: 580, r: 2.5, color: '#ffffff', t0: 0.1 },
+      { x: 860, y: 495, r: 5.0, color: '#ffffff', t0: 0.0, arcTrail: true },
+      { x: 560, y: 920, r: 4.2, color: '#ffffff', t0: 0.05, tail: { dx: 45, dy: 12 } },
+      { x: 265, y: 125, r: 4.0, color: '#ffffff', t0: 0.0, greenTail: { dx: 65, dy: -18 } }
+    ];
+
+    function renderCanvasScene(t, camState, lightProgress) {
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      // 1. Background Fill
+      // Default requested mode: Starts with vibrant Lime-to-Emerald gradient (#a8f532 -> #38a628),
+      // then transitions at 2.40s - 3.05s to Crisp Pure White (#ffffff -> #f4f7f2)
+      const startBgCenter = state.limeStartPalette ? '#a6f232' : '#0a2422';
+      const startBgEdge   = state.limeStartPalette ? '#39a828' : '#040e10';
+      const endBgCenter   = '#ffffff';
+      const endBgEdge     = '#f3f6f0';
+
+      const bgCenter = lerpColor(startBgCenter, endBgCenter, lightProgress);
+      const bgEdge   = lerpColor(startBgEdge, endBgEdge, lightProgress);
+
+      const bgGrad = ctx.createRadialGradient(
+        canvasW * 0.5, canvasH * 0.45, 10,
+        canvasW * 0.5, canvasH * 0.5, Math.max(canvasW, canvasH) * 0.72
+      );
+      bgGrad.addColorStop(0, bgCenter);
+      bgGrad.addColorStop(1, bgEdge);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvasW, canvasH);
+
+      // Map 1000x1000 SVG coordinate space onto the canvas so CAD lines align 100% with the SVG
+      const svgSize = Math.min(canvasW, canvasH) * 0.88;
+      const scaleFactor = svgSize / 1000;
+      const offsetX = (canvasW - svgSize) / 2;
+      const offsetY = (canvasH - svgSize) / 2;
+
+      ctx.translate(offsetX + 500 * scaleFactor, offsetY + 500 * scaleFactor);
+      ctx.scale(scaleFactor * camState.scale, scaleFactor * camState.scale);
+      ctx.rotate((camState.rotate * Math.PI) / 180);
+      ctx.translate(-500 + camState.panX, -500 + camState.panY);
+
+      // Master opacity of CAD construction elements (fades out cleanly during the White BG Reveal)
+      const cadAlpha = clamp(1 - invLerp(2.30, 2.80, t), 0, 1);
+
+      if (cadAlpha > 0.005) {
+        // 2. Volumetric White Halo behind the Travelling White Square (0.0s -> 2.3s)
+        const auraGlow = ctx.createRadialGradient(
+          camState.sqX, camState.sqY, 10,
+          camState.sqX, camState.sqY, 350
+        );
+        if (state.limeStartPalette) {
+          auraGlow.addColorStop(0, `rgba(255, 255, 255, ${0.42 * cadAlpha})`);
+          auraGlow.addColorStop(0.45, `rgba(235, 255, 195, ${0.18 * cadAlpha})`);
+          auraGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        } else {
+          auraGlow.addColorStop(0, `rgba(155, 248, 45, ${0.28 * cadAlpha})`);
+          auraGlow.addColorStop(0.45, `rgba(95, 205, 30, ${0.10 * cadAlpha})`);
+          auraGlow.addColorStop(1, 'rgba(10, 40, 30, 0)');
+        }
+        ctx.fillStyle = auraGlow;
+        ctx.beginPath();
+        ctx.arc(camState.sqX, camState.sqY, 350, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 3. Concentric Compass Construction Circles (Centered on P loop center: 555, 405.5)
+        const circleProgress = Ease.outCubic(invLerp(0.32, 1.55, t));
+        if (circleProgress > 0) {
+          const cx = 555;
+          const cy = 405.5;
+          const radii = [
+            { r: 258.5, alpha: 0.48, startAngle: -Math.PI * 0.65, sweep: Math.PI * 1.9 },
+            { r: 445, alpha: 0.55, startAngle: -Math.PI * 0.85, sweep: Math.PI * 2.0 },
+            { r: 482, alpha: 0.35, startAngle: -Math.PI * 0.4, sweep: Math.PI * 1.85 }
+          ];
+
+          radii.forEach((c, i) => {
+            ctx.save();
+            ctx.strokeStyle = `rgba(255, 255, 255, ${c.alpha * cadAlpha})`;
+            ctx.lineWidth = 1.7;
+            ctx.beginPath();
+            ctx.arc(cx, cy, c.r, c.startAngle, c.startAngle + c.sweep * circleProgress);
+            ctx.stroke();
+
+            // Orbiting white vertex nodes on the circles (Matches 00:01 & 00:02)
+            if (i < 2) {
+              const nodeAngle = c.startAngle + c.sweep * circleProgress;
+              const nx = cx + Math.cos(nodeAngle) * c.r;
+              const ny = cy + Math.sin(nodeAngle) * c.r;
+              ctx.fillStyle = `rgba(255, 255, 255, ${0.98 * cadAlpha})`;
+              ctx.beginPath();
+              ctx.arc(nx, ny, 4.6, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          });
+
+          // Fixed white compass nodes on the outer circles (seen at 00:01 and 00:02)
+          const fixedNodes = [
+            { angle: 2.88, r: 445 }, // Left circle node
+            { angle: 0.14, r: 445 }, // Right circle node
+            { angle: 2.35, r: 482 }  // Bottom-left outer circle node
+          ];
+          fixedNodes.forEach(fn => {
+            const fnAlpha = invLerp(0.65, 1.1, t) * cadAlpha;
+            if (fnAlpha > 0) {
+              const x = cx + Math.cos(fn.angle) * fn.r;
+              const y = cy + Math.sin(fn.angle) * fn.r;
+              ctx.fillStyle = `rgba(255, 255, 255, ${0.96 * fnAlpha})`;
+              ctx.beginPath();
+              ctx.arc(x, y, 4.8, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+        }
+
+        // 4. Architectural CAD Straight Tangent Lines & Travelling Nodes
+        CAD_LINES.forEach(line => {
+          const p = Ease.outCubic(invLerp(line.start, line.end, t));
+          if (p <= 0) return;
+
+          const curX = lerp(line.x1, line.x2, p);
+          const curY = lerp(line.y1, line.y2, p);
+
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.46 * cadAlpha})`;
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.moveTo(line.x1, line.y1);
+          ctx.lineTo(curX, curY);
+          ctx.stroke();
+
+          if (line.hasDot) {
+            const dp = Ease.outQuart(invLerp(line.dotStart, line.end + 0.2, t));
+            const dx = lerp(line.x1, line.x2, dp * 0.72);
+            const dy = lerp(line.y1, line.y2, dp * 0.72);
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.96 * cadAlpha})`;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 4.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // 5. Top-Left Circuit Feed Line & White Node (Seen at 00:01 and 00:02)
+        const circuitP = Ease.outCubic(invLerp(0.45, 1.35, t));
+        if (circuitP > 0) {
+          ctx.save();
+          ctx.strokeStyle = state.limeStartPalette
+            ? `rgba(255, 255, 255, ${0.85 * cadAlpha})`
+            : `rgba(165, 245, 48, ${0.75 * cadAlpha})`;
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(-350, 217);
+          const feedX = lerp(-350, 205, circuitP);
+          ctx.lineTo(feedX, 217);
+          ctx.stroke();
+
+          // Upper-left vertical branch with rounded elbow (matches 00:01 & 00:02 top-left)
+          const branchP = Ease.outCubic(invLerp(0.6, 1.5, t));
+          if (branchP > 0) {
+            ctx.beginPath();
+            ctx.moveTo(205, 147);
+            ctx.lineTo(-45, 147);
+            ctx.arcTo(-85, 147, -85, 107, 40);
+            ctx.lineTo(-85, lerp(107, -220, branchP));
+            ctx.stroke();
+
+            // White node on the vertical branch (seen in 00:01 and 00:02)
+            const branchNodeY = lerp(80, 15, branchP);
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.98 * cadAlpha})`;
+            ctx.beginPath();
+            ctx.arc(-85, branchNodeY, 5.0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // 6. Early Comet Dots & Tails (00:00 - 00:01)
+        const earlyAlpha = clamp(1 - invLerp(0.75, 1.35, t), 0, 1) * cadAlpha;
+        if (earlyAlpha > 0) {
+          AMBIENT_DOTS.forEach(dot => {
+            const dp = Ease.outCubic(invLerp(dot.t0, dot.t0 + 0.85, t));
+            if (dp <= 0) return;
+
+            const shiftX = dp * 28;
+            const shiftY = dp * -18;
+            const x = dot.x + shiftX;
+            const y = dot.y + shiftY;
+
+            if (dot.greenTail) {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${0.9 * earlyAlpha})`;
+              ctx.lineWidth = 3.2;
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.lineTo(x + dot.greenTail.dx * (1 - dp * 0.4), y + dot.greenTail.dy * (1 - dp * 0.4));
+              ctx.stroke();
+            }
+
+            if (dot.tail) {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${0.8 * earlyAlpha})`;
+              ctx.lineWidth = 2.4;
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.lineTo(x + dot.tail.dx, y + dot.tail.dy);
+              ctx.stroke();
+            }
+
+            if (dot.arcTrail) {
+              ctx.strokeStyle = `rgba(255, 255, 255, ${0.75 * earlyAlpha})`;
+              ctx.lineWidth = 2.2;
+              ctx.beginPath();
+              ctx.moveTo(x, y);
+              ctx.quadraticCurveTo(x + 8, y - 45, x - 5, y - 95);
+              ctx.stroke();
+            }
+
+            ctx.fillStyle = `rgba(255, 255, 255, ${earlyAlpha})`;
+            ctx.beginPath();
+            ctx.arc(x, y, dot.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // --- 6. MASTER TIMELINE CHOREOGRAPHY UPDATE (60-120 FPS) ---
+    function evaluateTimeline(t) {
+      // Determine White Background Reveal progress (2.38s -> 3.00s)
+      const lightProgress = Ease.inOutCubic(invLerp(2.38, 3.00, t));
+
+      // Dynamically transition the Logo Gradient from Pure White (on Lime BG) -> Vibrant Lime (on White BG)
+      if (state.limeStartPalette) {
+        dom.dynStop1.setAttribute('stop-color', lerpColor('#ffffff', '#b4f535', lightProgress));
+        dom.dynStop2.setAttribute('stop-color', lerpColor('#ffffff', '#7ed928', lightProgress));
+        dom.dynStop3.setAttribute('stop-color', lerpColor('#f2ffe6', '#36a628', lightProgress));
+      } else {
+        dom.dynStop1.setAttribute('stop-color', '#b4f535');
+        dom.dynStop2.setAttribute('stop-color', '#7ed928');
+        dom.dynStop3.setAttribute('stop-color', '#36a628');
+      }
+
+      // --- A. CAMERA RIG CHOREOGRAPHY ---
+      // 0.00s -> 1.50s: Camera zooms out from 1.36x to 1.0x and un-tilts from -22deg to 0deg
+      const camIntroP = Ease.outQuart(invLerp(0.0, 1.55, t));
+      let camScale = lerp(1.36, 1.0, camIntroP);
+      let camRotate = lerp(-22, 0, camIntroP);
+      let camPanX = lerp(-15, 0, camIntroP);
+      let camPanY = lerp(-35, 0, camIntroP);
+
+      // 2.35s -> 3.20s: Resolution Transition to make room for PLAINSYT + Motto
+      const resolveP = Ease.inOutQuart(invLerp(2.35, 3.20, t));
+
+      if (state.variant === 'english-only') {
+        // Horizontal English.png full lockup mode centered with motto underneath
+        camScale = lerp(camScale, 0.92, resolveP);
+        camPanY = lerp(camPanY, -30, resolveP);
+      } else {
+        // Stacked Video Loop + English.png Lockup: P icon sits above PLAINSYT + Motto
+        camScale = lerp(camScale, 0.52, resolveP);
+        camPanY = lerp(camPanY, -255, resolveP);
+      }
+
+      dom.cameraRig.setAttribute(
+        'transform',
+        `translate(500, 500) scale(${camScale.toFixed(4)}) rotate(${camRotate.toFixed(3)}) translate(${camPanX.toFixed(2)}, ${camPanY.toFixed(2)})`
+      );
+
+      // --- B. TRAVELLING GLOWING SQUARE CHOREOGRAPHY ---
+      // At 0.00s: starts near center (495, 465) tilted in pure white.
+      // Lands at top-left (275, 217) at 1.15s, and in English.png unified mode glides into the middle-left block (275, 400)
+      const sqFlightP = Ease.inOutCubic(invLerp(0.0, 1.20, t));
+      const targetSqX = 275;
+      let targetSqY = 217;
+      if (state.variant !== 'video-split') {
+        const dockMergeP = Ease.inOutCubic(invLerp(1.12, 1.72, t));
+        targetSqY = lerp(217, 400, dockMergeP);
+      }
+
+      // Curved Bezier flight path from center to top-left
+      const arcLift = Math.sin(sqFlightP * Math.PI) * -65;
+      const sqX = lerp(495, targetSqX, sqFlightP) + arcLift * 0.35;
+      const sqY = lerp(465, targetSqY, sqFlightP) + arcLift;
+      const sqRot = lerp(32, 0, sqFlightP);
+      const sqScale = lerp(0.76, 1.0, sqFlightP);
+
+      dom.travellingSquareGroup.setAttribute(
+        'transform',
+        `translate(${sqX.toFixed(2)}, ${sqY.toFixed(2)}) rotate(${sqRot.toFixed(2)}) scale(${sqScale.toFixed(3)})`
+      );
+
+      // Outer white halo frame around the square seen around 00:00.8 - 00:01.6
+      const haloAlpha = Math.sin(invLerp(0.55, 1.65, t) * Math.PI);
+      dom.squareOuterHalo.setAttribute('opacity', (haloAlpha * 0.9).toFixed(3));
+
+      // In unified English.png mode, once the main P body fills at 1.85s, the travelling square seamlessly merges into it
+      if (state.variant !== 'video-split') {
+        const sqFadeOut = 1 - invLerp(1.65, 2.02, t);
+        dom.travellingSquare.setAttribute('opacity', sqFadeOut.toFixed(3));
+      } else {
+        dom.travellingSquare.setAttribute('opacity', '1');
+        if (lightProgress > 0.5) {
+          dom.travellingSquare.setAttribute('filter', 'url(#inner-bevel)');
+          dom.travellingSquare.setAttribute('stroke', 'none');
+        } else {
+          dom.travellingSquare.setAttribute('filter', 'url(#neon-glow)');
+          dom.travellingSquare.setAttribute('stroke', '#ffffff');
+        }
+      }
+
+      // --- C. WHITE NEON TRACE CONTOURS ON LIME BG (0.00s -> 2.40s) ---
+      const earlyDraw = Ease.outCubic(invLerp(0.0, 0.55, t));
+      const earlyFade = 1 - Ease.inOutCubic(invLerp(0.45, 0.95, t));
+      dom.pTraceEarly.style.strokeDashoffset = `${traceEarlyLength * (1 - earlyDraw)}`;
+      dom.pTraceEarly.setAttribute('opacity', earlyFade.toFixed(3));
+
+      const mainDraw = Ease.inOutCubic(invLerp(0.28, 1.55, t));
+      const mainTraceFade = 1 - invLerp(2.10, 2.58, t);
+      dom.pTraceMain.style.strokeDashoffset = `${traceMainLength * (1 - mainDraw)}`;
+      dom.pTraceMain.setAttribute('opacity', mainTraceFade.toFixed(3));
+
+      // --- D. P LOGO BODY FILL (Starts White at 1.48s, turns Lime at 2.40s - 3.00s) ---
+      const fillInP = Ease.inOutCubic(invLerp(1.48, 2.08, t));
+      dom.pFilledBody.setAttribute('opacity', fillInP.toFixed(3));
+
+      // White back glow behind the filled P during the Lime phase
+      const backGlowAlpha = fillInP * (1 - lightProgress * 0.9) * 0.55;
+      dom.iconBackGlow.setAttribute('opacity', backGlowAlpha.toFixed(3));
+
+      // Studio shadow & 3D bevel highlight during the White Background Reveal
+      dom.pBevelOverlay.setAttribute('opacity', (lightProgress * 0.92).toFixed(3));
+      if (lightProgress > 0.35) {
+        dom.pIconGroup.setAttribute('filter', 'url(#studio-shadow)');
+      } else {
+        dom.pIconGroup.removeAttribute('filter');
+      }
+
+      // --- E. LIME PLAINSYT WORDMARK REVEAL ON WHITE BG (2.45s -> 3.45s) ---
+      const wmGlobalP = invLerp(2.45, 3.40, t);
+
+      if (state.variant === 'english-only') {
+        const horizP = Ease.inOutQuart(invLerp(2.35, 3.15, t));
+        dom.pIconGroup.setAttribute('opacity', (1 - horizP).toFixed(3));
+        dom.wordmarkGroup.setAttribute(
+          'transform',
+          `translate(500, 465) scale(0.215) translate(-2325, -460)`
+        );
+      } else {
+        dom.pIconGroup.setAttribute('opacity', '1');
+        const wmY = lerp(890, 845, Ease.outCubic(wmGlobalP));
+        dom.wordmarkGroup.setAttribute(
+          'transform',
+          `translate(500, ${wmY.toFixed(2)}) scale(0.255) translate(-2325, -450)`
+        );
+      }
+
+      dom.wordmarkGroup.setAttribute('opacity', clamp(wmGlobalP * 2.2, 0, 1).toFixed(3));
+
+      // Staggered per-letter geometric entrance filled with the Lime-Green gradient!
+      dom.wmLetters.forEach((el, idx) => {
+        const lStart = 2.45 + idx * 0.052;
+        const lEnd = lStart + 0.44;
+        const lp = Ease.outBack(invLerp(lStart, lEnd, t));
+        const lAlpha = Ease.outCubic(invLerp(lStart, lStart + 0.25, t));
+
+        const dy = (1 - lp) * 65;
+        const scaleY = lerp(0.75, 1.0, lp);
+        el.setAttribute('opacity', lAlpha.toFixed(3));
+        el.setAttribute('transform', `translate(0, ${dy.toFixed(1)}) scale(1, ${scaleY.toFixed(3)})`);
+        el.setAttribute('fill', 'url(#plainsyt-green-grad)');
+      });
+
+      // --- F. MOTTO REVEAL: "insight hidden in plain sight" (2.85s -> 3.75s) ---
+      const mottoP = Ease.outQuart(invLerp(2.85, 3.70, t));
+      const mottoAlpha = Ease.outCubic(invLerp(2.85, 3.45, t));
+
+      if (state.variant === 'english-only') {
+        const mottoY = lerp(635, 600, mottoP);
+        dom.mottoGroup.setAttribute('transform', `translate(500, ${mottoY.toFixed(2)}) scale(0.95)`);
+      } else {
+        const mottoY = lerp(1045, 995, mottoP);
+        dom.mottoGroup.setAttribute('transform', `translate(500, ${mottoY.toFixed(2)}) scale(1.18)`);
+      }
+
+      dom.mottoGroup.setAttribute('opacity', mottoAlpha.toFixed(3));
+      // Smoothly expand letter-spacing as the motto resolves into plain sight
+      const trackingEm = lerp(0.12, 0.34, mottoP);
+      dom.mottoText.setAttribute('letter-spacing', `${trackingEm.toFixed(3)}em`);
+
+      // Animate flanking geometric hairlines outward
+      const lineSpan = lerp(255, 385, mottoP);
+      dom.mottoLineLeft.setAttribute('x1', (-lineSpan).toFixed(1));
+      dom.mottoLineRight.setAttribute('x2', lineSpan.toFixed(1));
+
+      // Render Canvas Background, CAD Circles, Tangents & Nodes
+      renderCanvasScene(
+        t,
+        {
+          scale: camScale,
+          rotate: camRotate,
+          panX: camPanX,
+          panY: camPanY,
+          sqX,
+          sqY
+        },
+        lightProgress
+      );
+
+      // Update UI Timecode & Scrubber
+      dom.scrubber.value = t.toFixed(3);
+      const secs = Math.floor(t);
+      const ms = Math.floor((t - secs) * 100);
+      dom.timecode.textContent = `00:0${secs}.${ms.toString().padStart(2, '0')}`;
+    }
+
+    // --- 7. MAIN ANIMATION LOOP ---
+    function tick(now) {
+      const dt = Math.min((now - state.lastFrameTime) / 1000, 0.1);
+      state.lastFrameTime = now;
+
+      if (state.playing) {
+        if (state.time === 0 && !soundEngine.hasTriggeredCycle) {
+          soundEngine.triggerChordSwell();
+          soundEngine.hasTriggeredCycle = true;
+        }
+
+        state.time += dt * state.speed;
+
+        if (state.time >= state.duration) {
+          if (state.loop) {
+            state.time = 0;
+            soundEngine.hasTriggeredCycle = false;
+          } else {
+            state.time = state.duration;
+            setPlaying(false);
+          }
+        }
+      }
+
+      evaluateTimeline(state.time);
+      requestAnimationFrame(tick);
+    }
+
+    // --- 8. INTERACTIVE STUDIO CONTROLS & SHORTCUTS ---
+    function setPlaying(playState) {
+      state.playing = playState;
+      dom.iconPause.classList.toggle('hidden', !playState);
+      dom.iconPlay.classList.toggle('hidden', playState);
+    }
+
+    dom.btnPlay.addEventListener('click', () => {
+      if (state.time >= state.duration) {
+        state.time = 0;
+        soundEngine.hasTriggeredCycle = false;
+      }
+      setPlaying(!state.playing);
+    });
+
+    dom.btnRestart.addEventListener('click', () => {
+      state.time = 0;
+      soundEngine.hasTriggeredCycle = false;
+      setPlaying(true);
+    });
+
+    dom.scrubber.addEventListener('input', (e) => {
+      setPlaying(false);
+      state.time = parseFloat(e.target.value);
+      evaluateTimeline(state.time);
+    });
+
+    dom.variantBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        dom.variantBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.variant = btn.dataset.variant;
+        updateVariantGeometry();
+        evaluateTimeline(state.time);
+      });
+    });
+
+    dom.btnThemeLock.addEventListener('click', () => {
+      state.limeStartPalette = !state.limeStartPalette;
+      dom.labelTheme.textContent = state.limeStartPalette ? 'Lime → White' : 'Dark → White';
+      evaluateTimeline(state.time);
+    });
+
+    const speeds = [0.25, 0.5, 1.0, 1.5];
+    let speedIdx = 2;
+    dom.btnSpeed.addEventListener('click', () => {
+      speedIdx = (speedIdx + 1) % speeds.length;
+      state.speed = speeds[speedIdx];
+      dom.btnSpeed.textContent = `${state.speed}x`;
+    });
+
+    dom.btnLoop.addEventListener('click', () => {
+      state.loop = !state.loop;
+      dom.btnLoop.classList.toggle('bg-[#a8f530]/15', state.loop);
+      dom.btnLoop.classList.toggle('text-[#b8ff47]', state.loop);
+      dom.btnLoop.classList.toggle('border-[#a8f530]/40', state.loop);
+      dom.btnLoop.classList.toggle('bg-white/5', !state.loop);
+      dom.btnLoop.classList.toggle('text-white/50', !state.loop);
+      dom.btnLoop.classList.toggle('border-white/10', !state.loop);
+    });
+
+    dom.btnSound.addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      dom.soundOffIcon.classList.toggle('hidden', state.soundEnabled);
+      dom.soundOnIcon.classList.toggle('hidden', !state.soundEnabled);
+      dom.btnSound.classList.toggle('border-[#a8f530]/40', state.soundEnabled);
+      if (state.soundEnabled) {
+        soundEngine.init();
+        soundEngine.triggerChordSwell();
+      }
+    });
+
+    // Keyboard shortcuts (Space: Play/Pause, R: Restart, Left/Right Arrows: Frame step)
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        dom.btnPlay.click();
+      } else if (e.code === 'KeyR') {
+        dom.btnRestart.click();
+      } else if (e.code === 'ArrowRight') {
+        setPlaying(false);
+        state.time = clamp(state.time + 0.04, 0, state.duration);
+        evaluateTimeline(state.time);
+      } else if (e.code === 'ArrowLeft') {
+        setPlaying(false);
+        state.time = clamp(state.time - 0.04, 0, state.duration);
+        evaluateTimeline(state.time);
+      }
+    });
+
+    // Auto-hide HUD bar after 2.8 seconds of mouse inactivity for a clean full-screen view
+    let hudTimeout = null;
+    function wakeHud() {
+      dom.hudBar.classList.remove('hud-hidden');
+      clearTimeout(hudTimeout);
+      hudTimeout = setTimeout(() => {
+        if (state.playing) {
+          dom.hudBar.classList.add('hud-hidden');
+        }
+      }, 2800);
+    }
+
+    window.addEventListener('mousemove', wakeHud);
+    window.addEventListener('touchstart', wakeHud);
+
+    // Start Animation on Window Load
+    window.onload = function () {
+      state.lastFrameTime = performance.now();
+      wakeHud();
+      requestAnimationFrame(tick);
+    };
+  </script>
+</body>
+</html>

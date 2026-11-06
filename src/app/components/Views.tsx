@@ -978,6 +978,7 @@ export function ProfileView({
   isLoading,
   allProfiles = [],
   followingIds = [],
+  allFollows = [],
   onToggleFollowUser,
 }: {
   profile: UserProfile | null;
@@ -1011,6 +1012,8 @@ export function ProfileView({
   onCommentArticle: (id: string, text: string) => void;
   onSavePost: (id: string) => void;
   onCommentPost: (id: string, text: string) => void;
+  onEditComment?: (id: string, newText: string) => void;
+  onDeleteComment?: (id: string) => void;
   onShare: (label: string) => void;
   onRemoveSavedArticle: (id: string) => void;
   onRemoveSavedPost: (id: string) => void;
@@ -1019,6 +1022,7 @@ export function ProfileView({
   isLoading?: boolean;
   allProfiles?: UserProfile[];
   followingIds?: string[];
+  allFollows?: Array<{ followerId: string; followingId: string }>;
   onToggleFollowUser?: (userId: string) => void;
 }) {
   const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'following' | 'followers' | 'saved' | 'orders'>('articles');
@@ -1029,36 +1033,43 @@ export function ProfileView({
     title: string;
   } | null>(null);
 
-  const effectiveFollowingCount = isSelf
-    ? (followingIdsCount ?? profile?.followingCount ?? 0)
-    : (profile?.followingCount || 0);
+  // Real followers list (database-backed, zero hardcoded/fake numbers)
+  const displayedFollowers = useMemo(() => {
+    if (!profile) return [];
+    const directFollowerIds = new Set<string>();
+    for (const f of allFollows) {
+      if (f.followingId === profile.id) {
+        directFollowerIds.add(f.followerId);
+      }
+    }
+    if (!isSelf && currentUser && isFollowing) {
+      directFollowerIds.add(currentUser.id);
+    } else if (!isSelf && currentUser && !isFollowing) {
+      directFollowerIds.delete(currentUser.id);
+    }
+    return (allProfiles || []).filter((p) => p.id !== profile.id && directFollowerIds.has(p.id));
+  }, [allProfiles, profile, allFollows, isSelf, currentUser, isFollowing]);
 
-  const effectiveFollowersCount = isSelf
-    ? (profile?.followersCount || 0)
-    : Math.max(0, (profile?.followersCount || 0) + (isFollowing ? 1 : 0));
-
-  // Determine who you / the profile are following
+  // Real following list (database-backed)
   const displayedFollowing = useMemo(() => {
     if (!profile) return [];
     if (isSelf) {
       return (allProfiles || []).filter((p) => p.id !== profile.id && (followingIds || []).includes(p.id));
     }
-    return (allProfiles || []).filter((p) => p.id !== profile.id).slice(0, Math.max(1, profile.followingCount || 2));
-  }, [allProfiles, profile, isSelf, followingIds]);
-
-  // Determine who follows this profile
-  const displayedFollowers = useMemo(() => {
-    if (!profile) return [];
-    const list: UserProfile[] = [];
-    if (!isSelf && currentUser && isFollowing) {
-      list.push(currentUser);
+    const directFollowingIds = new Set<string>();
+    for (const f of allFollows) {
+      if (f.followerId === profile.id) {
+        directFollowingIds.add(f.followingId);
+      }
     }
-    const others = (allProfiles || []).filter(
-      (p) => p.id !== profile.id && (!currentUser || p.id !== currentUser.id),
-    );
-    list.push(...others.slice(0, Math.max(0, effectiveFollowersCount - list.length)));
-    return list;
-  }, [allProfiles, profile, isSelf, currentUser, isFollowing, effectiveFollowersCount]);
+    return (allProfiles || []).filter((p) => p.id !== profile.id && directFollowingIds.has(p.id));
+  }, [allProfiles, profile, isSelf, followingIds, allFollows]);
+
+  const effectiveFollowersCount = displayedFollowers.length;
+
+  const effectiveFollowingCount = isSelf
+    ? (followingIds || []).length
+    : displayedFollowing.length;
 
   if (isLoading || (!profile && !isOwnProfile)) {
     return <ProfilePageSkeleton />;
@@ -1376,6 +1387,8 @@ export function ProfileView({
                   onOpenReactionsBreakdown={() => onOpenReactionsBreakdown('article', a.id)}
                   onBookmark={() => onBookmarkArticle(a.id)}
                   onComment={(t) => onCommentArticle(a.id, t)}
+                  onEditComment={onEditComment}
+                  onDeleteComment={onDeleteComment}
                   onReactComment={(cid, type) => onReact('comment', cid, type)}
                   onShare={() => onShare(a.title)}
                   onNavigateProfile={onNavigateProfile}
@@ -1414,6 +1427,8 @@ export function ProfileView({
                   onOpenReactionsBreakdown={() => onOpenReactionsBreakdown('post', p.id)}
                   onSave={() => onSavePost(p.id)}
                   onComment={(t) => onCommentPost(p.id, t)}
+                  onEditComment={onEditComment}
+                  onDeleteComment={onDeleteComment}
                   onReactComment={(cid, type) => onReact('comment', cid, type)}
                   onShare={() => onShare(p.author.name)}
                   onNavigateProfile={onNavigateProfile}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Globe2, MoreHorizontal, MessageCircle, Share2, Send, Bookmark, Bot, ExternalLink } from 'lucide-react';
 import type { CommunityPost, LinkedInReactionType, UserProfile } from '../types';
-import { Avatar, FEED_CARD, VerifiedBadge, cn } from './Primitives';
+import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
@@ -21,6 +21,8 @@ interface Props {
   onOpenReactionsBreakdown: () => void;
   onSave: () => void;
   onComment: (text: string, parentId?: string, replyToAuthor?: string) => void;
+  onEditComment?: (commentId: string, newText: string) => void;
+  onDeleteComment?: (commentId: string) => void;
   onReactComment?: (commentId: string, type: LinkedInReactionType) => void;
   onShare: () => void;
   onNavigateProfile: (userId: string) => void;
@@ -36,6 +38,8 @@ export function CommunityPostCard({
   onOpenReactionsBreakdown,
   onSave,
   onComment,
+  onEditComment,
+  onDeleteComment,
   onReactComment,
   onShare,
   onNavigateProfile,
@@ -48,6 +52,16 @@ export function CommunityPostCard({
   const [text, setText] = useState('');
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
+
+  const canManageComment = (comment: Comment) =>
+    Boolean(
+      currentUser &&
+        (currentUser.id === comment.authorId ||
+          currentUser.name === comment.author ||
+          currentUser.role === 'Admin'),
+    );
   const long = post.content.length > 260;
   const shown = long && !expanded ? post.content.slice(0, 240).trimEnd() + '…' : post.content;
   const themed = post.textTheme && post.content.length < 140 && !post.images?.length;
@@ -267,12 +281,16 @@ export function CommunityPostCard({
         <button
           type="button"
           onClick={() => setShowComments((s) => !s)}
+          aria-label="মন্তব্য দেখুন বা লিখুন"
+          title="মন্তব্য"
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <MessageCircle className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
-          <span className="truncate">
-            <span className="hidden xs:inline">Comment</span> (<span className="font-bangla font-bold">{toBengaliNumerals(post.comments.length)}</span>)
-          </span>
+          {post.comments.length > 0 && (
+            <span className="font-bangla font-bold text-[12px] opacity-90">
+              (<Num>{toBengaliNumerals(post.comments.length)}</Num>)
+            </span>
+          )}
         </button>
         <button
           type="button"
@@ -320,9 +338,52 @@ export function CommunityPostCard({
                       >
                         <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
                       </button>
-                      <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">{c.text}</p>
+                      {editingCommentId === c.id ? (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const clean = editingText.trim();
+                            if (clean && clean !== c.text) {
+                              onEditComment?.(c.id, clean);
+                            }
+                            setEditingCommentId(null);
+                          }}
+                          className="mt-1 space-y-2"
+                        >
+                          <textarea
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            autoFocus
+                            rows={2}
+                            className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
+                          />
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="submit"
+                              disabled={!editingText.trim()}
+                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                            >
+                              সংরক্ষণ
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingCommentId(null)}
+                              className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
+                            >
+                              বাতিল
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">
+                          {c.text}
+                          {c.isEdited && (
+                            <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                          )}
+                        </p>
+                      )}
                     </div>
-                    <div className="ml-2 mt-0.5 flex items-center gap-3 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
+                    <div className="ml-2 mt-0.5 flex flex-wrap items-center gap-2.5 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
                       <span className="font-semibold text-slate-500 dark:text-slate-400">{c.timestamp}</span>
                       {onReactComment && (
                         <LinkedInReactionPickerButton
@@ -342,10 +403,39 @@ export function CommunityPostCard({
                             setReplyText(`@${c.author} `);
                           }
                         }}
-                        className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                        className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
                       >
                         উত্তর দিন
                       </button>
+                      {canManageComment(c) && (
+                        <>
+                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingCommentId(c.id);
+                              setEditingText(c.text);
+                            }}
+                            className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
+                            title="মন্তব্য সম্পাদনা করুন"
+                          >
+                            এডিট
+                          </button>
+                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof window !== 'undefined' && window.confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')) {
+                                onDeleteComment?.(c.id);
+                              }
+                            }}
+                            className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
+                            title="মন্তব্য মুছে ফেলুন"
+                          >
+                            মুছুন
+                          </button>
+                        </>
+                      )}
                     </div>
 
                     {/* Inline Reply Input */}
@@ -403,9 +493,52 @@ export function CommunityPostCard({
                                 >
                                   <span className="text-[12px] font-semibold text-slate-900 dark:text-white">{r.author}</span>
                                 </button>
-                                <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">{r.text}</p>
+                                {editingCommentId === r.id ? (
+                                  <form
+                                    onSubmit={(e) => {
+                                      e.preventDefault();
+                                      const clean = editingText.trim();
+                                      if (clean && clean !== r.text) {
+                                        onEditComment?.(r.id, clean);
+                                      }
+                                      setEditingCommentId(null);
+                                    }}
+                                    className="mt-1 space-y-2"
+                                  >
+                                    <textarea
+                                      value={editingText}
+                                      onChange={(e) => setEditingText(e.target.value)}
+                                      autoFocus
+                                      rows={2}
+                                      className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
+                                    />
+                                    <div className="flex items-center gap-1.5">
+                                      <button
+                                        type="submit"
+                                        disabled={!editingText.trim()}
+                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                                      >
+                                        সংরক্ষণ
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingCommentId(null)}
+                                        className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
+                                      >
+                                        বাতিল
+                                      </button>
+                                    </div>
+                                  </form>
+                                ) : (
+                                  <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">
+                                    {r.text}
+                                    {r.isEdited && (
+                                      <span className="ml-1.5 text-[10px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                                    )}
+                                  </p>
+                                )}
                               </div>
-                              <div className="ml-2 mt-0.5 flex items-center gap-2.5 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
+                              <div className="ml-2 mt-0.5 flex flex-wrap items-center gap-2 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
                                 <span className="text-slate-400">{r.timestamp}</span>
                                 {onReactComment && (
                                   <LinkedInReactionPickerButton
@@ -421,10 +554,39 @@ export function CommunityPostCard({
                                     setReplyingToId(c.id);
                                     setReplyText(`@${r.author} `);
                                   }}
-                                  className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                                  className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
                                 >
                                   উত্তর দিন
                                 </button>
+                                {canManageComment(r) && (
+                                  <>
+                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEditingCommentId(r.id);
+                                        setEditingText(r.text);
+                                      }}
+                                      className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
+                                      title="মন্তব্য সম্পাদনা করুন"
+                                    >
+                                      এডিট
+                                    </button>
+                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (typeof window !== 'undefined' && window.confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')) {
+                                          onDeleteComment?.(r.id);
+                                        }
+                                      }}
+                                      className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
+                                      title="মন্তব্য মুছে ফেলুন"
+                                    >
+                                      মুছুন
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </div>

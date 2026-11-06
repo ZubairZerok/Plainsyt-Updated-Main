@@ -13,6 +13,9 @@ export function LinkedInReactionBadge({
   className?: string;
 }) {
   const meta = getReactionMeta(type);
+  const isIdea = type === 'insightful';
+  const isLike = type === 'like';
+
   return (
     <span
       title={meta.label}
@@ -23,40 +26,24 @@ export function LinkedInReactionBadge({
         className,
       )}
     >
-      {type === 'like' && (
-        /* Thumbs Up — Standard agreement */
-        <svg viewBox="0 0 24 24" className="size-[62%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M2 20h2V8H2v12zm19.5-9c-.3-.3-.7-.5-1.1-.5H14l1.1-5.3c.1-.5 0-1-.3-1.4-.3-.4-.7-.6-1.2-.6h-1c-.3 0-.6.1-.8.3L7.3 10.3C7.1 10.5 7 10.7 7 11v9c0 1.1.9 2 2 2h8.5c.8 0 1.5-.5 1.8-1.2l2.3-5.4c.2-.4.2-.9 0-1.4z" />
-        </svg>
-      )}
-      {type === 'celebrate' && (
-        /* Clapping Hands / Applause — For milestones and breakthroughs */
-        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M18.5 2.5c-1.1 0-2 .9-2 2 0 .4.1.7.3 1L14 8.3 11.6 6c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4L12.5 10l-3.2-3.2c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4L11 11.4 7.6 8c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l4.2 4.2c-.7.6-1.4 1.4-1.9 2.3l-3-1.8c-.5-.3-1.2-.2-1.5.3-.3.5-.2 1.2.3 1.5l4.3 2.6c1.3 2.1 3.6 3.5 6.2 3.5 4.1 0 7.5-3.4 7.5-7.5 0-2.3-1-4.4-2.7-5.8.4-.5.6-1.1.6-1.7 0-1.1-.9-2-2-2z" />
-        </svg>
-      )}
-      {type === 'support' && (
-        /* Heart-in-Hands — Backing the initiative or solidarity */
-        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 .71-.11 1.4-.3 2.05-.6-.3-1.27-.45-1.95-.45-2.76 0-5 2.24-5 5 0 .93.26 1.8.72 2.55-1.07.72-2.39 1.25-3.47 1.7zm10-3.35c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5zm-3 1h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2z" />
-        </svg>
-      )}
-      {type === 'insightful' && (
-        /* Luminous Lightbulb — Thought-leadership and valuable insights */
-        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M12 2a7 7 0 00-7 7c0 2.4 1.2 4.5 3 5.7V17c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-2.3c1.8-1.3 3-3.4 3-5.7a7 7 0 00-7-7zm2 15h-4v-1h4v1zm0-2h-4v-1h4v1zm1.3-4.7l-.3.3V13h-4v-1.4l-.3-.3A5 5 0 1115.3 10.3z" />
-        </svg>
-      )}
-      {type === 'love' && (
-        /* Heart — Strong emotional connection and love */
+      {isLike && (
+        /* Heart icon from reaction-buttons.html */
         <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
         </svg>
       )}
-      {type === 'curious' && (
-        /* Thinking Curious Face — Curious to learn or investigate more */
+      {isIdea && (
+        /* Bulb icon from reaction-buttons.html */
+        <svg viewBox="0 0 24 24" className="size-[68%] overflow-visible fill-none stroke-current stroke-2 drop-shadow-xs" aria-hidden>
+          <g className="stroke-[1.8]"><path d="M12 -.2V-2.4M17.8 2.2l1.55-1.55M6.2 2.2L4.65.65M20.2 8h2.2M3.8 8H1.6"/></g>
+          <path className="fill-current stroke-current" d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.3 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+          <path className="stroke-current" d="M9 18h6M10 22h4"/>
+        </svg>
+      )}
+      {!isLike && !isIdea && (
+        /* Fallback standard */
         <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3-9c.83 0 1.5-.67 1.5-1.5S9.83 8 9 8s-1.5.67-1.5 1.5S8.17 11 9 11zm6 0c.83 0 1.5-.67 1.5-1.5S15.83 8 15 8s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-3 4c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
         </svg>
       )}
     </span>
@@ -142,18 +129,37 @@ export function LinkedInReactionPickerButton({
 }) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<LinkedInReactionType | null>(null);
-  const [burst, setBurst] = useState(false);
+  const [burstDots, setBurstDots] = useState<Array<{ x: number; y: number }>>([]);
+  const [burstKind, setBurstKind] = useState<LinkedInReactionType | null>(null);
+  const [rollDir, setRollDir] = useState<'up' | 'down' | ''>('');
+  const [btnHovered, setBtnHovered] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const holdTimer = useRef<number>();
   const closeTimer = useRef<number>();
   const didLongPress = useRef(false);
   const pointerId = useRef<number | null>(null);
 
+  const triggerBurst = (kind: LinkedInReactionType) => {
+    const isIdea = kind === 'insightful';
+    const n = isIdea ? 6 : 8;
+    const dots: Array<{ x: number; y: number }> = [];
+    for (let i = 0; i < n; i++) {
+      const a = (Math.PI * 2 * i) / n + (isIdea ? -Math.PI / 2 : 0);
+      const d = isIdea ? 24 : 22;
+      dots.push({ x: Math.round(Math.cos(a) * d), y: Math.round(Math.sin(a) * d) });
+    }
+    setBurstDots(dots);
+    setBurstKind(kind);
+    setRollDir('up');
+    window.setTimeout(() => {
+      setBurstDots([]);
+      setBurstKind(null);
+    }, 700);
+  };
+
   const openMenu = () => {
     window.clearTimeout(closeTimer.current);
     setOpen(true);
-    setBurst(true);
-    window.setTimeout(() => setBurst(false), 420);
   };
 
   const scheduleClose = () => {
@@ -169,6 +175,11 @@ export function LinkedInReactionPickerButton({
   };
 
   const select = (type: LinkedInReactionType) => {
+    if (userReaction === type) {
+      setRollDir('down');
+    } else {
+      triggerBurst(type);
+    }
     onSelect(type);
     setOpen(false);
     setHovered(null);
@@ -247,10 +258,11 @@ export function LinkedInReactionPickerButton({
       didLongPress.current = false;
       return;
     }
-    onSelect(userReaction ?? 'like');
+    select(userReaction ?? 'like');
   };
 
   const activeMeta = userReaction ? getReactionMeta(userReaction) : null;
+  const isIdea = userReaction === 'insightful';
 
   const tray = open && (
     <div
@@ -262,41 +274,65 @@ export function LinkedInReactionPickerButton({
       }}
       onMouseLeave={scheduleClose}
       className={cn(
-        'absolute z-50 flex items-end gap-0.5 rounded-full border border-white/20 bg-white px-2 py-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] dark:bg-[#0b1a14] dark:border-white/10',
+        'absolute z-50 flex items-center gap-2 rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#18213A]/95 p-1.5 shadow-[0_12px_40px_rgba(0,0,0,0.22)] backdrop-blur-md',
         floating
           ? 'bottom-[calc(100%+10px)] right-0 origin-bottom-right'
           : 'bottom-[calc(100%+10px)] left-0 origin-bottom-left',
-        burst ? 'fb-reaction-tray-in' : '',
+        'animate-in fade-in zoom-in-95 duration-150',
       )}
     >
-      {LINKEDIN_REACTIONS.map((r, i) => {
-        const isHot = hovered === r.type || userReaction === r.type;
+      {LINKEDIN_REACTIONS.map((r) => {
+        const isIdeaOption = r.type === 'insightful';
+        const isCurrent = userReaction === r.type;
+        const isHoveredOrActive = hovered === r.type;
         return (
-          <button
-            key={r.type}
-            type="button"
-            data-reaction-type={r.type}
-            style={{ animationDelay: `${i * 35}ms` }}
-            onPointerEnter={() => setHovered(r.type)}
-            onPointerLeave={() => setHovered(null)}
-            onClick={(e) => {
-              e.stopPropagation();
-              select(r.type);
-            }}
-            className={cn(
-              'fb-reaction-emoji relative flex size-10 items-center justify-center rounded-full transition-transform duration-150 ease-out will-change-transform',
-              isHot ? 'scale-[1.45] -translate-y-3 z-10' : 'scale-100 translate-y-0',
+          <div key={r.type} className="relative flex flex-col items-center">
+            {isHoveredOrActive && (
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2.5 py-0.5 font-bangla text-[11px] font-bold text-white shadow-md pointer-events-none animate-in fade-in zoom-in-90 duration-100 z-30">
+                {r.labelBn}
+              </div>
             )}
-            aria-label={`${r.label} (${r.labelBn})`}
-          >
-            {isHot && (
-              <span className="pointer-events-none absolute -top-11 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[#061621] px-2.5 py-1 text-center font-bangla shadow-2xl ring-1 ring-white/15 z-40">
-                <span className="block text-[11px] font-bold text-white leading-tight">{r.labelBn}</span>
-                <span className="block text-[9.5px] font-medium text-slate-300 leading-tight">{r.desc}</span>
+            <button
+              type="button"
+              data-reaction-type={r.type}
+              data-kind={isIdeaOption ? 'idea' : 'like'}
+              aria-pressed={isCurrent}
+              onPointerEnter={() => setHovered(r.type)}
+              onPointerLeave={() => setHovered(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                select(r.type);
+              }}
+              className={cn(
+                'react-btn !p-2 !rounded-full transition-transform duration-150 ease-out cursor-pointer',
+                isHoveredOrActive ? '!scale-125' : isCurrent ? '!scale-110' : 'hover:scale-110',
+              )}
+              title={r.labelBn}
+              aria-label={r.labelBn}
+            >
+              <span className="react-ico-wrap">
+                <svg className="react-ico" viewBox="0 0 24 24" aria-hidden="true">
+                  {isIdeaOption ? (
+                    <>
+                      <g className="react-rays">
+                        <path d="M12 -.2V-2.4M17.8 2.2l1.55-1.55M6.2 2.2L4.65.65M20.2 8h2.2M3.8 8H1.6" />
+                      </g>
+                      <path
+                        className={cn('react-glass', isCurrent && 'fill-current stroke-current')}
+                        d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.3 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+                      />
+                      <path className="stroke-current" d="M9 18h6M10 22h4" />
+                    </>
+                  ) : (
+                    <path
+                      className={cn('react-heart', isCurrent && 'fill-current stroke-current')}
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                    />
+                  )}
+                </svg>
               </span>
-            )}
-            <LinkedInReactionBadge type={r.type} size="size-9" className="shadow-md ring-2 ring-white/90" />
-          </button>
+            </button>
+          </div>
         );
       })}
     </div>
@@ -314,10 +350,43 @@ export function LinkedInReactionPickerButton({
           onPointerCancel={onPointerCancel}
           onClick={onClick}
           onContextMenu={(e) => e.preventDefault()}
+          data-kind={isIdea ? 'idea' : 'like'}
           aria-pressed={!!userReaction}
-          className={cn(className)}
+          className={cn('react-btn !p-2 !rounded-full', className)}
         >
-          <LinkedInReactionBadge type={userReaction ?? 'like'} size="size-5" />
+          <span className={cn('react-ico-wrap', burstKind ? 'anim-on' : '')}>
+            <svg className="react-ico" viewBox="0 0 24 24" aria-hidden="true">
+              {isIdea ? (
+                <>
+                  <g className="react-rays">
+                    <path d="M12 -.2V-2.4M17.8 2.2l1.55-1.55M6.2 2.2L4.65.65M20.2 8h2.2M3.8 8H1.6" />
+                  </g>
+                  <path
+                    className="react-glass"
+                    d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.3 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+                  />
+                  <path className="stroke-current" d="M9 18h6M10 22h4" />
+                </>
+              ) : (
+                <path
+                  className="react-heart"
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                />
+              )}
+            </svg>
+            {burstDots.length > 0 && (
+              <>
+                {burstDots.map((d, i) => (
+                  <span
+                    key={i}
+                    className="react-dot"
+                    style={{ '--x': `${d.x}px`, '--y': `${d.y}px` } as React.CSSProperties}
+                  />
+                ))}
+                <span className="react-ring" />
+              </>
+            )}
+          </span>
         </button>
       </div>
     );
@@ -327,12 +396,15 @@ export function LinkedInReactionPickerButton({
     <div
       ref={rootRef}
       className="relative inline-flex"
-      onMouseEnter={() => {
-        /* desktop: hover opens like FB desktop after a beat */
-      }}
       onMouseLeave={scheduleClose}
     >
       {tray}
+
+      {btnHovered && !open && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2.5 py-0.5 font-bangla text-[11px] font-bold text-white shadow-md pointer-events-none animate-in fade-in zoom-in-90 duration-100 z-30 hidden sm:block">
+          {activeMeta ? activeMeta.labelBn : 'লাইক'}
+        </div>
+      )}
 
       <button
         type="button"
@@ -343,29 +415,64 @@ export function LinkedInReactionPickerButton({
         onClick={onClick}
         onContextMenu={(e) => e.preventDefault()}
         onMouseEnter={() => {
+          setBtnHovered(true);
           window.clearTimeout(holdTimer.current);
           holdTimer.current = window.setTimeout(openMenu, 480);
         }}
+        onMouseLeave={() => {
+          setBtnHovered(false);
+          scheduleClose();
+        }}
+        title={activeMeta ? activeMeta.labelBn : 'লাইক'}
+        aria-label={activeMeta ? activeMeta.labelBn : 'লাইক'}
+        data-kind={isIdea ? 'idea' : 'like'}
         aria-pressed={!!userReaction}
-        style={activeMeta ? { color: activeMeta.color } : undefined}
         className={cn(
-          'flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 font-sans font-semibold transition-all hover:bg-slate-100 dark:hover:bg-white/5 active:scale-95 select-none touch-manipulation',
-          compact ? 'text-[11.5px] px-2 py-0.5' : 'text-[13px]',
-          !activeMeta && 'text-slate-600 dark:text-slate-300',
+          'react-btn',
+          compact ? '!p-1.5 !text-xs' : countLabel ? '!px-2.5 !py-1.5' : '!p-2',
           className,
         )}
       >
-        {activeMeta ? (
-          <LinkedInReactionBadge type={activeMeta.type} size={compact ? 'size-3.5' : 'size-[18px]'} />
-        ) : (
-          <LinkedInReactionBadge
-            type="like"
-            size={compact ? 'size-3.5' : 'size-[18px]'}
-            className="!bg-slate-200 dark:!bg-white/10 !text-slate-600 dark:!text-slate-300"
-          />
+        <span className={cn('react-ico-wrap', burstKind ? 'anim-on' : '')}>
+          <svg className="react-ico" viewBox="0 0 24 24" aria-hidden="true">
+            {isIdea ? (
+              <>
+                <g className="react-rays">
+                  <path d="M12 -.2V-2.4M17.8 2.2l1.55-1.55M6.2 2.2L4.65.65M20.2 8h2.2M3.8 8H1.6" />
+                </g>
+                <path
+                  className="react-glass"
+                  d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.3 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+                />
+                <path className="stroke-current" d="M9 18h6M10 22h4" />
+              </>
+            ) : (
+              <path
+                className="react-heart"
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            )}
+          </svg>
+          {burstDots.length > 0 && (
+            <>
+              {burstDots.map((d, i) => (
+                <span
+                  key={i}
+                  className="react-dot"
+                  style={{ '--x': `${d.x}px`, '--y': `${d.y}px` } as React.CSSProperties}
+                />
+              ))}
+              <span className="react-ring" />
+            </>
+          )}
+        </span>
+        {countLabel && (
+          <span className="react-count font-bangla font-bold text-[12px]">
+            <span className={cn('react-num', rollDir)}>
+              <Num>{countLabel}</Num>
+            </span>
+          </span>
         )}
-        <span>{activeMeta ? activeMeta.labelBn : 'লাইক'}</span>
-        {countLabel && <span className="font-bangla font-bold text-[12px] opacity-90">(<Num>{countLabel}</Num>)</span>}
       </button>
     </div>
   );

@@ -522,7 +522,7 @@ insert into public.profiles (
   'Bangladesh Agricultural University (BAU)',
   'ময়মনসিংহ, বাংলাদেশ',
   'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  '/images/hasan_zubair.png',
+  'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
   true,
   'z65gt9@gmail.com',
   0

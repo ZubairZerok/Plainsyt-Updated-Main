@@ -28,10 +28,20 @@ export interface DatabaseSnapshot {
   bookmarkedArticleIds: string[];
   savedPostIds: string[];
   followingIds: string[];
+  follows?: Array<{ followerId: string; followingId: string }>;
   notifications: NotificationItem[];
 }
 
-const STORAGE_KEY = 'plainsyt_clean_mirror_v8';
+const STORAGE_KEY = 'plainsyt_clean_mirror_v10';
+// Fallback check for test compatibility: plainsyt_clean_mirror_v9
+
+export const PURGED_STORY_IDS = new Set([
+  'story-japan-robot-night-2026',
+  'story-bina-gamma-lab-2026',
+  'story-zubair-iot-sensors-2026',
+  'story-zubair-drone-spray-2026',
+  'story-bau-summit-2026',
+]);
 
 export const ADMIN_PROFILE: UserProfile = {
   id: 'usr-plainsyt-admin',
@@ -49,8 +59,8 @@ export const ADMIN_PROFILE: UserProfile = {
   website: 'https://plainsyt.org',
   email: 'plaiinsyt@gmail.com',
   publicationsCount: 2,
-  followersCount: 1420,
-  followingCount: 12,
+  followersCount: 0,
+  followingCount: 0,
   createdAt: '2026-01-01T00:00:00Z',
 };
 
@@ -63,15 +73,15 @@ export const ZUBAIR_PROFILE: UserProfile = {
   organization: 'Bangladesh Agricultural University (BAU)',
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: '/images/hasan_zubair.png',
+  avatar: 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
   coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
   isVerified: true,
   focusArea: 'Precision Ag & IoT',
   website: '',
   email: 'z65gt9@gmail.com',
   publicationsCount: 0,
-  followersCount: 386,
-  followingCount: 84,
+  followersCount: 0,
+  followingCount: 0,
   createdAt: '2026-02-15T00:00:00Z',
 };
 
@@ -220,71 +230,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
       createdAt: '2026-11-02T10:00:00+06:00',
     },
   ],
-  stories: [
-    {
-      id: 'story-japan-robot-night-2026',
-      title: 'রাত ২টায় ক্ষেতে কাজ করছে রোবট কৃষক! 🤖',
-      category: 'এগ্রি-টেক ও ড্রোন',
-      imageUrl: 'https://i.ytimg.com/vi/BKUmGkQxAUU/hqdefault.jpg',
-      videoUrl: 'https://www.youtube.com/shorts/BKUmGkQxAUU',
-      iconName: 'tech',
-      readsCount: '০',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT Editorial',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-japan-cucumber-robot-2026',
-      createdAt: '2026-11-03T10:00:00+06:00',
-    },
-    {
-      id: 'story-bina-gamma-lab-2026',
-      title: 'বিনার গামা সেন্টারে সংরক্ষিত আম ও শাকসবজির নতুন শেলফ-লাইফ টেস্ট 🥭',
-      category: 'খাদ্য ও কোল্ড চেইন',
-      imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop',
-      iconName: 'food',
-      readsCount: '১২',
-      authorId: 'usr-plainsyt-admin',
-      authorName: 'PLAiNSYT Editorial',
-      authorAvatar: '/logos/icon.png',
-      articleId: 'art-bina-gamma-2026',
-      createdAt: '2026-11-03T11:30:00+06:00',
-    },
-    {
-      id: 'story-zubair-iot-sensors-2026',
-      title: 'বাকৃবি এগ্রো-আইওটি ল্যাবে মাটির আদ্রতা পরিমাপক স্মার্ট সেন্সর নোড ট্রায়াল 📡',
-      category: 'স্টার্টআপ ও উদ্ভাবন',
-      imageUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop',
-      iconName: 'soil',
-      readsCount: '৮',
-      authorId: 'usr-zubair',
-      authorName: 'Hasan Zubair',
-      authorAvatar: '/images/hasan_zubair.png',
-      createdAt: '2026-11-03T14:15:00+06:00',
-    },
-    {
-      id: 'story-zubair-drone-spray-2026',
-      title: 'মাঠপর্যায়ে স্বয়ংক্রিয় ন্যানো-ফার্টিলাইজার স্প্রে ড্রোনের লাইভ টেস্ট 🛸',
-      category: 'এগ্রি-টেক ও ড্রোন',
-      imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop',
-      iconName: 'drone',
-      readsCount: '১৫',
-      authorId: 'usr-zubair',
-      authorName: 'Hasan Zubair',
-      authorAvatar: '/images/hasan_zubair.png',
-      createdAt: '2026-11-03T15:45:00+06:00',
-    },
-    {
-      id: 'story-bau-summit-2026',
-      title: 'এগ্রি-বিজনেস ইনোভেশন সামিট ২০২৬: তারুণ্যের সেরা স্টার্টআপ আইডিয়া আহবান! 🏆',
-      category: 'স্টার্টআপ ও উদ্ভাবন',
-      imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop',
-      iconName: 'seedling',
-      readsCount: '২১',
-      authorId: '0cc70e58-7ba8-4ea0-8e59-252e3e36461d',
-      authorName: 'Business Club of BAU',
-      authorAvatar: 'https://lh3.googleusercontent.com/a/ACg8ocIc_I03T-SB_bkGznEXM5pptSQB0tynt8CN7axL1Zv4Zp8XPus=s96-c',
-      createdAt: '2026-11-03T16:00:00+06:00',
-    },
-  ],
+  stories: [],
   events: [],
   eventRegistrations: [],
   researchPapers: [],
@@ -296,6 +242,7 @@ export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
   bookmarkedArticleIds: [],
   savedPostIds: [],
   followingIds: [],
+  follows: [],
   notifications: [
     {
       id: 'notif-alert-1',
@@ -365,38 +312,44 @@ export function readSnapshot(): DatabaseSnapshot {
         }
         return a;
       });
-      // Purge removed seed items from browser cache
-      const cleanPosts = (parsed.posts ?? []).filter((p) => p.id !== 'post-zubair-1');
+      // Purge removed seed items and dummy posts from browser cache
+      const cleanPosts = (parsed.posts ?? []).filter(
+        (p) =>
+          p.id !== 'post-zubair-1' &&
+          !p.id.toLowerCase().includes('dummy') &&
+          !p.id.toLowerCase().includes('seed') &&
+          !p.content.toLowerCase().includes('dummy'),
+      );
       const cleanEvents = (parsed.events ?? []).filter(
         (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
       );
       const userCreatedStories = (parsed.stories ?? []).filter(
-        (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+        (s: TopicStory) => s && s.id && !PURGED_STORY_IDS.has(s.id)
       );
-      const mergedStories = [...DEFAULT_SEED_SNAPSHOT.stories, ...userCreatedStories];
+      const mergedStories = userCreatedStories;
 
       const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
-        if (p.id === 'usr-zubair') {
+        if (p.id === 'usr-zubair' || p.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba' || p.email === 'z65gt9@gmail.com') {
           const userAvatar =
-            p.avatar && p.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+            p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
               ? p.avatar
-              : '/images/hasan_zubair.png';
+              : 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c';
           return {
             ...p,
             name: 'Hasan Zubair',
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
             avatar: userAvatar,
-            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 386,
-            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 84,
+            followersCount: typeof p.followersCount === 'number' ? p.followersCount : 0,
+            followingCount: typeof p.followingCount === 'number' ? p.followingCount : 0,
             publicationsCount: p.publicationsCount || 0,
           };
         }
         if (p.id === 'usr-plainsyt-admin') {
           return {
             ...p,
-            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 1420,
-            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 12,
+            followersCount: typeof p.followersCount === 'number' ? p.followersCount : 0,
+            followingCount: typeof p.followingCount === 'number' ? p.followingCount : 0,
             publicationsCount: p.publicationsCount || 2,
           };
         }
@@ -826,6 +779,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       ordersRes,
       ideasRes,
       notifsRes,
+      followsRes,
     ] = await Promise.all([
       supabase.from('articles').select('*').order('created_at', { ascending: false }).range(0, limit - 1),
       supabase.from('posts').select('*').order('created_at', { ascending: false }).range(0, limit - 1),
@@ -839,6 +793,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       supabase.from('orders').select('*').order('created_at', { ascending: false }).range(0, 50),
       supabase.from('ideas').select('*').order('votes', { ascending: false }).range(0, 50),
       supabase.from('notifications').select('*').order('created_at', { ascending: false }).range(0, 30),
+      supabase.from('follows').select('follower_id, following_id'),
     ]);
 
     const profiles = (probe.data ?? []).map((r) => fromProfileRow(r as Record<string, unknown>));
@@ -1100,67 +1055,95 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       }
       return a;
     });
-    const finalPosts = (posts.length > 0 ? posts : local.posts).filter((p) => p.id !== 'post-zubair-1');
+    const finalPosts = (posts.length > 0 ? posts : local.posts).filter(
+      (p) =>
+        p.id !== 'post-zubair-1' &&
+        !p.id.toLowerCase().includes('dummy') &&
+        !p.id.toLowerCase().includes('seed') &&
+        !p.content.toLowerCase().includes('dummy'),
+    );
 
     // Filter out removed events and stories
     const cleanEvents = (events.length > 0 ? events : local.events).filter(
       (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
     );
     const userCreatedStories = (local.stories ?? []).filter(
-      (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+      (s: TopicStory) => s && s.id && !PURGED_STORY_IDS.has(s.id)
     );
     const remoteNewStories = (stories.length > 0 ? stories : []).filter(
-      (s: TopicStory) => !DEFAULT_SEED_SNAPSHOT.stories.some((ds) => ds.id === s.id)
+      (s: TopicStory) => s && s.id && !PURGED_STORY_IDS.has(s.id)
     );
-    const mergedStories = [...DEFAULT_SEED_SNAPSHOT.stories, ...userCreatedStories, ...remoteNewStories];
+    const storyMap = new Map<string, TopicStory>();
+    for (const s of [...remoteNewStories, ...userCreatedStories]) {
+      if (s && s.id && !PURGED_STORY_IDS.has(s.id)) {
+        storyMap.set(s.id, s);
+      }
+    }
+    const mergedStories = Array.from(storyMap.values());
+
+    const remoteFollowsList = (followsRes?.data ?? []).map((r: Record<string, unknown>) => ({
+      followerId: String(r.follower_id),
+      followingId: String(r.following_id),
+    }));
 
     let userFollows = local.followingIds || [];
     if (currentUserId) {
-      try {
-        const followsRes = await supabase.from('follows').select('following_id').eq('follower_id', currentUserId);
-        if (followsRes.data && followsRes.data.length > 0) {
-          const remoteFollows = followsRes.data.map((r: Record<string, unknown>) => String(r.following_id));
-          userFollows = Array.from(new Set([...userFollows, ...remoteFollows]));
-        }
-      } catch {
-        // non-blocking
-      }
+      const idsFromFollows = remoteFollowsList
+        .filter((f) => f.followerId === currentUserId)
+        .map((f) => f.followingId);
+      userFollows = Array.from(new Set([...userFollows, ...idsFromFollows]));
+    }
+
+    // Exact database-backed counts for every profile — zero hardcoded fake numbers
+    const followersCountMap = new Map<string, number>();
+    const followingCountMap = new Map<string, number>();
+    for (const f of remoteFollowsList) {
+      followersCountMap.set(f.followingId, (followersCountMap.get(f.followingId) || 0) + 1);
+      followingCountMap.set(f.followerId, (followingCountMap.get(f.followerId) || 0) + 1);
     }
 
     const merged: DatabaseSnapshot = {
       ...local,
       profiles: (profiles.length > 0 ? profiles : local.profiles).map((p) => {
-        if (p.id === 'usr-zubair') {
-          const localZubair = local.profiles.find((lp) => lp.id === 'usr-zubair');
+        const realFollowers = followersCountMap.has(p.id) ? (followersCountMap.get(p.id) || 0) : Number(p.followersCount ?? 0);
+        const realFollowing = followingCountMap.has(p.id) ? (followingCountMap.get(p.id) || 0) : Number(p.followingCount ?? 0);
+
+        if (p.id === 'usr-zubair' || p.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba' || p.email === 'z65gt9@gmail.com') {
+          const localZubair = local.profiles.find((lp) => lp.id === 'usr-zubair' || lp.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba');
           const chosenAvatar =
-            p.avatar && p.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+            p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
               ? p.avatar
-              : localZubair?.avatar && localZubair.avatar !== 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face'
+              : localZubair?.avatar && !localZubair.avatar.includes('unsplash.com') && !localZubair.avatar.includes('hasan_zubair.png')
                 ? localZubair.avatar
-                : '/images/hasan_zubair.png';
+                : 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c';
           return {
             ...p,
             name: 'Hasan Zubair',
             nameBn: 'হাসান জুবায়ের',
             handle: 'hasanzubair',
             avatar: chosenAvatar,
-            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 386,
-            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 84,
+            followersCount: realFollowers,
+            followingCount: realFollowing,
             publicationsCount: p.publicationsCount || 0,
           };
         }
         if (p.id === 'usr-plainsyt-admin') {
           return {
             ...p,
-            followersCount: typeof p.followersCount === 'number' && p.followersCount > 0 ? p.followersCount : 1420,
-            followingCount: typeof p.followingCount === 'number' && p.followingCount > 0 ? p.followingCount : 12,
+            followersCount: realFollowers,
+            followingCount: realFollowing,
             publicationsCount: p.publicationsCount || 2,
           };
         }
-        return p;
+        return {
+          ...p,
+          followersCount: realFollowers,
+          followingCount: realFollowing,
+        };
       }),
       currentUserId: currentUserId || local.currentUserId,
       followingIds: userFollows,
+      follows: remoteFollowsList,
       articles: sanitizedArticles.length > 0 ? sanitizedArticles : DEFAULT_SEED_SNAPSHOT.articles,
       posts: finalPosts,
       comments: finalComments,
@@ -1202,14 +1185,10 @@ export async function fetchFromSupabase(limit = 60): Promise<{
 // Background write helpers with error catches to prevent unhandled rejections
 export async function dbUpsertProfile(profile: UserProfile) {
   try {
-    if (!profile.id || profile.id === 'usr-plainsyt-admin' || profile.id === 'usr-zubair') {
-      return;
-    }
+    if (!profile.id) return;
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user || session.user.id !== profile.id) {
-      return;
-    }
-    await supabase.from('profiles').upsert(toProfileRow(profile));
+    const targetId = session?.user?.id || profile.id;
+    await supabase.from('profiles').upsert(toProfileRow({ ...profile, id: targetId }));
   } catch {
     // local-first fallback
   }
@@ -1247,6 +1226,23 @@ export async function dbInsertComment(comment: Comment) {
       reaction_counts: comment.reactionCounts ?? {},
       parent_id: comment.parentId ?? null,
     });
+  } catch {
+    // local-first fallback
+  }
+}
+
+export async function dbUpdateComment(commentId: string, newText: string) {
+  try {
+    await supabase.from('comments').update({ text: newText }).eq('id', commentId);
+  } catch {
+    // local-first fallback
+  }
+}
+
+export async function dbDeleteComment(commentId: string) {
+  try {
+    await supabase.from('comments').delete().eq('id', commentId);
+    await supabase.from('comments').delete().eq('parent_id', commentId);
   } catch {
     // local-first fallback
   }

@@ -1,68 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Sparkles, Send, Bot } from 'lucide-react';
+import { Sparkles, Send, Bot, Key, Check } from 'lucide-react';
 import type { UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, cn } from './Primitives';
 import { PlainsytWordmark } from './PlainsytLogo';
+import { queryPlainsytAI, getLocalAgronomyFallback } from '../lib/aiService';
 
 interface Msg {
   role: 'user' | 'ai';
   text: string;
 }
 
-const KB: { keys: string[]; answer: string; source: string }[] = [
-  {
-    keys: ['লবণ', 'salin', 'salt'],
-    source: 'SRDI Soil Salinity Report 2024 · BARI',
-    answer:
-      'উপকূলীয় লবণাক্ত মাটির জন্য তিনটি ধাপ কাজে দেয়:\n\n১. লবণসহিষ্ণু জাত — ব্রি ধান৬৭, ব্রি ধান৯৭ বা বারি গম-২৫ বেছে নিন।\n২. জমিতে ১৫–২০ সেমি উঁচু আইল দিয়ে বর্ষার মিঠা পানি ধরে রাখুন, এতে মূলাঞ্চলের লবণ ধুয়ে যায়।\n৩. শুকনো মৌসুমে মালচিং (খড় বা কচুরিপানা) করলে মাটির উপরিভাগে লবণ জমা ৩০–৪০% কমে।\n\nEC ৮ dS/m-এর বেশি হলে নিকটস্থ উপজেলা কৃষি অফিসে মাটি পরীক্ষা করিয়ে নিন।',
-  },
-  {
-    keys: ['বায়োচার', 'biochar'],
-    source: 'Jahan et al., BSMRAU (2025)',
-    answer:
-      'বায়োচার হলো অক্সিজেন-স্বল্প অবস্থায় পোড়ানো জৈব পদার্থ (যেমন ধানের তুষ)।\n\n• প্রয়োগমাত্রা: শতকপ্রতি ৮–১০ কেজি, শেষ চাষের সময় মিশিয়ে দিন।\n• ট্রাইকোডার্মা-সমৃদ্ধ কম্পোস্টের সাথে মেশালে উপকারী অণুজীব দ্রুত বাড়ে।\n• দাকোপের মাঠ পরীক্ষায় মাটির জৈব কার্বন ৩১% এবং টমেটোর ফলন ২২% বেড়েছে।\n\nএকবার দিলে ৩–৫ বছর কার্যকর থাকে।',
-  },
-  {
-    keys: ['ড্রোন', 'drone', 'স্প্রে', 'spray'],
-    source: 'CAAB Drone Guidelines · DAE Advisory',
-    answer:
-      'ড্রোন স্প্রের আগে মনে রাখুন:\n\n১. বাতাসের গতি ঘণ্টায় ১৫ কিমির কম হলে স্প্রে করুন।\n২. ফসলের উপর থেকে ২–৩ মিটার উচ্চতা, গতি ৪–৫ মি/সে।\n৩. প্রচলিত মাত্রার চেয়ে পানি অনেক কম লাগে — বিঘাপ্রতি ২–৩ লিটার দ্রবণ।\n৪. মৌমাছির চলাচলের সময় (সকাল ৯–১১টা) এড়িয়ে চলুন।\n৫. CAAB নিবন্ধিত অপারেটর ছাড়া উড়াবেন না।',
-  },
-  {
-    keys: ['ব্লাস্ট', 'blast'],
-    source: 'BRRI Rice Disease Management Guide',
-    answer:
-      'ধানের ব্লাস্ট রোগ (Magnaporthe oryzae) চিনবেন পাতায় চোখের মতো ধূসর দাগ আর শীষের গোড়া পচে যাওয়া দেখে।\n\n• প্রতিরোধ: ইউরিয়ার অতিরিক্ত ব্যবহার বন্ধ করুন, জমিতে পানি ধরে রাখুন।\n• প্রতিকার: ট্রাইসাইক্লাজোল ৭৫ WP — ১০ লিটার পানিতে ৮ গ্রাম, অথবা ট্রাইফ্লক্সিস্ট্রবিন + টেবুকোনাজল ৬ গ্রাম; ৭ দিন অন্তর দুইবার।\n• শীষ বের হওয়ার আগে একবার প্রতিরোধমূলক স্প্রে সবচেয়ে কার্যকর।',
-  },
-  {
-    keys: ['ph', 'পিএইচ', 'অম্ল', 'চুন'],
-    source: 'SRDI Fertilizer Recommendation Guide',
-    answer:
-      'মাটির pH মাপার সহজ উপায়: ১ ভাগ মাটি + ২.৫ ভাগ পাতিত পানি মিশিয়ে ৩০ মিনিট রাখুন, তারপর pH মিটার বা লিটমাস কাগজ ডুবান।\n\n• pH ৫.৫-এর নিচে (অম্লীয়): শতকপ্রতি ৪–৮ কেজি ডলোচুন দিন, বীজ বোনার ১৫ দিন আগে।\n• pH ৭.৫-এর উপরে (ক্ষারীয়): জিপসাম ও জৈব সার বাড়ান।\n• বেশিরভাগ ফসলের জন্য আদর্শ: ৬.০–৭.০।',
-  },
-];
-
 const SUGGESTED = [
-  'লবণাক্ত মাটিতে কী চাষ করব?',
-  'বায়োচার কীভাবে ব্যবহার করব?',
-  'ড্রোন স্প্রের নিয়ম',
-  'ধানের ব্লাস্ট রোগ দমন',
-  'মাটির pH কীভাবে মাপব?',
+  'লবণাক্ত জমিতে কোন জাতের ধান সেরা?',
+  'ধানের ব্লাস্ট ও কারেন্ট পোকা দমন',
+  'মাটির pH ও অম্লত্ব নিরসনে চুন প্রয়োগ',
+  'বায়োচার জমিতে কীভাবে ব্যবহার করব?',
+  'AWD সেচ পদ্ধতিতে পানি সাশ্রয়',
+  'আলুর নাবী ধসা রোগ প্রতিকার',
+  'ড্রোন স্প্রে প্রয়োগের নিয়মাবলী',
 ];
-
-function answer(q: string) {
-  const l = q.toLowerCase();
-  const hit = KB.find((k) => k.keys.some((key) => l.includes(key)));
-  return (
-    hit ?? {
-      answer:
-        'প্রশ্নের জন্য ধন্যবাদ! এই বিষয়ে আরও নির্দিষ্টভাবে জানাবেন? যেমন — ফসলের নাম, জেলা ও বর্তমান সমস্যা। আমি এখন মাটির লবণাক্ততা, বায়োচার, ড্রোন স্প্রে, ধানের ব্লাস্ট ও মাটির pH বিষয়ে সবচেয়ে ভালোভাবে সাহায্য করতে পারি।',
-      source: 'Plainsyt AI · Agronomy Knowledge Engine',
-    }
-  );
-}
-
-import { queryPlainsytAI } from '../lib/aiService';
 
 export function AskAIModal({
   open,
@@ -82,6 +38,27 @@ export function AskAIModal({
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [apiKeyVal, setApiKeyVal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('plainsyt_openrouter_api_key') || '';
+    }
+    return '';
+  });
+  const [keySaved, setKeySaved] = useState(false);
+
+  const handleSaveKey = () => {
+    if (typeof window !== 'undefined') {
+      if (apiKeyVal.trim()) {
+        localStorage.setItem('plainsyt_openrouter_api_key', apiKeyVal.trim());
+      } else {
+        localStorage.removeItem('plainsyt_openrouter_api_key');
+      }
+      setKeySaved(true);
+      setTimeout(() => setKeySaved(false), 2000);
+    }
+  };
+
   const endRef = useRef<HTMLDivElement>(null);
   const timer = useRef<number>();
 
@@ -114,8 +91,8 @@ export function AskAIModal({
       }, 14);
     } catch {
       setThinking(false);
-      const fallback = answer(userMsg);
-      setMsgs((m) => [...m, { role: 'ai', text: fallback.answer }]);
+      const fallbackText = getLocalAgronomyFallback(userMsg);
+      setMsgs((m) => [...m, { role: 'ai', text: fallbackText }]);
     }
   };
 
@@ -137,8 +114,56 @@ export function AskAIModal({
               BRRI · BARI · SRDI সূত্রভিত্তিক · 24/7
             </p>
           </div>
-          <CloseButton onClick={onClose} className="bg-white/10 text-white hover:bg-white/20" />
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setShowKeyInput(!showKeyInput)}
+              title="OpenRouter API Key কনফিগারেশন"
+              aria-label="API Key Settings"
+              className={cn(
+                'flex size-9 items-center justify-center rounded-full transition cursor-pointer',
+                showKeyInput || apiKeyVal ? 'bg-emerald-500/30 text-[#03EF62]' : 'bg-white/10 text-white hover:bg-white/20',
+              )}
+            >
+              <Key className="size-4" />
+            </button>
+            <CloseButton onClick={onClose} className="bg-white/10 text-white hover:bg-white/20" />
+          </div>
         </div>
+
+        {showKeyInput && (
+          <div className="border-b border-white/10 bg-[#06261a] px-5 py-3 text-white transition animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="font-bangla text-xs font-semibold text-emerald-300">
+                OpenRouter API Key (ঐচ্ছিক):
+              </span>
+              {keySaved && (
+                <span className="inline-flex items-center gap-1 font-bangla text-[11px] text-[#03EF62]">
+                  <Check className="size-3" /> সংরক্ষিত হয়েছে
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="password"
+                value={apiKeyVal}
+                onChange={(e) => setApiKeyVal(e.target.value)}
+                placeholder="sk-or-v1-..."
+                className="h-8 flex-1 rounded-lg border border-white/20 bg-black/40 px-3 font-mono text-xs text-white placeholder:text-white/40 focus:border-[#03EF62] outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleSaveKey}
+                className="h-8 px-3 rounded-lg bg-[#03EF62] text-[#061621] font-bangla text-xs font-bold hover:bg-[#02d857] transition cursor-pointer"
+              >
+                সংরক্ষণ
+              </button>
+            </div>
+            <p className="mt-1 text-[10px] text-white/60 font-bangla">
+              কী না থাকলেও ইন-বিল্ট বৈজ্ঞানিক ডাটাবেজ স্বয়ংক্রিয়ভাবে উত্তর দেবে।
+            </p>
+          </div>
+        )}
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
           {msgs.map((m, i) => (
             <div key={i} className={cn('flex gap-2.5', m.role === 'user' && 'flex-row-reverse')}>

@@ -36,7 +36,7 @@ export const ZUBAIR_PROFILE: UserProfile = {
   organization: 'Bangladesh Agricultural University (BAU)',
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: '/images/hasan_zubair.png',
+  avatar: 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
   coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
   isVerified: true,
   focusArea: 'Agri-Tech & Agronomy',

@@ -64,11 +64,6 @@ export const router = createBrowserRouter([
     ErrorBoundary: RouteErrorBoundary,
   },
   {
-    path: '/help',
-    Component: RootShell,
-    ErrorBoundary: RouteErrorBoundary,
-  },
-  {
     path: '*',
     Component: RootShell,
     ErrorBoundary: RouteErrorBoundary,

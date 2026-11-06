@@ -44,8 +44,8 @@ export function Avatar({
           hasStory
             ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-canvas-card shadow-sm'
             : ring
-            ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card'
-            : 'border border-slate-200/60 dark:border-white/10',
+              ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-canvas-card'
+              : 'border border-slate-200/60 dark:border-white/10',
           isPlainsytAvatar ? 'bg-[#03EF62]' : ((!isUrl || loadFailed) && tone),
         )}
       >
@@ -74,12 +74,14 @@ export function FollowIconButton({
   className,
   title,
   showLabel,
+  limeTick,
 }: {
   isFollowing: boolean;
   onClick: (e: React.MouseEvent) => void;
   className?: string;
   title?: string;
   showLabel?: boolean;
+  limeTick?: boolean;
 }) {
   return (
     <button
@@ -91,7 +93,9 @@ export function FollowIconButton({
         'group relative inline-flex items-center justify-center rounded-full transition-all active:scale-90 shadow-sm shrink-0',
         showLabel ? 'h-8 px-3.5 gap-1.5 text-xs font-bold' : 'size-7',
         isFollowing
-          ? 'bg-slate-100 dark:bg-white/15 text-slate-800 dark:text-white border border-slate-200 dark:border-white/20 hover:bg-slate-200 dark:hover:bg-white/25'
+          ? (limeTick
+              ? 'bg-[#03EF62] text-white border border-[#03EF62] hover:bg-[#02d857]'
+              : 'bg-slate-100 dark:bg-white/15 text-slate-800 dark:text-white border border-slate-200 dark:border-white/20 hover:bg-slate-200 dark:hover:bg-white/25')
           : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d857] hover:scale-105',
         className,
       )}

@@ -45,7 +45,7 @@ export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl
   return null;
 }
 
-const QUICK_EMOJIS = ['❤️', '🔥', '👏', '💡', '😮', '😂'];
+
 
 interface FloatingReaction {
   id: string;
@@ -65,6 +65,8 @@ interface Props {
   onToggleFollow: (authorId: string) => void;
   onReact: (targetType: ReactionTargetType, targetId: string, type: LinkedInReactionType) => void;
   onComment: (targetId: string, text: string) => void;
+  onEditComment?: (id: string, newText: string) => void;
+  onDeleteComment?: (id: string) => void;
   onShare: (title: string) => void;
   onSave: (storyId: string) => void;
   onOpenAuth: () => void;
@@ -83,6 +85,8 @@ export function StoryViewerModal({
   onToggleFollow,
   onReact,
   onComment,
+  onEditComment,
+  onDeleteComment,
   onShare,
   onSave,
   onOpenAuth,
@@ -121,6 +125,8 @@ export function StoryViewerModal({
   const [showComments, setShowComments] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
   const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
   const [userReactions, setUserReactions] = useState<Record<string, LinkedInReactionType>>({});
   const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
@@ -650,10 +656,15 @@ export function StoryViewerModal({
               <div className="flex items-center gap-2.5 min-w-0">
                 <button
                   type="button"
-                  onClick={() => {
-                    if (onNavigateProfile) onNavigateProfile(currentGroup.authorId);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onNavigateProfile) {
+                      onClose();
+                      onNavigateProfile(currentGroup.authorId);
+                    }
                   }}
-                  className="relative group shrink-0"
+                  title={`${currentGroup.authorName} এর প্রোফাইল দেখুন`}
+                  className="relative group shrink-0 cursor-pointer"
                 >
                   <Avatar
                     src={currentGroup.authorAvatar}
@@ -667,13 +678,25 @@ export function StoryViewerModal({
                 <div className="flex flex-col min-w-0 leading-tight">
                   <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
                     <div className="inline-flex items-center gap-1.5 min-w-0 shrink-0">
-                      <span className="font-bangla font-bold text-sm truncate text-white drop-shadow">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onNavigateProfile) {
+                            onClose();
+                            onNavigateProfile(currentGroup.authorId);
+                          }
+                        }}
+                        title={`${currentGroup.authorName} এর প্রোফাইল দেখুন`}
+                        className="font-bangla font-bold text-sm truncate text-white drop-shadow hover:underline hover:text-[#03EF62] transition text-left cursor-pointer"
+                      >
                         {currentGroup.authorName}
-                      </span>
-                      {/* Follow Icon Button (Icon Only, No Text) */}
+                      </button>
+                      {/* Follow Icon Button (Lime background & White checkmark when following) */}
                       {currentGroup.authorId !== currentUser?.id && (
                         <FollowIconButton
                           isFollowing={isFollowing}
+                          limeTick
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!currentUser) {
@@ -862,12 +885,15 @@ export function StoryViewerModal({
                 )}
               </button>
 
-              {/* Share Story */}
+              {/* Share Story (Facebook & Copy Link) */}
               <button
                 type="button"
-                onClick={() => onShare(currentStory.title)}
+                onClick={() => {
+                  setPaused(true);
+                  onShare(currentStory.title);
+                }}
                 className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90"
-                title="লিংক শেয়ার করুন"
+                title="ফেসবুক বা লিংক শেয়ার করুন"
               >
                 <Share2 className="size-4.5" />
               </button>
@@ -884,20 +910,6 @@ export function StoryViewerModal({
               >
                 <Bookmark className={cn('size-4.5', isSaved && 'fill-current')} />
               </button>
-            </div>
-
-            {/* Quick emoji reaction bar */}
-            <div className="flex items-center justify-around px-1 pt-0.5">
-              {QUICK_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => triggerReaction('like', emoji)}
-                  className="text-lg hover:scale-130 transition-transform active:scale-90 p-0.5"
-                >
-                  {emoji}
-                </button>
-              ))}
             </div>
           </div>
         </div>
@@ -942,20 +954,97 @@ export function StoryViewerModal({
                 এখনো কোনো মন্তব্য নেই। প্রথম মন্তব্যটি আপনিই করুন!
               </div>
             ) : (
-              itemComments.map((c) => (
-                <div key={c.id} className="flex items-start gap-2.5">
-                  <Avatar src={c.avatar} name={c.author} size="size-7" />
-                  <div className="flex-1 min-w-0 bg-white/5 rounded-2xl p-2.5 border border-white/5">
-                    <div className="flex items-baseline justify-between gap-1">
-                      <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
-                      <span className="font-bangla text-[10px] text-emerald-400 shrink-0">
-                        {c.timestampLabel || 'এখন'}
-                      </span>
+              itemComments.map((c) => {
+                const canManage = Boolean(
+                  currentUser &&
+                    (currentUser.id === c.authorId ||
+                      currentUser.name === c.author ||
+                      currentUser.role === 'Admin'),
+                );
+                return (
+                  <div key={c.id} className="flex items-start gap-2.5">
+                    <Avatar src={c.avatar} name={c.author} size="size-7" />
+                    <div className="flex-1 min-w-0 bg-white/5 rounded-2xl p-2.5 border border-white/5">
+                      <div className="flex items-baseline justify-between gap-1">
+                        <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
+                        <span className="font-bangla text-[10px] text-emerald-400 shrink-0">
+                          {c.timestampLabel || 'এখন'}
+                        </span>
+                      </div>
+                      {editingCommentId === c.id ? (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const clean = editingText.trim();
+                            if (clean && clean !== c.text) {
+                              onEditComment?.(c.id, clean);
+                            }
+                            setEditingCommentId(null);
+                          }}
+                          className="mt-1 space-y-1.5"
+                        >
+                          <input
+                            type="text"
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            autoFocus
+                            className="w-full rounded-lg border border-white/20 bg-black/40 px-2 py-1 font-bangla text-xs text-white outline-none focus:border-[#03EF62]"
+                          />
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="submit"
+                              disabled={!editingText.trim()}
+                              className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
+                            >
+                              সংরক্ষণ
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingCommentId(null)}
+                              className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
+                            >
+                              বাতিল
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <p className="mt-1 font-bangla text-xs text-white/85 leading-relaxed break-words">
+                          {c.text}
+                          {c.isEdited && (
+                            <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
+                          )}
+                        </p>
+                      )}
+                      {canManage && editingCommentId !== c.id && (
+                        <div className="mt-1 flex items-center gap-2 font-bangla text-[10.5px]">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingCommentId(c.id);
+                              setEditingText(c.text);
+                            }}
+                            className="text-white/60 hover:text-[#03EF62] transition cursor-pointer"
+                          >
+                            এডিট
+                          </button>
+                          <span className="text-white/20">·</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
+                                onDeleteComment?.(c.id);
+                              }
+                            }}
+                            className="text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                          >
+                            মুছুন
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <p className="mt-1 font-bangla text-xs text-white/85 leading-relaxed break-words">{c.text}</p>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 

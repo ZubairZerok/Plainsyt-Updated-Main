@@ -15,11 +15,13 @@ export function PhotoLightboxModal({
 }) {
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     if (payload) {
       setIndex(payload.index || 0);
       setZoom(1);
+      setImgError(false);
     }
   }, [payload]);
 
@@ -140,6 +142,7 @@ export function PhotoLightboxModal({
             onClick={() => {
               setIndex((i) => (i - 1 + total) % total);
               setZoom(1);
+              setImgError(false);
             }}
             aria-label="Previous photo"
             className="absolute left-4 z-10 flex size-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white transition hover:bg-black/80"
@@ -149,11 +152,13 @@ export function PhotoLightboxModal({
         )}
 
         <img
-          src={currentSrc}
+          src={imgError ? '/images/japan_cucumber_robot.jpg' : currentSrc}
           alt={payload.title || 'Full view'}
+          onError={() => setImgError(true)}
           onClick={() => setZoom((z) => (z === 1 ? 1.5 : 1))}
           style={{ transform: `scale(${zoom})` }}
           className="max-h-[78vh] max-w-[92vw] cursor-zoom-in rounded-lg object-contain shadow-2xl transition-transform duration-200"
+          decoding="async"
         />
 
         {total > 1 && (
@@ -162,6 +167,7 @@ export function PhotoLightboxModal({
             onClick={() => {
               setIndex((i) => (i + 1) % total);
               setZoom(1);
+              setImgError(false);
             }}
             aria-label="Next photo"
             className="absolute right-4 z-10 flex size-11 items-center justify-center rounded-full border border-white/20 bg-black/60 text-white transition hover:bg-black/80"

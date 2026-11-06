@@ -1,5 +1,5 @@
 # PLAiNSYT (প্লেইনসাইট) — Complete Enterprise Platform & SaaS Architectural Specification
-> **Document Version**: 4.0.0-PROD  
+> **Document Version**: 5.0.0-PROD  
 > **Classification**: Production Software Design Specification & Technical Architecture Reference  
 > **Target Platform**: Desktop, Tablet, Mobile Web (Progressive Web Application)  
 > **Source Repository**: `hasan2104074-hue/Trying`  
@@ -15,12 +15,13 @@
 
 ### 1.2 Core Pillars of the Platform
 1. **Curated Scientific Journalism & Publishing**: Peer-reviewed and journalistic long-form articles covering nuclear agriculture, precision agronomy, post-harvest engineering, climate-resilient genetics, and sustainable farming.
-2. **Community Social Feed (Agro-Network)**: Real-time microposts, photo collections, technical inquiries, and LinkedIn-style professional peer reactions.
-3. **Agro-Stories & Reels Hub**: Vertical micro-learning video reels and 24-hour disappearing agricultural field stories.
+2. **Community Social Feed (Agro-Network)**: Real-time microposts, photo collections, technical inquiries, and professional peer reactions.
+3. **Agro-Stories & Reels Hub**: Vertical micro-learning video reels and 24-hour agricultural field stories.
 4. **Agri-Tech Store & bKash Digital Commerce**: Peer-to-peer specialized farm machinery, organic inputs, biotechnology seeds, and direct-to-consumer bKash checkout with transaction verification.
 5. **Open Reader Idea Board & Collaborative Innovation**: Crowdsourced problem-solving board with voting, categorization, and researcher feedback.
 6. **Academic & Research Papers Repository**: Digital indexing of whitepapers, DOI links, impact metrics, and author citations.
 7. **Events, Seminars & Workshops Calendar**: Real-time event registrations, seat tracking, venue maps, and calendar exports.
+8. **PLAiNSYT AI Agronomy Assistant**: Ultra-trained localized AI agronomy intelligence engine integrated via OpenRouter.
 
 ---
 
@@ -33,6 +34,7 @@
 |  | Vite 6.x + React 19 / 18 SPA + TypeScript 5.x + Tailwind CSS v4 / PostCSS       |  |
 |  | Typography: 'Hind Siliguri' (Bengali) + 'Newsreader' / Serif + Inter / Sans     |  |
 |  | Routing: React Router v7 (Data Router with RouteErrorBoundary & Lazy Fallbacks) |  |
+|  | Video Splash Engine: Accelerated 2.2x Brand Induction Video with Preload       |  |
 |  +---------------------------------------------------------------------------------+  |
 +---------------------------------------------------------------------------------------+
                                            |  HTTPS / WebSocket / JSON
@@ -50,8 +52,8 @@
                                            v
 +---------------------------------------------------------------------------------------+
 |                              LOCAL PERSISTENCE & SYNC                                 |
-|  - Storage Engine: 'plainsyt_clean_mirror_v5' (localStorage fallback)                 |
-|  - Auth Session Key: 'plainsyt_auth_session_v1'                                       |
+|  - Storage Engine: 'plainsyt_clean_mirror_v9' (localStorage fallback)                 |
+|  - Auth Session Key: 'plainsyt_auth_session'                                          |
 |  - Optimistic State Manager with Commit Pipeline & Server Convergence                 |
 +---------------------------------------------------------------------------------------+
 ```
@@ -60,8 +62,8 @@
 - **Build Tool**: Vite 6.3.5 (ESM bundling, HMR, aggressive tree-shaking, production chunk splitting).
 - **Core Runtime**: React (Functional components, custom hooks, deterministic rendering, strict prop interfaces).
 - **Routing**: `react-router` v7 (`createBrowserRouter`, `RouterProvider`, dynamic segment routing `/profile/:userId`, `/article/:articleId`, `/events/:eventId`).
-- **Styling Architecture**: Vanilla Tailwind CSS + Custom CSS Variables (`theme.css`). Zero Tailwind CSS runtime overhead.
-- **Iconography**: `lucide-react` (SVG vectorized icons), custom SVG glyphs, and high-definition PNG brand marks.
+- **Styling Architecture**: Vanilla Tailwind CSS + Custom CSS Variables (`theme.css`).
+- **Iconography**: `lucide-react` (SVG vectorized icons), custom SVG glyphs, and high-definition brand marks.
 
 ### 2.2 Backend & Data Layer
 - **Database**: Supabase PostgreSQL 15.
@@ -83,7 +85,7 @@ The visual theme relies on high-contrast, eco-scientific tones anchored by the s
 | **Lime Green Light Wash** | `rgba(0, 237, 100, 0.12)` | `#03EF621F` | Subtle badge backgrounds, highlight pills, active state cards |
 | **Midnight Obsidian (Canvas Dark)**| `#061621` | `rgb(6, 22, 33)` | Dark mode body background, desktop nav headers, dark buttons |
 | **Deep Pine Green** | `#041d13` | `rgb(4, 29, 19)` | Modal headers, gradient stops, premium banner covers |
-| **Card Surface (Dark Mode)** | `#071f2d` | `rgb(7, 31, 45)` | Dark mode modal body, popover menus, reaction picker containers |
+| **Card Surface (Dark Mode)** | `#071f2d` | `rgb(7, 31, 45)` | Dark mode modal body, popover menus, reaction containers |
 | **Card Border (Dark Mode)** | `rgba(255, 255, 255, 0.10)` | White @ 10% | Clean, non-brutalist border dividers on dark themes |
 | **Canvas Light** | `#f4f6f8` | `rgb(244, 246, 248)` | Light mode platform background, clean paper contrast |
 | **Card Surface (Light Mode)** | `#ffffff` | `rgb(255, 255, 255)` | Feed cards, sidebar containers, reader modals |
@@ -98,249 +100,77 @@ The visual theme relies on high-contrast, eco-scientific tones anchored by the s
 ### 3.2 Typography Standards
 - **Bengali Primary (`font-bangla`)**: Google Font **'Hind Siliguri'** (`sans-serif`).
   - Strict rule: All Bengali text, author bylines, titles, descriptions, comments, and form inputs must use `font-bangla`.
-  - Fallback stack: `'Hind Siliguri', 'Noto Sans Bengali', -apple-system, sans-serif`.
+  - Strict numeric rule: All digits and numbers (both Bengali `০-৯` and Latin `0-9`) must render in Bold 700 version of Hind Siliguri across all statistics, counters, prices, dates, and badges.
 - **Editorial Display (`font-display`)**: **'Newsreader'** / High-elegance editorial serif.
-  - Used for article main headings, section kickoff titles, and quote callouts.
 - **Interface Sans (`font-sans`)**: **'Inter'** (`sans-serif`).
-  - Used for English text, UI buttons, numerical badges, and technical controls.
 - **Monospace Code & Plates (`font-mono`)**: **'JetBrains Mono'** / `'SF Mono'`.
-  - Used for figure tags (`FIG. ART-001`), SKU numbers, order numbers, and timestamps where monospacing prevents layout jitter.
-
-### 3.3 Geometry, Radii & Elevations
-- **Corner Radii**:
-  - `rounded-full` (9999px): Primary buttons, pill tags, navigation indicators, user avatars.
-  - `rounded-3xl` (24px): Floating modals, error cards, auth dialogues.
-  - `rounded-2xl` (16px): Feed cards, article cards, product tiles, story thumbnails.
-  - `rounded-xl` (12px): Form input fields, dropdown menus, comment boxes.
-  - `rounded-lg` (8px): Icon containers, sub-buttons, small status chips.
-- **Shadow Standards**:
-  - `shadow-tactile-xs`: `0 1px 2px rgba(6, 22, 33, 0.06), 0 2px 4px rgba(6, 22, 33, 0.04)`.
-  - `shadow-sm`: Standard card separation in light mode.
-  - `shadow-2xl`: Modals, lightboxes, and overlay menus.
-  - Clean styling directive: Avoid harsh brutalist black outlines. Use soft borders (`border-slate-200/80` or `border-white/10`) with gentle ambient occlusion.
 
 ---
 
-## 4. Comprehensive Layout & Shell Architecture
+## 4. Brand Induction & Procedural Splash Screen Engine
 
-### 4.1 Global Desktop Grid Structure
-On desktop screens (`>= 1024px`), the shell employs a three-column layout:
-- **Left Sidebar**: 224px (14rem) to 240px (15rem) fixed column. Contains navigation shortcuts, research topics, and quick category jumps.
-- **Center Main Content**: Flexible responsive column (`max-w-[760px]`, centered). Houses the active feed, articles, discussions, or marketplace.
-- **Right Sidebar**: 224px to 240px sticky column. Houses Top Trending Articles (ranked 1–5), Upcoming Events with registration, and Recommended Researchers.
-
-```
-+---------------------------------------------------------------------------------------------------+
-|  HEADER (Top Navigation: 56px / 64px)                                                             |
-|  [Logo: Plainsyt]   [Search ⌘K]       [Home] [Explore] [Events] [Store] [Ideas]       [Theme] [Login] |
-+---------------------------------------------------------------------------------------------------+
-|               |                                                          |                        |
-|  LEFT SIDEBAR |  CENTER FEED / ACTIVE VIEW                               |  RIGHT SIDEBAR         |
-|  - Shortcuts  |  - Story & Reel Bar                                      |  - Trending Articles   |
-|  - Topics     |  - Post Creation Card                                    |  - Upcoming Events     |
-|  - Pillars    |  - Dynamic Feed Cards (Articles, Community Posts, Reels) |  - Researcher Follows  |
-|  - Ecosystem  |  - Infinite Scroll / Pagination                          |                        |
-|               |                                                          |                        |
-+---------------------------------------------------------------------------------------------------+
-|  MOBILE BOTTOM BAR (Hidden on Desktop; Fixed at Bottom on Screens < 768px: Home, Explore, etc.)   |
-+---------------------------------------------------------------------------------------------------+
-```
-
-### 4.2 Header (Top Navigation) Specifications
-- **Height**: 52px on mobile (`< 768px`), 64px on tablet and desktop (`>= 768px`).
-- **Background**: High-visibility `#03EF62` (Lime Green) with subtle bottom border `rgba(6, 22, 33, 0.15)`.
-- **Brand Mark**: Responsive `PlainsytLogo`:
-  - Desktop: Full white/dark wordmark `প্লেইনসাইট / PLAiNSYT`.
-  - Mobile: Clean circular logo icon with zero awkward borders.
-- **Global Search Button**:
-  - Triggers interactive search modal (`⌘K` or `Ctrl+K` keybinding listener).
-  - Searches across articles, authors, community posts, and category tags simultaneously.
-- **Center Desktop Navigation Tabs**:
-  - Icons: Home (`Home`), Explore (`Compass`), Events (`CalendarDays`), Store (`Store`), Ideas (`Lightbulb`).
-  - Active State: High-contrast midnight obsidian pill (`bg-[#061621] text-white shadow-md scale-105`).
-  - Hover State: Gentle lift (`hover:bg-[#061621]/15 hover:scale-105`) with smooth animated floating tooltip in Bengali.
-- **Right Action Cluster — Logged-In State**:
-  1. **AI Assistant (`Sparkles`)**: Opens Plainsyt Intelligent Agri-Knowledge Assistant.
-  2. **Shopping Cart (`ShoppingBag`)**: Opens slide-over cart drawer with badge count.
-  3. **Theme Toggle (`Sun` / `Moon`)**: Seamless dark mode and light mode switcher.
-  4. **Saved Bookmarks (`Bookmark`)**: Opens modal listing saved articles and posts.
-  5. **Notifications (`Bell`)**: Shows unread counter badge; opens notifications popover.
-  6. **User Avatar Profile Button**: Displays user profile avatar with green online badge; on click, reveals dropdown with Profile link, Account Switch, and Log Out.
-- **Right Action Cluster — Logged-Out State**:
-  - Search icon.
-  - Theme toggle (Sun/Moon).
-  - **Single Primary Action Button**: **"লগইন"** (`bg-[#061621] text-white rounded-full font-bold px-4 py-2`).
-  - All clutter (AI button, Cart, Saved posts, Notifications, separate "Sign up" button) is strictly hidden for guests.
+### 4.1 Precision Canvas & SVG Geometric Choreography
+- **Engine**: Self-contained React procedural canvas and infinite-resolution SVG vector pipeline ported from `splashscreen.html`.
+- **Layout Variant**: Horizontal `English.png` wordmark lockup centered with official motto *"insight hidden in plain sight"*.
+- **Execution Speed**: Calibrated to **1.75x** speed delivering a brisk, engaging intro in ~2.7s.
+- **Dynamic Palette (Lime to White)**:
+  - Starts with vibrant deep lime background (`#a6f232` -> `#39a828`) displaying glowing white CAD construction tangents, compass circles, and comets.
+  - Dynamically transitions into crisp paper white (`#ffffff` -> `#f3f6f0`) while the wordmark letters resolve in luminous Plainsyt lime gradient (`#b4f535` -> `#7ed928` -> `#36a628`).
+- **Interactive Controls & Dismissal**: 1-click tap-to-dismiss anywhere on screen with silky smooth 0.4s fade-out, backed by a 3.2s safety fallback.
 
 ---
 
-## 5. Screen & View Deep Dives
+## 5. Interaction & Engagement Model
 
-### 5.1 Home View (`/`)
-The primary social and editorial stream:
-1. **Stories & Reels Carousel**:
-   - Horizontal scroll container featuring 24-hour agricultural stories and short-form video reels.
-   - Creator avatar with glowing lime border, topic title, and duration badge.
-   - Click opens the full-screen reel player or story viewer.
-2. **Post Creator Card**:
-   - Shows user's avatar and prompt: `"আপনার কৃষি ভাবনা বা অভিজ্ঞতা শেয়ার করুন..."`.
-   - Text theme picker (vibrant gradients: emerald-green, sunset-gold, electric-purple, midnight-pine).
-   - Multi-photo attachment support with preview and removal.
-   - Post button with loading spinner and instant optimistic feed integration.
-3. **Article Cards**:
-   - Clean aspect ratio (16:9 for featured, 2:1 for standard).
-   - High-fidelity figure plate (`FIG. ART-BINA-GAMMA-2026`).
-   - Category pill (`বিজ্ঞান`, `কৃষি প্রযুক্তি`, `মৃত্তিকা বিজ্ঞান`) in brand lime wash.
-   - **Published Date & Time**: Displayed prominently with `<Calendar />` icon (e.g. `০১ নভেম্বর ২০২৬, ০৩:০৭`).
-   - **Read Time**: `<Clock />` icon + Bengali numerals (e.g. `৫ মিনিট পড়া`).
-   - Title: `font-display text-[20px] sm:text-[22px] font-bold text-pine-950 hover:underline`.
-   - Subtitle: Summarized context in `font-bangla`.
-   - Author Byline: Avatar, author name, designation, and organization rendered strictly in `font-bangla` (`Hind Siliguri`).
-   - **LinkedIn-Style 6-Way Reactions Bar**: Like, Celebrate, Support, Love, Insightful, Curious.
-   - **Nested Commenting**: Real-time comment input, comment count, and threaded discussions.
-4. **Community Post Cards**:
-   - Microposts with optional text gradient themes for high visual impact.
-   - Photo grids (1, 2, 3, or 4+ images with "+N more" overlay).
-   - Verified researcher badge for verified faculty and scientists.
-   - Real-time timestamp (e.g. `৩ ঘণ্টা আগে`).
+### 5.1 Focused 2-Reaction Architecture & Physics States
+Derived from `reaction-buttons.html`, PLAiNSYT implements an interactive physics-driven reaction system:
+1. **Like (`like`, Heart)**:
+   - Icon: Scalable vector heart path.
+   - Colors: Light `#E5385F` (text `#C8244B`, soft background `#FDE7EC`); Dark `#FF6B8A` (text `#FF8FA6`, soft background `#3B2030`).
+   - Active Animation: `@keyframes react-pop` (scale bounce from 1 → 0.68 → 1.32 → 1) accompanied by 8 radiating particle burst dots and an expanding accent ring.
+2. **Idea / New Insight (`insightful`, Light Bulb / নতুন জানলাম)**:
+   - Icon: Scalable vector bulb with filament glass, metallic base, and radiating rays.
+   - Colors: Light `#F2A900` (text `#7A5400`, soft background `#FFF2C4`); Dark `#FFC933` (text `#FFD966`, soft background `#3A3114`).
+   - Active Animation: Glass fills with amber glow, rays shine with `@keyframes react-shine`, bulb flickers with `@keyframes react-flicker`, drop-shadow glow `drop-shadow(0 0 5px var(--idea))`, accompanied by 6 radiating particle burst dots and an expanding ring.
 
-### 5.2 Article Reader Modal & Standalone Route (`/article/:articleId`)
-- **Dual Presentation**: Can be viewed as an in-place lightbox modal without losing feed position, or directly accessed via permalink `/article/:articleId`.
-- **Hero Cover Image**: Full-width high-resolution photograph with scientific photo credits and source attribution.
-- **Metadata Header**:
-  - Full article category chip.
-  - Published timestamp in Bengali.
-  - Estimated read time.
-  - Author profile link and institutional designation.
-- **Key Takeaways Box (মূল কথা)**:
-  - Green-tinted callout containing 3–5 bulleted research takeaways for rapid scanning.
-- **Body Content**:
-  - Multi-paragraph editorial text formatted with readable line heights (`leading-[1.8]`), comfortable column widths, and responsive font sizes (`text-[16px] sm:text-[17.5px]`).
-- **Research Basis / Methodology**:
-  - Specific DOI links, research institute badges, and key metrics (e.g. `500 kCi Cobalt-60`).
-- **Reader Engagement**:
-  - Full reaction bar, bookmark toggle, share to social channels, and complete comments thread.
+### 5.2 Interactive Button States & Rolling Numerals
+- **Idle**: Clean pill border (`1.5px solid var(--react-line)`), card surface background, muted typography.
+- **Hover**: Subtle elevation (`translateY(-1px)`), colored border matching reaction accent, and colored glow shadow (`0 4px 14px -6px var(--c)`).
+- **Pressed**: Tactile spring compression (`scale(0.94)`).
+- **Active (Toggled On)**: Soft background wash (`var(--soft)`), solid colored border (`var(--c)`), and vibrant text (`var(--t)`).
+- **Rolling Number Animation**: Hind Siliguri bold 700 counters roll vertically (`react-rollUp` on react, `react-rollDown` on unreact).
 
-### 5.3 Agro-Tech Store (`/store`)
-- **Product Grid**: Specialized agro-inputs, IoT soil sensors, drip irrigation kits, organic bio-fertilizers, and certified seeds.
-- **Product Cards**: High-resolution product photography, seller name, stock badge, tag (`Agri-Tech`, `Organic`, `Hardware`), price in Bangladeshi Taka (`৳ ১,৮৫০ / পিস`).
-- **Add-to-Cart Flow**: Instant optimistic cart badge update, slide-over cart drawer.
-- **bKash Direct Send-Money Checkout**:
-  1. Delivery address form (District, Full address, Phone number).
-  2. Delivery zone selector: Inside Dhaka (৳ ৬০) vs Outside Dhaka (৳ ১২০).
-  3. Real-time subtotal, delivery fee, and grand total calculation in BDT.
-  4. Designated official receiver bKash number (`01771047033`).
-  5. Buyer enters their Sender bKash Number and Transaction ID (`TrxID`).
-  6. Instant validation and order submission with generated unique Order Number (e.g. `ORD-2026-9481`).
-  7. Orders tracked in user profile under "অর্ডার ইতিহাস" (Orders Tab).
+### 5.2 Resilient Reaction & Comment Persistence
+- **State Convergence**: Reactions and comments are stored in Supabase tables `public.reactions` and `public.comments`.
+- **Deduplication Engine**: Client-side resilient merge index (`targetType:targetId:userId`) merges local storage and remote Supabase reactions. Reactions never disappear on page refresh, navigation, or temporary network interruptions.
+- **Threaded Inline Replies**: Comments support nested hierarchy via `parentId`. Users can reply directly to any comment with `@author` tagging and visual indentation.
 
-### 5.4 Events & Seminars Hub (`/events` & `/events/:eventId`)
-- **Events Calendar**: Categorized upcoming agricultural conferences, workshops, drone training sessions, and field expos.
-- **Date Badge**: Stylized calendar card with month in Bengali (`নভেম্বর`) and bold day number (`০৫`).
-- **Event Metadata**: Venue location (`কৃষিবিদ ইনস্টিটিউট বাংলাদেশ (KIB), ঢাকা`), registered attendee counter, organizer name.
-- **1-Click Registration**:
-  - Logged-in users can register with one click.
-  - Real-time registration state stored in Supabase table `public.event_registrations`.
-  - Registered events display "নিবন্ধিত" (Registered) badge with option to cancel or download calendar invite.
+### 5.3 Icon-Only Clean Card Actions
+- **MessageCircle**: Comment buttons across article cards, community posts, and reels render strictly the `MessageCircle` SVG icon and numeral badge `(<Num>{count}</Num>)` when `count > 0`. Textual "Comment" strings are completely eliminated for clean, uncluttered visual rhythm.
+- **Dual-Action ShareModal**:
+  - Direct Facebook share integration (`https://www.facebook.com/sharer/sharer.php?u=...`).
+  - 1-click copy link action with instant visual feedback and toast confirmation.
 
-### 5.5 Reader Ideas Board (`/ideas`)
-- **Collaborative Innovation**: Readers and grassroots innovators submit agricultural problems and proposed technological solutions.
-- **Upvoting Engine**: Users upvote practical ideas; counts update optimistically and persist in Supabase table `public.ideas`.
-- **Category Filter**: Filter ideas by tags (`ড্রোন প্রযুক্তি`, `স্মার্ট সেচ`, `শস্য প্রক্রিয়াজাতকরণ`, `জৈব সার`).
-
-### 5.6 Researcher & User Profiles (`/profile` & `/profile/:userId`)
-- **Cover Banner**: High-elegance organic gradient (customizable per user) with 1-click palette editor for profile owners.
-- **Profile Header**:
-  - High-resolution circular avatar with online status indicator.
-  - Verified researcher badge (`VerifiedBadge`).
-  - Full Name in Bengali and English.
-  - Academic / Institutional Role & Designation (`Research Fellow · Bangladesh Agricultural University`).
-  - Username handle (`@zubair`).
-  - Geographic location (`ময়মনসিংহ, বাংলাদেশ`).
-  - Research focus area pill (`Agri-Tech & Agronomy`).
-  - Follower & Following counters with instant follow/unfollow capability.
-- **Profile Control Bar (for Profile Owner)**:
-  - **সেটিংস (Settings)**: Opens `ProfileSettingsModal` for photo upload, bio editing, and username modification.
-  - **লগইন / সুইচ (Switch Account)**: Opens `AuthModal`.
-  - **সাইন আউট (Log Out)**: Safely terminates Supabase session, resets local state, and toasts feedback.
-  - **Dark Mode Toggle**: Light / Dark mode toggle button.
-- **Content Tabs**:
-  1. **নিবন্ধসমূহ (Articles)**: Articles authored by this researcher.
-  2. **পোস্টসমূহ (Posts)**: Community updates and field notes published by this user.
-  3. **সংরক্ষিত (Saved)**: Bookmarked articles and posts (visible to own profile).
-  4. **অর্ডার ইতিহাস (Orders)**: Status of store orders placed via bKash.
+### 5.4 Follow Graph & Verification
+- **Relational Integrity**: Following/follower metrics are 100% computed from the relational `public.follows` table. Zero hardcoded numbers exist across the platform.
+- **Instant Toggle**: Following someone updates both local state and Supabase table optimistically with feedback.
 
 ---
 
-## 6. Authentication & User Session Management
+## 6. Standalone Article Route (`/article/:articleId`)
 
-### 6.1 Smart Unified Authentication Flow
-The authentication system is designed to eliminate user friction. There are no confusing tabs or separate registration mazes.
-
-```
-+-------------------------------------------------------------------------------------------------+
-|                                USER CLICKS "লগইন" IN HEADER                                     |
-+-------------------------------------------------------------------------------------------------+
-                                                |
-                                                v
-+-------------------------------------------------------------------------------------------------+
-|                                     AUTH MODAL OPENS                                            |
-|                                                                                                 |
-|   [ G ] Google দিয়ে এক ক্লিকে এগিয়ে যান  (Direct OAuth for both new and existing users)        |
-|                                                                                                 |
-|   ------------------------------ অথবা ইমেইল দিয়ে প্রবেশ করুন ---------------------------------  |
-|                                                                                                 |
-|   ইমেইল ঠিকানা:   [ your.email@example.com                                                    ] |
-|   পাসওয়ার্ড:       [ ••••••••                                                                👁 ] |
-|                                                                                                 |
-|   [                                     লগইন করুন  ->                                         ] |
-+-------------------------------------------------------------------------------------------------+
-                                                |
-                       +------------------------+------------------------+
-                       | User enters Email & Password and clicks Submit   |
-                       v                                                 v
-         [ Case A: Email Exists in DB ]                     [ Case B: Email NOT Found in DB ]
-                       |                                                 |
-                       v                                                 v
-         Verify Password via Supabase Auth                  **SMART AUTO-DETECTION TRIGGERS!**
-          /                         \                       Modal smoothly expands and states:
-     [ Matches ]               [ Incorrect ]                "স্বাগতম! আপনি নতুন সদস্য হিসেবে
-          |                          |                      শনাক্ত হয়েছেন। অনুগ্রহ করে শুধু আপনার
-          v                          v                      নামটি লিখুন, এখনই অ্যাকাউন্ট তৈরি হবে।"
-     LOGGED IN!              Shows error message                         |
-     Toast: "স্বাগতম!"       "পাসওয়ার্ড সঠিক নয়"                         v
-     Modal Closes            Offers password reset          [ আপনার পূর্ণ নাম: যেমন জুবায়ের হাসান ]
-                                                            Button updates to:
-                                                            [ অ্যাকাউন্ট তৈরি ও প্রবেশ করুন -> ]
-                                                                         |
-                                                                         v
-                                                            Submits name, email & password
-                                                            Creates auth user + public profile
-                                                            LOGGED IN IMMEDIATELY!
-```
-
-### 6.2 Session Persistence
-- **Tokens**: Supabase JWT tokens are stored securely in browser storage.
-- **Cross-Tab Synchronization**: Real-time window storage listeners keep all open tabs synchronized when a user signs in, updates their profile, or signs out.
-- **Security Attestation**: Every transaction and mutation requires valid session identity enforced by PostgreSQL RLS.
+- **Dynamic Routing**: Standalone permalink views for articles (`/article/:articleId`).
+- **Iconized Mobile Navigation**: The back button on mobile is a clean, circular icon button (`size-9 rounded-full border border-slate-200/90 dark:border-white/10 flex items-center justify-center`). On desktop screens, it smoothly expands to include `ফিডে ফিরে যান`.
+- **Purged Debug Routes**: All internal route labels (`Standalone Article Route · /article/...`) are permanently purged.
+- **Peer-Reviewed Citation Card**: Research articles feature verified academic methodology cards displaying research institute badges (e.g. BRRI, BINA, BAU), DOI links, and direct source URLs.
 
 ---
 
-## 7. Error Screen & Fallback Architecture
+## 7. PLAiNSYT AI Agronomy Intelligence Engine
 
-### 7.1 Developer Error Sanitization
-Internal JavaScript runtime errors, minified bundle exceptions, and React rendering failures (such as `useState is not defined`, `ReferenceError`, or unhandled promise rejections) are **strictly shielded** from end users.
-- The `getSafeErrorMessage()` filter inspects error payloads.
-- Any technical stack traces or variable reference errors are converted into a courteous, professional Bengali notification:
-  > *"একটি সাময়িক কারিগরি জটিলতা দেখা দিয়েছে। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন অথবা মূল পাতায় ফিরে যান।"*
-
-### 7.2 Standalone Red Glitch Logo
-Replacing traditional generic alert triangles (`!`), the error screen features a custom high-tech **Glitch Logo**:
-- **Pure Red Formulation**: Implemented via CSS `mask-image` referencing `/logos/icon.png` with background color `#FF2E2E`. This guarantees an intense, vivid red with zero yellowish or amber color distortion.
-- **Chromatic Aberration & Jitter**: Layered offset clones animated with `@keyframes red-glitch-anim` and `@keyframes red-glitch-jitter`.
-- **Clean Silhouette**: No square border box, no horizontal scanlines, and no distracting footer labels.
-- **Dimensions**: Large, prominent 112px–128px center emblem with soft ambient red pulse glow.
-- **Primary Recovery Action**: Prominent button in brand **Lime Green** (`bg-[#03EF62] hover:bg-[#02d955] text-[#061621] font-bold`) titled **"রিফ্রেশ করুন"**, alongside a secondary **"মূল পাতা"** navigation button.
+- **Localized Agro-Knowledge**: Ultra-trained conversational assistant specialized in Bangladesh's 30 agro-ecological zones (AEZ 1 to 30), Haor basin agriculture, coastal salinity management, nuclear mutation crop varieties (BINA), and BRRI rice strains.
+- **OpenRouter Engine**: Directly connected to OpenRouter API supporting high-performance LLMs with graceful offline fallback.
+- **Clean UI**: Removed generic subtitle text; streamlined header with direct query inputs and suggested prompt chips.
 
 ---
 
@@ -357,7 +187,7 @@ The database schema consists of 13 fully normalized, interconnected tables with 
 |  +--------------------+--------------------------------------------------------------------------+ |
 |  | id (TEXT, PK)      | 'usr-plainsyt-admin', 'usr-zubair', 'u-...'                              | |
 |  | name / name_bn     | Bengali and English user display names                                   | |
-|  | handle             | Unique handle (e.g. 'plainsyt', 'zubair')                                | |
+|  | handle             | Unique handle (e.g. 'plainsyt', 'hasanzubair')                           | |
 |  | role / organization| Academic rank and institutional affiliation                              | |
 |  | avatar / cover     | Media storage URLs and gradient configurations                           | |
 |  | is_verified        | Boolean indicating institutional researcher accreditation                | |
@@ -371,10 +201,10 @@ The database schema consists of 13 fully normalized, interconnected tables with 
 |  - id (PK)                - id (PK)               - target_type          - target_type             |
 |  - title, subtitle        - author_id (FK)        - target_id            - target_id               |
 |  - slug (UNIQUE)          - content               - user_id (FK)         - author_id (FK)          |
-|  - category               - images (JSONB)        - type (like, love...) - text                    |
-|  - author_id (FK)         - reaction_counts       - created_at           - reaction_counts         |
-|  - content (JSONB)        - stats (JSONB)                                - created_at              |
-|  - takeaways (JSONB)      - created_at                                                             |
+|  - category               - images (JSONB)        - type ('like',        - parent_id (FK, self)    |
+|  - author_id (FK)         - reaction_counts              'insightful')   - text                    |
+|  - content (JSONB)        - stats (JSONB)         - created_at           - reaction_counts         |
+|  - takeaways (JSONB)      - created_at                                   - created_at              |
 |  - published_at                                                                                    |
 |  - stats (JSONB)                                                                                   |
 |                                                                                                    |
@@ -395,13 +225,13 @@ The database schema consists of 13 fully normalized, interconnected tables with 
 
 ---
 
-## 9. Performance, Accessibility & SEO Best Practices
+## 9. Purged Routes & Clean Architecture Policy
 
-1. **Font Optimization**: Bengali fonts are preloaded via Google Fonts (`family=Hind+Siliguri:wght@400;500;600;700`) with `font-display: swap` to ensure instant visual readiness without layout shifts.
-2. **Asset CDN Fallbacks**: Logos and hero photography utilize dual-path resolution (local asset `/logos/icon.png` with automatic failover to remote unpkg / GitHub CDN).
-3. **Semantic HTML5 Structure**: Every view implements a single logical `<h1>`, structured `<article>`, `<header>`, `<main>`, `<aside>`, and `<nav>` landmarks.
-4. **WCAG Color Contrast**: High contrast is preserved across all states. In dark mode, all text is pure `#FFFFFF` or high-luminance `#E2E8F0` on `#061621` background, completely avoiding low-contrast dark fonts on dark backgrounds.
-5. **Mobile Viewport Ergonomics**: Essential interaction targets maintain a minimum hit area of 44×44 pixels. The mobile bottom navigation is pinned with iOS safe-area padding (`pb-[max(0.4rem,env(safe-area-inset-bottom))]`).
+To guarantee an uncluttered, high-utility product experience, the following obsolete views and routes have been **completely eliminated** from the application router, headers, and view switchboards:
+- `/help`: Editorial guidelines and help view removed.
+- `/me/analytics`: Generic user analytics dashboard purged.
+- `/me/reading-history`: Reading log history view purged.
+- Dummy seed posts (`post-zubair-1` and synthetic dummy items) completely eliminated from database queries and storage mirrors.
 
 ---
 
@@ -411,8 +241,8 @@ The database schema consists of 13 fully normalized, interconnected tables with 
 | :--- | :--- | :--- |
 | **Development Server** | `npm run dev` | Runs Vite dev server at `http://localhost:5173` |
 | **Production Build** | `npm run build` | Compiles TypeScript and outputs optimized assets to `dist/` |
-| **Preview Build** | `npm run preview` | Spins up local HTTP server serving production build |
-| **Database Migration** | Supabase SQL Dashboard | Run `src/app/lib/schemaSql.ts` to re-seed or update schema |
+| **Run Full Test Suite**| `node scripts/test_full_suite.mjs` | Executes automated assertions across all views & APIs |
+| **Database Migration** | Supabase SQL Dashboard | Apply SQL scripts from `supabase/migrations/` |
 | **Verify Fonts** | Check `font-bangla` class | Guarantees 'Hind Siliguri' font across Bengali text elements |
 
 *This document represents the complete, definitive technical reference for the PLAiNSYT SaaS Platform.*

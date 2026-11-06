@@ -34,6 +34,8 @@ export interface FeedApi {
   onCommentArticle: (id: string, text: string) => void;
   onSavePost: (id: string) => void;
   onCommentPost: (id: string, text: string) => void;
+  onEditComment?: (id: string, newText: string) => void;
+  onDeleteComment?: (id: string) => void;
   onShare: (label: string) => void;
   onPlayReel: (index: number) => void;
   onSaveReel: (id: string) => void;
@@ -70,6 +72,8 @@ export function CentralFeed(f: FeedApi) {
         onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('article', a.id)}
         onBookmark={() => f.onBookmarkArticle(a.id)}
         onComment={(t) => f.onCommentArticle(a.id, t)}
+        onEditComment={f.onEditComment}
+        onDeleteComment={f.onDeleteComment}
         onReactComment={(cid, type) => f.onReact('comment', cid, type)}
         onShare={() => f.onShare(a.title)}
         onNavigateProfile={f.onNavigateProfile}
@@ -94,6 +98,8 @@ export function CentralFeed(f: FeedApi) {
         onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('post', p.id)}
         onSave={() => f.onSavePost(p.id)}
         onComment={(t) => f.onCommentPost(p.id, t)}
+        onEditComment={f.onEditComment}
+        onDeleteComment={f.onDeleteComment}
         onReactComment={(cid, type) => f.onReact('comment', cid, type)}
         onShare={() => f.onShare(p.author.name)}
         onNavigateProfile={f.onNavigateProfile}

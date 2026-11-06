@@ -13,57 +13,27 @@ export interface ReactionDefinition {
   emoji: string;
 }
 
-/** Plainsyt SaaS reactions — 5 specific actionable research/initiative reactions */
+/** Plainsyt SaaS reactions — strictly Like (Heart) and Idea (Light Bulb / নতুন জানলাম) */
 export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
   {
     type: 'like',
     label: 'Like',
-    labelBn: 'পছন্দ',
-    desc: 'Standard agreement',
-    descBn: 'সাধারণ সম্মতি',
-    color: '#0A66C2',
-    bg: '#0A66C2',
-    emoji: '👍',
+    labelBn: 'লাইক',
+    desc: 'Heart / Like reaction',
+    descBn: 'পছন্দ',
+    color: '#E5385F',
+    bg: '#E5385F',
+    emoji: '❤️',
   },
   {
     type: 'insightful',
-    label: 'Insightful',
-    labelBn: 'তথ্যবহুল',
-    desc: 'Learned something new',
-    descBn: 'নতুন শিক্ষা',
-    color: '#D97706',
-    bg: '#D97706',
+    label: 'Idea',
+    labelBn: 'নতুন জানলাম',
+    desc: 'Learned something new / Idea',
+    descBn: 'নতুন জানলাম',
+    color: '#F2A900',
+    bg: '#F2A900',
     emoji: '💡',
-  },
-  {
-    type: 'support',
-    label: 'Support',
-    labelBn: 'সমর্থন',
-    desc: 'Backing the initiative or policy stance',
-    descBn: 'উদ্যোগে সমর্থন',
-    color: '#705BAF',
-    bg: '#705BAF',
-    emoji: '🤝',
-  },
-  {
-    type: 'celebrate',
-    label: 'Celebrate',
-    labelBn: 'অভিনন্দন',
-    desc: 'For milestones, breakthroughs, or success stories',
-    descBn: 'মাইলফলক ও সাফল্য',
-    color: '#368853',
-    bg: '#368853',
-    emoji: '👏',
-  },
-  {
-    type: 'curious',
-    label: 'Curious',
-    labelBn: 'কৌতূহলী',
-    desc: 'Want to see more data / follow-ups on this',
-    descBn: 'আরও তথ্য চাই',
-    color: '#2977C9',
-    bg: '#2977C9',
-    emoji: '🔍',
   },
 ];
 

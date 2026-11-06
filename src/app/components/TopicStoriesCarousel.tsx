@@ -61,6 +61,10 @@ export function TopicStoriesCarousel({
     return groups;
   }, [stories]);
 
+  if (stories.length === 0 && !currentUser) {
+    return null;
+  }
+
   return (
     <section className="group/car relative" aria-label="Topic stories">
       <div

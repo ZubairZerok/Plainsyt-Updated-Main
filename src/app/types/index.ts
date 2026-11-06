@@ -68,6 +68,7 @@ export interface Comment {
   userReaction?: LinkedInReactionType | null;
   parentId?: string | null;
   replyToAuthor?: string;
+  isEdited?: boolean;
 }
 
 export interface Article {

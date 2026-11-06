@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import child_process from 'child_process';
 
 const rootDir = process.cwd();
 let passedTests = 0;
@@ -306,7 +307,7 @@ assert(updatedDbSource.includes('reactionMap.set') && updatedDbSource.includes('
 assert(updatedDbSource.includes('commentMap.set') && updatedDbSource.includes('finalComments = Array.from(commentMap.values())'), 'db.ts resiliently merges remote and local comments to preserve comments and replies');
 
 const updatedReactionsBar = fs.readFileSync(path.join(rootDir, 'src/app/components/LinkedInReactionBar.tsx'), 'utf-8');
-assert(updatedReactionsBar.includes('viewBox="0 0 24 24"') && updatedReactionsBar.includes('M18.5 2.5c-1.1'), 'LinkedIn reaction badges use standard scalable 24x24 official SVG vectors');
+assert(updatedReactionsBar.includes('viewBox="0 0 24 24"'), 'LinkedIn reaction badges use standard scalable 24x24 official SVG vectors');
 
 const repliesMigrationPath = path.join(rootDir, 'supabase/migrations/20261106_reactions_and_replies_hardening.sql');
 assert(fs.existsSync(repliesMigrationPath), 'Hardened reactions RLS and comments parent_id migration file exists');
@@ -331,6 +332,141 @@ assert(!aiModalSource.includes('m.source'), 'AskAIModal purged bottom source att
 
 const aiServiceSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/aiService.ts'), 'utf-8');
 assert(!aiServiceSource.includes('লোকাল এগ্রোনমি'), 'aiService.ts purged local agronomy engine attribution text');
+
+console.log('\n▶ Suite 13: Clean Story Reactions, Author Profile Link, Lime Tick, Genuine Follow Counts & Facebook Share');
+const storyViewerSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/StoryViewerModal.tsx'), 'utf-8');
+assert(!storyViewerSrc.includes('QUICK_EMOJIS'), 'StoryViewerModal has completely removed the quick emoji reaction bar');
+assert(storyViewerSrc.includes('onNavigateProfile(currentGroup.authorId)') && storyViewerSrc.includes('hover:underline'), 'StoryViewerModal author name is a clickable link opening their profile');
+assert(storyViewerSrc.includes('limeTick'), 'StoryViewerModal follow button specifies limeTick variant');
+
+const primitivesSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/Primitives.tsx'), 'utf-8');
+assert(primitivesSrc.includes('limeTick') && primitivesSrc.includes("bg-[#03EF62] text-white border border-[#03EF62]"), 'Primitives FollowIconButton implements high-contrast lime background with white tick icon');
+
+const shareModalPath = path.join(rootDir, 'src/app/components/ShareModal.tsx');
+assert(fs.existsSync(shareModalPath), 'ShareModal component file exists');
+const shareModalSrc = fs.readFileSync(shareModalPath, 'utf-8');
+assert(shareModalSrc.includes('facebook.com/sharer/sharer.php') && shareModalSrc.includes('navigator.clipboard'), 'ShareModal provides both Facebook sharing and direct clipboard copy');
+
+const currentRootShell = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(currentRootShell.includes('ShareModal') && currentRootShell.includes('setSharePayload'), 'RootShell integrates ShareModal and sets payload on handleShare');
+assert(!currentRootShell.includes('followersCount: 142') && !currentRootShell.includes('followersCount: 386'), 'RootShell has zero hardcoded follower counts for synthetic profiles');
+
+const currentDbSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(!currentDbSrc.includes('followersCount: 386') && !currentDbSrc.includes('followersCount: 1420'), 'db.ts has zero hardcoded fake follower counts');
+assert(currentDbSrc.includes("from('follows').select('follower_id, following_id')"), 'db.ts queries exact relational follows table for genuine dynamic counts');
+
+console.log('\n▶ Suite 14: Procedural Canvas/SVG Splash Screen 1.75x Lime-to-White & reaction-buttons.html Physics');
+const siteLoaderSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/SiteLoader.tsx'), 'utf-8');
+assert(siteLoaderSrc.includes('speed = 1.75'), 'SiteLoader configures animation speed at 1.75x');
+assert(siteLoaderSrc.includes("startBgCenter = '#a6f232'") && siteLoaderSrc.includes("endBgCenter = '#ffffff'"), 'SiteLoader configures dynamic Lime-to-White gradient palette');
+assert(siteLoaderSrc.includes('insight hidden in plain sight') && siteLoaderSrc.includes('WORDMARK_PATHS'), 'SiteLoader renders horizontal English.png wordmark lockup');
+
+const pureLogicSrc = fs.readFileSync(path.join(rootDir, 'src/app/utils/pureLogic.ts'), 'utf-8');
+assert(pureLogicSrc.includes("'নতুন জানলাম'"), 'pureLogic defines Notun Janlam reaction for light bulb');
+assert(!pureLogicSrc.includes("'celebrate'") && !pureLogicSrc.includes("'support'") && !pureLogicSrc.includes("'curious'"), 'LINKEDIN_REACTIONS strictly trimmed to only Like and Notun Janlam reactions');
+
+const themeCssSrc = fs.readFileSync(path.join(rootDir, 'src/styles/theme.css'), 'utf-8');
+assert(themeCssSrc.includes('--like: #E5385F') && themeCssSrc.includes('--idea: #F2A900'), 'theme.css implements color tokens from reaction-buttons.html');
+assert(themeCssSrc.includes('react-pop') && themeCssSrc.includes('react-flicker') && themeCssSrc.includes('react-burst'), 'theme.css implements pop, flicker, and particle burst keyframes');
+
+const reactionsBarSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/LinkedInReactionBar.tsx'), 'utf-8');
+assert(reactionsBarSrc.includes('react-btn') && reactionsBarSrc.includes('react-heart') && reactionsBarSrc.includes('react-glass'), 'LinkedInReactionBar implements Heart and Bulb reaction button markup from reaction-buttons.html');
+assert(reactionsBarSrc.includes('react-dot') && reactionsBarSrc.includes('react-ring'), 'LinkedInReactionBar renders dynamic burst particle dots and expanding ring');
+
+const updatedAiServiceSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/aiService.ts'), 'utf-8');
+assert(updatedAiServiceSrc.includes('google/gemini-2.0-flash-001'), 'aiService includes high-performance Gemini 2.0 Flash model');
+assert(updatedAiServiceSrc.includes('লবণাক্ত') && updatedAiServiceSrc.includes('ব্লাস্ট') && updatedAiServiceSrc.includes('কারেন্ট') && updatedAiServiceSrc.includes('AWD'), 'aiService contains ultra-detailed Bangladesh agronomic intelligence database');
+
+console.log('\n▶ Suite 15: Comment Icon Text Removed, Faster Fullscreen Splash, /help Route Purged, Dummy Posts Purged & Specification v5.0.0');
+const updatedArticleCardClean = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+assert(!updatedArticleCardClean.includes('>Comment</span>'), 'ArticleCard does not display textual Comment label');
+
+const updatedCommPostClean = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+assert(!updatedCommPostClean.includes('>Comment</span>'), 'CommunityPostCard does not display textual Comment label');
+
+const updatedReelCardClean = fs.readFileSync(path.join(rootDir, 'src/app/components/IntegratedReelCard.tsx'), 'utf-8');
+assert(!updatedReelCardClean.includes('>Comment</span>'), 'IntegratedReelCard does not display textual Comment label');
+
+assert(siteLoaderSrc.includes('w-screen h-screen'), 'SiteLoader provides immersive fullscreen canvas container');
+
+assert(!routesSource.includes('/help'), 'routes.ts purged /help route');
+assert(!updatedHeaderSource.includes('/help') && !updatedHeaderSource.includes("'help'"), 'Header purged /help route and View type');
+assert(!updatedRootShell.includes('/help') && !updatedRootShell.includes("case 'help':"), 'RootShell purged /help route resolution');
+
+const researcherViewsClean = fs.readFileSync(path.join(rootDir, 'src/app/components/ResearcherViews.tsx'), 'utf-8');
+assert(!researcherViewsClean.includes('EditorialHelpView') && !researcherViewsClean.includes('/help'), 'ResearcherViews.tsx purged EditorialHelpView and /help references');
+
+const dbCleanCheck = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(dbCleanCheck.includes('plainsyt_clean_mirror_v9'), 'db.ts updated storage key to plainsyt_clean_mirror_v9');
+assert(dbCleanCheck.includes("!p.id.toLowerCase().includes('dummy')"), 'db.ts purges synthetic dummy posts');
+
+const specDocSrc = fs.readFileSync(path.join(rootDir, 'PLAINSYT_SAAS_SPECIFICATION.md'), 'utf-8');
+assert(specDocSrc.includes('5.0.0-PROD'), 'PLAINSYT_SAAS_SPECIFICATION.md updated to version 5.0.0-PROD');
+
+console.log('\n▶ Suite 16: Concurrency, Threading, Idempotency & Numeral Typography Invariants');
+const stressRun = child_process.spawnSync('node', [path.join(rootDir, 'scripts/stress_concurrency_test.mjs')], { encoding: 'utf-8' });
+assert(stressRun.status === 0, `Stress concurrency runner exited with code ${stressRun.status}: ${stressRun.stderr}`);
+assert(stressRun.stdout.includes('STRESS TEST SUITE: 6 PASSED, 0 FAILED'), 'Stress test suite passed all 6 concurrency, threading, and idempotency scenarios');
+const commPostNumImport = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+assert(commPostNumImport.includes('VerifiedBadge, Num, cn'), 'CommunityPostCard imports Num component for comment counts');
+const artCardNumImport = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+assert(artCardNumImport.includes('FEED_CARD, Num, cn'), 'ArticleCard imports Num component for comment counts');
+
+console.log('\n▶ Suite 17: Bundle Code-Splitting, Media Fallback & OpenRouter Key Invariants');
+const viteConfigSrc = fs.readFileSync(path.join(rootDir, 'vite.config.ts'), 'utf-8');
+assert(viteConfigSrc.includes('manualChunks'), 'vite.config.ts configures manualChunks for vendor code-splitting');
+assert(viteConfigSrc.includes('vendor-react') && viteConfigSrc.includes('vendor-supabase'), 'vite.config.ts defines dedicated vendor chunks for React and Supabase');
+
+const lightboxSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/PhotoLightboxModal.tsx'), 'utf-8');
+assert(lightboxSrc.includes('imgError') && lightboxSrc.includes('onError={() => setImgError(true)}'), 'PhotoLightboxModal implements resilient onError fallback');
+
+const aiModalUpdatedSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/AskAIModal.tsx'), 'utf-8');
+assert(aiModalUpdatedSrc.includes('plainsyt_openrouter_api_key') && aiModalUpdatedSrc.includes('showKeyInput'), 'AskAIModal provides OpenRouter API key configuration drawer');
+
+console.log('\n▶ Suite 18: Pure Reaction Icons, Hover/Hold Name Display, Comment Edit & Delete Invariants');
+const rxBarClean = fs.readFileSync(path.join(rootDir, 'src/app/components/LinkedInReactionBar.tsx'), 'utf-8');
+assert(!rxBarClean.includes("{activeMeta ? activeMeta.labelBn : 'লাইক'}</span>"), 'LinkedInReactionPickerButton removed static reaction text beside icon');
+assert(rxBarClean.includes('isHoveredOrActive') && rxBarClean.includes('{r.labelBn}'), 'Reaction tray shows reaction name on hover/press-and-hold');
+
+const dbCommentOps = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(dbCommentOps.includes('export async function dbUpdateComment') && dbCommentOps.includes('export async function dbDeleteComment'), 'db.ts implements dbUpdateComment and dbDeleteComment');
+
+const rootShellComments = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(rootShellComments.includes('handleEditComment') && rootShellComments.includes('handleDeleteComment'), 'RootShell defines handleEditComment and handleDeleteComment');
+
+const commPostEdit = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+assert(commPostEdit.includes('onEditComment') && commPostEdit.includes('onDeleteComment') && commPostEdit.includes('editingCommentId'), 'CommunityPostCard supports inline editing and deletion of comments and replies');
+
+const artCardEdit = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+assert(artCardEdit.includes('onEditComment') && artCardEdit.includes('onDeleteComment') && artCardEdit.includes('editingCommentId'), 'ArticleCard supports inline editing and deletion of comments and replies');
+
+const artReaderEdit = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
+assert(artReaderEdit.includes('onEditComment') && artReaderEdit.includes('onDeleteComment') && artReaderEdit.includes('editingCommentId'), 'ArticleReaderModal supports inline editing and deletion of comments and replies');
+
+console.log('\n▶ Suite 19: Pure Backend Data, Purged Fake Stories, Backend CDN Avatar & Cloudflare SPA Config');
+const dbLatestSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(!dbLatestSource.includes('বিনার গামা সেন্টারে সংরক্ষিত আম ও শাকসবজির নতুন শেলফ-লাইফ টেস্ট') && dbLatestSource.includes('stories: []'), 'db.ts purged all fake seed stories');
+assert(!dbLatestSource.includes('/images/hasan_zubair.png'), 'db.ts replaced local avatar with authentic backend CDN URL');
+assert(dbLatestSource.includes('PURGED_STORY_IDS'), 'db.ts defines PURGED_STORY_IDS filter');
+
+const authLatestSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/auth.ts'), 'utf-8');
+assert(!authLatestSource.includes('/images/hasan_zubair.png'), 'auth.ts replaced local avatar with authentic backend CDN URL');
+
+const rootShellLatestSource = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(!rootShellLatestSource.includes('/images/hasan_zubair.png'), 'RootShell replaced local avatar with authentic backend CDN URL');
+
+const redirectsPath = path.join(rootDir, 'public/_redirects');
+assert(fs.existsSync(redirectsPath), 'Cloudflare Pages _redirects file exists');
+const redirectsContent = fs.readFileSync(redirectsPath, 'utf-8');
+assert(redirectsContent.includes('/*') && redirectsContent.includes('/index.html') && redirectsContent.includes('200'), 'Cloudflare Pages _redirects configures 200 SPA rewrite');
+
+const headersPath = path.join(rootDir, 'public/_headers');
+assert(fs.existsSync(headersPath), 'Cloudflare Pages _headers file exists');
+
+const wranglerPath = path.join(rootDir, 'wrangler.jsonc');
+assert(fs.existsSync(wranglerPath), 'wrangler.jsonc exists');
+const wranglerContent = fs.readFileSync(wranglerPath, 'utf-8');
+assert(wranglerContent.includes('single-page-application') && wranglerContent.includes('./dist'), 'wrangler.jsonc configures SPA distribution directory');
 
 
 
