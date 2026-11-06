@@ -285,6 +285,35 @@ assert(!articleCardSourceUpdated.includes('c.role'), 'ArticleCard has removed ro
 assert(!articleReaderSource.includes('c.role'), 'ArticleReaderModal has removed role tags beside commenter names');
 assert(!reelPlayerSource.includes('c.role'), 'ReelPlayerModal has removed role tags beside commenter names');
 
+console.log('\n▶ Suite 11: Standalone Back Button, Research Citation, Reaction Persistence & Threaded Replies');
+const updatedRootShell = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(!updatedRootShell.includes('Standalone Article Route · /article/'), 'Standalone article route debug tag is completely removed');
+assert(updatedRootShell.includes('size-9 sm:size-auto') && updatedRootShell.includes('hidden sm:inline font-bangla'), 'Standalone article back button is iconized on mobile and text-responsive on desktop');
+
+const updatedArticleReader = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
+assert(updatedArticleReader.includes('গবেষণা ও প্রাথমিক তথ্যসূত্র') && updatedArticleReader.includes('resolvedSourceUrl'), 'Article reader has authoritative peer-reviewed research basis and live clickable source link');
+assert(updatedArticleReader.includes('ShieldCheck') && updatedArticleReader.includes('GraduationCap'), 'Article reader research basis displays academic verification badges');
+assert(updatedArticleReader.includes('setReplyingToId') && updatedArticleReader.includes('উত্তর দিন'), 'Article reader supports inline threaded replies to comments');
+
+const updatedCommPost = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+assert(updatedCommPost.includes('setReplyingToId') && updatedCommPost.includes('উত্তর দিন') && updatedCommPost.includes('replies.map'), 'Community post card supports inline replies and nested threaded comments');
+
+const updatedArticleCard = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+assert(updatedArticleCard.includes('setReplyingToId') && updatedArticleCard.includes('উত্তর দিন') && updatedArticleCard.includes('replies.map'), 'Article card supports inline replies and nested threaded comments');
+
+const updatedDbSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(updatedDbSource.includes('reactionMap.set') && updatedDbSource.includes('finalReactions = Array.from(reactionMap.values())'), 'db.ts resiliently merges remote and local reactions to prevent disappearance on refresh');
+assert(updatedDbSource.includes('commentMap.set') && updatedDbSource.includes('finalComments = Array.from(commentMap.values())'), 'db.ts resiliently merges remote and local comments to preserve comments and replies');
+
+const updatedReactionsBar = fs.readFileSync(path.join(rootDir, 'src/app/components/LinkedInReactionBar.tsx'), 'utf-8');
+assert(updatedReactionsBar.includes('viewBox="0 0 24 24"') && updatedReactionsBar.includes('M18.5 2.5c-1.1'), 'LinkedIn reaction badges use standard scalable 24x24 official SVG vectors');
+
+const repliesMigrationPath = path.join(rootDir, 'supabase/migrations/20261106_reactions_and_replies_hardening.sql');
+assert(fs.existsSync(repliesMigrationPath), 'Hardened reactions RLS and comments parent_id migration file exists');
+const repliesMigrationSource = fs.readFileSync(repliesMigrationPath, 'utf-8');
+assert(repliesMigrationSource.includes('parent_id') && repliesMigrationSource.includes('reactions_write_auth'), 'Migration defines parent_id on comments and reactions_write_auth on reactions');
+
+
 
 console.log('\n====================================================');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);

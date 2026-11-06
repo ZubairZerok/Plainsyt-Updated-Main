@@ -66,6 +66,8 @@ export interface Comment {
   likes: number;
   reactionCounts?: ReactionCounts;
   userReaction?: LinkedInReactionType | null;
+  parentId?: string | null;
+  replyToAuthor?: string;
 }
 
 export interface Article {
@@ -99,6 +101,7 @@ export interface Article {
     journalOrInst: string;
     doiOrSource: string;
     keyMetric: string;
+    sourceUrl?: string;
   };
   stats: {
     views: number;

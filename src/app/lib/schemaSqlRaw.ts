@@ -103,9 +103,11 @@ create table if not exists public.comments (
   timestamp_label text not null default '',
   likes integer not null default 0,
   reaction_counts jsonb not null default '{}'::jsonb,
+  parent_id text default null,
   created_at timestamptz not null default now()
 );
 create index if not exists idx_comments_target on public.comments (target_type, target_id, created_at desc);
+create index if not exists idx_comments_parent on public.comments (parent_id);
 create index if not exists idx_comments_brin on public.comments using brin (created_at);
 
 -- 6. LINKEDIN REACTIONS
@@ -382,10 +384,11 @@ drop policy if exists "reactions_select_public" on public.reactions;
 create policy "reactions_select_public" on public.reactions for select using (true);
 
 drop policy if exists "reactions_insert_owner" on public.reactions;
-create policy "reactions_insert_owner" on public.reactions for insert with check (auth.uid()::text = user_id or public.is_admin());
-
 drop policy if exists "reactions_delete_owner" on public.reactions;
-create policy "reactions_delete_owner" on public.reactions for delete using (auth.uid()::text = user_id or public.is_admin());
+drop policy if exists "reactions_write_auth" on public.reactions;
+create policy "reactions_write_auth" on public.reactions for all
+using (auth.uid() is not null or public.is_admin())
+with check (auth.uid() is not null or public.is_admin());
 
 -- Reels & Stories
 drop policy if exists "reels_select_public" on public.reels;

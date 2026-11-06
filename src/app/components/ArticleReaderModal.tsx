@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { Bookmark, Share2, Clock, FlaskConical, Send, Eye, ExternalLink, Calendar } from 'lucide-react';
-import type { Article, LinkedInReactionType, UserProfile } from '../types';
-import { Modal, CloseButton, Avatar, SectionLabel, cn } from './Primitives';
+import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationCap, ShieldCheck, CornerDownRight } from 'lucide-react';
+import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
+import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
@@ -15,7 +15,7 @@ interface Props {
   onReact: (type: LinkedInReactionType) => void;
   onOpenReactionsBreakdown: () => void;
   onBookmark: () => void;
-  onComment: (t: string) => void;
+  onComment: (t: string, parentId?: string, replyToAuthor?: string) => void;
   onReactComment?: (commentId: string, type: LinkedInReactionType) => void;
   onShare: () => void;
   onNavigateProfile: (userId: string) => void;
@@ -38,6 +38,8 @@ export function ArticleReaderContent({
   onOpenPhoto,
 }: Omit<Props, 'article'> & { article: Article; isStandalonePage?: boolean }) {
   const [text, setText] = useState('');
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const touchStartY = useRef<number | null>(null);
   const rxTotal = totalReactions(a.reactionCounts, a.stats.likes);
@@ -224,32 +226,89 @@ export function ArticleReaderContent({
           ))}
         </div>
 
-        {a.externalLink && (
-          <div className="mt-5">
-            <a
-              href={a.externalLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-4 py-2 font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition"
-            >
-              External Reference / Source Link <ExternalLink className="size-3.5" />
-            </a>
-          </div>
-        )}
+        {/* Authoritative Peer-Reviewed Research & Primary Source Citation */}
+        {(a.researchBasis || a.externalLink) && (() => {
+          const resolvedSourceUrl =
+            a.researchBasis?.sourceUrl ||
+            a.externalLink ||
+            (a.researchBasis?.doiOrSource?.startsWith('http') ? a.researchBasis.doiOrSource : '') ||
+            (a.id === 'art-bina-gamma-2026' ? 'http://bina.gov.bd/' : '') ||
+            (a.id === 'art-japan-cucumber-robot-2026' ? 'https://www.zen-noh.or.jp/' : '') ||
+            `https://scholar.google.com/scholar?q=${encodeURIComponent(a.researchBasis?.journalOrInst || a.title)}`;
 
-        {a.researchBasis && (
-          <div className="mt-7 grid gap-3 rounded-2xl border border-slate-200/80 dark:border-[#03EF62]/40 bg-slate-50/60 dark:bg-white/5 p-4 font-mono text-[11.5px] text-slate-700 dark:text-slate-200 sm:grid-cols-[auto_1fr_auto] sm:items-center">
-            <FlaskConical className="size-5 text-emerald-600 dark:text-[#03EF62]" />
-            <div>
-              <p className="uppercase tracking-wider text-emerald-600 dark:text-[#03EF62] font-semibold text-[10px]">Research basis</p>
-              <p className="mt-0.5 font-medium">{a.researchBasis.journalOrInst}</p>
-              <p className="text-slate-500 dark:text-slate-400">{a.researchBasis.doiOrSource}</p>
-            </div>
-            <span className="rounded-full border border-emerald-200/80 dark:border-[#03EF62]/50 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-[12px] font-semibold text-emerald-800 dark:text-[#03EF62]">
-              {a.researchBasis.keyMetric}
-            </span>
-          </div>
-        )}
+          return (
+            <section
+              aria-label="গবেষণা ও তথ্যসূত্র"
+              className="mt-8 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-canvas-card/80 p-5 sm:p-6 shadow-xs backdrop-blur-sm space-y-4"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 dark:border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-[#03EF62]/15 text-emerald-700 dark:text-[#03EF62]">
+                    <GraduationCap className="size-4" />
+                  </span>
+                  <div>
+                    <h4 className="font-bangla text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-[#03EF62]">
+                      গবেষণা ও প্রাথমিক তথ্যসূত্র · Scientific Citation
+                    </h4>
+                    <p className="font-bangla text-[11px] text-slate-500 dark:text-slate-400">
+                      পিয়ার-রিভিউড প্রকাশনা ও প্রাতিষ্ঠানিক গবেষণা ডেটাসেট
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/80 dark:border-[#03EF62]/40 bg-emerald-50/80 dark:bg-[#03EF62]/10 px-2.5 py-0.5 font-bangla text-[10.5px] font-bold text-emerald-800 dark:text-[#03EF62]">
+                  <ShieldCheck className="size-3" /> যাচাইকৃত সোর্স
+                </span>
+              </div>
+
+              {a.researchBasis && (
+                <div className="space-y-3 font-bangla">
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      গবেষক দল ও প্রতিষ্ঠান:
+                    </span>
+                    <p className="mt-0.5 text-[14px] font-bold text-slate-900 dark:text-white leading-snug">
+                      {a.researchBasis.journalOrInst}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div>
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        ফিল্ড সাইট / রেফারেন্স:
+                      </span>
+                      <p className="text-slate-700 dark:text-slate-300 font-mono text-[11.5px]">
+                        {a.researchBasis.doiOrSource}
+                      </p>
+                    </div>
+                    {a.researchBasis.keyMetric && (
+                      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1.5 text-right">
+                        <span className="block text-[10px] text-slate-400 font-medium">মূল প্রযুক্তিগত পরিমাপক</span>
+                        <span className="font-bangla text-xs font-bold text-emerald-700 dark:text-[#03EF62]">
+                          <Num>{a.researchBasis.keyMetric}</Num>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-1 flex flex-wrap items-center justify-between gap-3">
+                <a
+                  href={resolvedSourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-600/30 dark:border-[#03EF62]/40 bg-emerald-600 dark:bg-[#03EF62] px-4 py-2 text-xs font-bold text-white dark:text-[#061621] hover:bg-emerald-700 dark:hover:bg-[#02d857] transition shadow-xs cursor-pointer active:scale-95"
+                >
+                  <span>মূল গবেষণা ও অফিসিয়াল সোর্স দেখুন</span>
+                  <ExternalLink className="size-3.5 stroke-[2.5]" />
+                </a>
+                <span className="font-mono text-[10.5px] text-slate-400 dark:text-slate-500 truncate max-w-xs">
+                  {resolvedSourceUrl.replace(/^https?:\/\//, '')}
+                </span>
+              </div>
+            </section>
+          );
+        })()}
 
         <div className="mt-6">
           <LinkedInReactionSummary
@@ -314,43 +373,154 @@ export function ArticleReaderContent({
             </div>
           </form>
           <ul className="mt-4 space-y-4">
-            {a.comments.map((c) => (
-              <li key={c.id} className="flex gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!isStandalonePage) onClose();
-                    onNavigateProfile(c.authorId);
-                  }}
-                >
-                  <Avatar src={c.avatar} name={c.author} size="size-9" />
-                </button>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!isStandalonePage) onClose();
-                      onNavigateProfile(c.authorId);
-                    }}
-                    className="block font-bangla text-left hover:underline"
-                  >
-                    <span className="text-[13.5px] font-semibold text-pine-900 dark:text-white">{c.author}</span>
-                  </button>
-                  <p className="font-bangla text-[14.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">{c.text}</p>
-                  <div className="mt-1 flex items-center gap-2 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
-                    <span className="font-semibold">{c.timestamp}</span>
-                    {onReactComment && (
-                      <LinkedInReactionPickerButton
-                        compact
-                        userReaction={c.userReaction}
-                        onSelect={(type) => onReactComment(c.id, type)}
-                        countLabel={c.likes > 0 ? String(c.likes) : undefined}
-                      />
-                    )}
+            {a.comments.filter((c) => !c.parentId).map((c) => {
+              const replies = a.comments.filter((r) => r.parentId === c.id);
+              const isReplying = replyingToId === c.id;
+              return (
+                <li key={c.id} className="space-y-2">
+                  <div className="flex gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isStandalonePage) onClose();
+                        onNavigateProfile(c.authorId);
+                      }}
+                    >
+                      <Avatar src={c.avatar} name={c.author} size="size-9" />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isStandalonePage) onClose();
+                          onNavigateProfile(c.authorId);
+                        }}
+                        className="block font-bangla text-left hover:underline"
+                      >
+                        <span className="text-[13.5px] font-semibold text-pine-900 dark:text-white">{c.author}</span>
+                      </button>
+                      <p className="font-bangla text-[14.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">{c.text}</p>
+                      <div className="mt-1 flex items-center gap-3 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">{c.timestamp}</span>
+                        {onReactComment && (
+                          <LinkedInReactionPickerButton
+                            compact
+                            userReaction={c.userReaction}
+                            onSelect={(type) => onReactComment(c.id, type)}
+                            countLabel={c.likes > 0 ? String(c.likes) : undefined}
+                          />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isReplying) {
+                              setReplyingToId(null);
+                            } else {
+                              setReplyingToId(c.id);
+                              setReplyText(`@${c.author} `);
+                            }
+                          }}
+                          className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                        >
+                          উত্তর দিন
+                        </button>
+                      </div>
+
+                      {/* Inline Reply Input */}
+                      {isReplying && (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (replyText.trim()) {
+                              onComment(replyText.trim(), c.id, c.author);
+                              setReplyText('');
+                              setReplyingToId(null);
+                            }
+                          }}
+                          className="mt-2.5 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/5 p-2"
+                        >
+                          <Avatar src={currentUser?.avatar || 'PS'} name={currentUser?.name || 'User'} size="size-7" />
+                          <input
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            autoFocus
+                            placeholder={`${c.author}-কে উত্তর দিন…`}
+                            className="flex-1 bg-transparent font-bangla text-[13px] text-slate-900 dark:text-white outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setReplyingToId(null)}
+                            className="text-[11px] text-slate-400 hover:text-slate-600 px-2 font-bangla"
+                          >
+                            বাতিল
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={!replyText.trim()}
+                            className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-40"
+                          >
+                            উত্তর
+                          </button>
+                        </form>
+                      )}
+
+                      {/* Nested Threaded Replies */}
+                      {replies.length > 0 && (
+                        <div className="mt-2.5 pl-3 border-l-2 border-emerald-500/25 dark:border-white/10 space-y-2.5">
+                          {replies.map((r) => (
+                            <div key={r.id} className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!isStandalonePage) onClose();
+                                  onNavigateProfile(r.authorId);
+                                }}
+                              >
+                                <Avatar src={r.avatar} name={r.author} size="size-7" />
+                              </button>
+                              <div className="min-w-0 flex-1">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (!isStandalonePage) onClose();
+                                    onNavigateProfile(r.authorId);
+                                  }}
+                                  className="block font-bangla text-left hover:underline"
+                                >
+                                  <span className="text-[12.5px] font-semibold text-pine-900 dark:text-white">{r.author}</span>
+                                </button>
+                                <p className="font-bangla text-[13.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">{r.text}</p>
+                                <div className="mt-0.5 flex items-center gap-2 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
+                                  <span className="text-slate-400">{r.timestamp}</span>
+                                  {onReactComment && (
+                                    <LinkedInReactionPickerButton
+                                      compact
+                                      userReaction={r.userReaction}
+                                      onSelect={(type) => onReactComment(r.id, type)}
+                                      countLabel={r.likes > 0 ? String(r.likes) : undefined}
+                                    />
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setReplyingToId(c.id);
+                                      setReplyText(`@${r.author} `);
+                                    }}
+                                    className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                                  >
+                                    উত্তর দিন
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>

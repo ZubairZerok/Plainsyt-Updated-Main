@@ -788,15 +788,15 @@ export function RootShell() {
   );
 
   const handleCommentArticle = useCallback(
-    (articleId: string, text: string) => {
+    (articleId: string, text: string, parentId?: string, replyToAuthor?: string) => {
       if (!currentUser) {
         requestAuth('মন্তব্য করতে দয়া করে আপনার অ্যাকাউন্টে লগইন করুন।', () => {
-          handleCommentArticle(articleId, text);
+          handleCommentArticle(articleId, text, parentId, replyToAuthor);
         });
         return;
       }
       const actor = currentUser;
-      const newComment = makeComment(text, actor, 'article', articleId);
+      const newComment = makeComment(text, actor, 'article', articleId, parentId, replyToAuthor);
       let updatedArticle: Article | undefined;
       commit((prev) => {
         const articles = prev.articles.map((a) => {
@@ -843,15 +843,15 @@ export function RootShell() {
   );
 
   const handleCommentPost = useCallback(
-    (postId: string, text: string) => {
+    (postId: string, text: string, parentId?: string, replyToAuthor?: string) => {
       if (!currentUser) {
         requestAuth('পোস্টে মন্তব্য করতে দয়া করে আপনার অ্যাকাউন্টে লগইন করুন।', () => {
-          handleCommentPost(postId, text);
+          handleCommentPost(postId, text, parentId, replyToAuthor);
         });
         return;
       }
       const actor = currentUser;
-      const newComment = makeComment(text, actor, 'post', postId);
+      const newComment = makeComment(text, actor, 'post', postId, parentId, replyToAuthor);
       let updatedPost: CommunityPost | undefined;
       commit((prev) => {
         const posts = prev.posts.map((p) => {
@@ -1595,17 +1595,17 @@ export function RootShell() {
       }
       return (
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2 sm:px-0">
+          <div className="flex items-center justify-between px-2 sm:px-0 mb-3">
             <button
               type="button"
               onClick={() => goNavigate('/')}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-pine-900 bg-canvas-card px-3 py-1.5 text-[13px] font-semibold text-pine-900 shadow-tactile-xs"
+              title="হোম ফিডে ফিরে যান"
+              aria-label="হোম ফিডে ফিরে যান"
+              className="inline-flex items-center justify-center gap-2 rounded-full sm:rounded-xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-canvas-card size-9 sm:size-auto sm:px-3.5 sm:py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:border-[#03EF62] hover:text-emerald-700 dark:hover:text-[#03EF62] transition shadow-xs active:scale-95 cursor-pointer"
             >
-              <ArrowLeft className="size-4" /> Back to Home Feed
+              <ArrowLeft className="size-4 shrink-0" />
+              <span className="hidden sm:inline font-bangla text-[13px]">ফিডে ফিরে যান</span>
             </button>
-            <span className="font-mono text-[11px] text-pine-600">
-              Standalone Article Route · /article/{standaloneArticle.id}
-            </span>
           </div>
           <ArticleReaderContent
             article={standaloneArticle}

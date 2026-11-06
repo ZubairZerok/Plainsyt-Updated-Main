@@ -15,7 +15,7 @@ interface Props {
   onReact: (type: LinkedInReactionType) => void;
   onOpenReactionsBreakdown: () => void;
   onBookmark: () => void;
-  onComment: (text: string) => void;
+  onComment: (text: string, parentId?: string, replyToAuthor?: string) => void;
   onReactComment?: (commentId: string, type: LinkedInReactionType) => void;
   onShare: () => void;
   onNavigateProfile: (userId: string) => void;
@@ -42,6 +42,8 @@ export function ArticleCard({
   onOpenStory,
 }: Props) {
   const [text, setText] = useState('');
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
   const [showComments, setShowComments] = useState(Boolean(lead));
 
   const submit = () => {
@@ -221,36 +223,140 @@ export function ArticleCard({
 
       {showComments && (
         <div className="border-t border-canvas-border bg-canvas-subtle/50 px-4 py-3 sm:px-5">
-          {a.comments.map((c) => (
-            <div key={c.id} className="mb-2.5 flex gap-2">
-              <button type="button" onClick={() => onNavigateProfile(c.authorId)} className="shrink-0">
-                <Avatar src={c.avatar} name={c.author} size="size-8" />
-              </button>
-              <div className="min-w-0 flex-1">
-                <div className="rounded-2xl bg-canvas-card px-3 py-2 ring-1 ring-canvas-border">
-                  <button
-                    type="button"
-                    onClick={() => onNavigateProfile(c.authorId)}
-                    className="block font-bangla text-left hover:underline"
-                  >
-                    <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
+          {a.comments.filter((c) => !c.parentId).map((c) => {
+            const replies = a.comments.filter((r) => r.parentId === c.id);
+            const isReplying = replyingToId === c.id;
+            return (
+              <div key={c.id} className="mb-3 space-y-1.5">
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => onNavigateProfile(c.authorId)} className="shrink-0">
+                    <Avatar src={c.avatar} name={c.author} size="size-8" />
                   </button>
-                  <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">{c.text}</p>
-                </div>
-                <div className="ml-2 mt-0.5 flex items-center gap-2 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
-                  <span className="font-semibold">{c.timestamp}</span>
-                  {onReactComment && (
-                    <LinkedInReactionPickerButton
-                      compact
-                      userReaction={c.userReaction}
-                      onSelect={(type) => onReactComment(c.id, type)}
-                      countLabel={c.likes > 0 ? String(c.likes) : undefined}
-                    />
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="rounded-2xl bg-canvas-card px-3 py-2 ring-1 ring-canvas-border">
+                      <button
+                        type="button"
+                        onClick={() => onNavigateProfile(c.authorId)}
+                        className="block font-bangla text-left hover:underline"
+                      >
+                        <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
+                      </button>
+                      <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">{c.text}</p>
+                    </div>
+                    <div className="ml-2 mt-0.5 flex items-center gap-3 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
+                      <span className="font-semibold text-slate-500 dark:text-slate-400">{c.timestamp}</span>
+                      {onReactComment && (
+                        <LinkedInReactionPickerButton
+                          compact
+                          userReaction={c.userReaction}
+                          onSelect={(type) => onReactComment(c.id, type)}
+                          countLabel={c.likes > 0 ? String(c.likes) : undefined}
+                        />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isReplying) {
+                            setReplyingToId(null);
+                          } else {
+                            setReplyingToId(c.id);
+                            setReplyText(`@${c.author} `);
+                          }
+                        }}
+                        className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                      >
+                        উত্তর দিন
+                      </button>
+                    </div>
+
+                    {/* Inline Reply Input */}
+                    {isReplying && (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (replyText.trim()) {
+                            onComment(replyText.trim(), c.id, c.author);
+                            setReplyText('');
+                            setReplyingToId(null);
+                          }
+                        }}
+                        className="mt-2 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-canvas-card p-2"
+                      >
+                        <Avatar src={currentUser?.avatar || 'PS'} name={currentUser?.name || 'User'} size="size-7" />
+                        <input
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          autoFocus
+                          placeholder={`${c.author}-কে উত্তর দিন…`}
+                          className="flex-1 bg-transparent font-bangla text-[12.5px] text-slate-900 dark:text-white outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setReplyingToId(null)}
+                          className="text-[11px] text-slate-400 hover:text-slate-600 px-2 font-bangla"
+                        >
+                          বাতিল
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={!replyText.trim()}
+                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-40"
+                        >
+                          উত্তর
+                        </button>
+                      </form>
+                    )}
+
+                    {/* Nested Threaded Replies */}
+                    {replies.length > 0 && (
+                      <div className="mt-2 pl-3 border-l-2 border-emerald-500/25 dark:border-white/10 space-y-2">
+                        {replies.map((r) => (
+                          <div key={r.id} className="flex gap-2">
+                            <button type="button" onClick={() => onNavigateProfile(r.authorId)} className="shrink-0">
+                              <Avatar src={r.avatar} name={r.author} size="size-7" />
+                            </button>
+                            <div className="min-w-0 flex-1">
+                              <div className="rounded-2xl bg-canvas-card px-2.5 py-1.5 ring-1 ring-canvas-border">
+                                <button
+                                  type="button"
+                                  onClick={() => onNavigateProfile(r.authorId)}
+                                  className="block font-bangla text-left hover:underline"
+                                >
+                                  <span className="text-[12px] font-semibold text-slate-900 dark:text-white">{r.author}</span>
+                                </button>
+                                <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">{r.text}</p>
+                              </div>
+                              <div className="ml-2 mt-0.5 flex items-center gap-2.5 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
+                                <span className="text-slate-400">{r.timestamp}</span>
+                                {onReactComment && (
+                                  <LinkedInReactionPickerButton
+                                    compact
+                                    userReaction={r.userReaction}
+                                    onSelect={(type) => onReactComment(r.id, type)}
+                                    countLabel={r.likes > 0 ? String(r.likes) : undefined}
+                                  />
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReplyingToId(c.id);
+                                    setReplyText(`@${r.author} `);
+                                  }}
+                                  className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition"
+                                >
+                                  উত্তর দিন
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <form
             onSubmit={(e) => {
               e.preventDefault();

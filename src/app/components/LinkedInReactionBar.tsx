@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { LinkedInReactionType, ReactionCounts, ReactionRecord } from '../types';
 import { LINKEDIN_REACTIONS, getReactionMeta, topReactionTypes, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
-import { Avatar, CloseButton, Modal, cn } from './Primitives';
+import { Avatar, CloseButton, Modal, Num, cn } from './Primitives';
 
 export function LinkedInReactionBadge({
   type,
@@ -25,38 +25,38 @@ export function LinkedInReactionBadge({
     >
       {type === 'like' && (
         /* Thumbs Up — Standard agreement */
-        <svg viewBox="0 0 20 20" className="size-[62%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M2 10.5a1.5 1.5 0 1 1 3 0v6a1.5 1.5 0 0 1-3 0v-6zM6 10.2c0-.5.3-1 .8-1.2l3.4-1.7V4a2 2 0 0 1 2-2c.6 0 1.1.4 1.2 1l.6 4h3.5a2 2 0 0 1 2 2.3l-1.3 6.5A2 2 0 0 1 16.2 17H7a1 1 0 0 1-1-1v-5.8z" />
-        </svg>
-      )}
-      {type === 'insightful' && (
-        /* Lightbulb — Learned something new */
-        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M10 2a6 6 0 0 0-4 10.5V14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-1.5A6 6 0 0 0 10 2zm-2 14h4v1a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-1z" />
-        </svg>
-      )}
-      {type === 'support' && (
-        /* Handshake — Backing the initiative, project, or policy stance */
-        <svg viewBox="0 0 24 24" className="size-[66%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M21.7 8.3a2.5 2.5 0 0 0-3.5 0l-2.7 2.7-2.1-2.1a2.5 2.5 0 0 0-3.5 0L7.4 11.4 4.9 8.9a1.5 1.5 0 0 0-2.1 2.1l3.5 3.5a1.5 1.5 0 0 0 2.1 0l3-3 2.1 2.1a2.5 2.5 0 0 0 3.5 0l4.7-4.7a2.5 2.5 0 0 0 0-3.5zM3.5 14.5l2.5 2.5a2.5 2.5 0 0 0 3.5 0l2.2-2.2-2.1-2.1-2.2 2.2a1.5 1.5 0 0 1-2.1 0l-1.8-1.8a1.5 1.5 0 0 0-2.1 2.1l2.1-0.7z" />
+        <svg viewBox="0 0 24 24" className="size-[62%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M2 20h2V8H2v12zm19.5-9c-.3-.3-.7-.5-1.1-.5H14l1.1-5.3c.1-.5 0-1-.3-1.4-.3-.4-.7-.6-1.2-.6h-1c-.3 0-.6.1-.8.3L7.3 10.3C7.1 10.5 7 10.7 7 11v9c0 1.1.9 2 2 2h8.5c.8 0 1.5-.5 1.8-1.2l2.3-5.4c.2-.4.2-.9 0-1.4z" />
         </svg>
       )}
       {type === 'celebrate' && (
-        /* Clapping Hands / Trophy — For milestones, breakthroughs, or success stories */
-        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M15 3h1.5A2.5 2.5 0 0 1 19 5.5V6a3.5 3.5 0 0 1-3.5 3.5H15a5 5 0 0 1-4 4.9V16h2a1 1 0 0 1 1 1v1H6v-1a1 1 0 0 1 1-1h2v-1.6A5 5 0 0 1 5 9.5H4.5A3.5 3.5 0 0 1 1 6v-.5A2.5 2.5 0 0 1 3.5 3H5V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1zm0 2V3H5v2h10zM3.5 5a.5.5 0 0 0-.5.5V6a1.5 1.5 0 0 0 1.5 1.5H5V5h-1.5zm13 0H15v2.5h.5A1.5 1.5 0 0 0 17 6v-.5a.5.5 0 0 0-.5-.5z" />
+        /* Clapping Hands / Applause — For milestones and breakthroughs */
+        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M18.5 2.5c-1.1 0-2 .9-2 2 0 .4.1.7.3 1L14 8.3 11.6 6c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4L12.5 10l-3.2-3.2c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4L11 11.4 7.6 8c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l4.2 4.2c-.7.6-1.4 1.4-1.9 2.3l-3-1.8c-.5-.3-1.2-.2-1.5.3-.3.5-.2 1.2.3 1.5l4.3 2.6c1.3 2.1 3.6 3.5 6.2 3.5 4.1 0 7.5-3.4 7.5-7.5 0-2.3-1-4.4-2.7-5.8.4-.5.6-1.1.6-1.7 0-1.1-.9-2-2-2z" />
         </svg>
       )}
-      {type === 'curious' && (
-        /* Magnifying Glass — Want to see more data / follow-ups on this */
-        <svg viewBox="0 0 20 20" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M9 3a6 6 0 1 0 3.7 10.7l4.3 4.3a1 1 0 0 0 1.4-1.4l-4.3-4.3A6 6 0 0 0 9 3zm-4 6a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" />
-          <circle cx="9" cy="9" r="1.5" />
+      {type === 'support' && (
+        /* Heart-in-Hands — Backing the initiative or solidarity */
+        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 .71-.11 1.4-.3 2.05-.6-.3-1.27-.45-1.95-.45-2.76 0-5 2.24-5 5 0 .93.26 1.8.72 2.55-1.07.72-2.39 1.25-3.47 1.7zm10-3.35c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5zm-3 1h-2v2h-2v-2h-2v-2h2v-2h2v2h2v2z" />
+        </svg>
+      )}
+      {type === 'insightful' && (
+        /* Luminous Lightbulb — Thought-leadership and valuable insights */
+        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M12 2a7 7 0 00-7 7c0 2.4 1.2 4.5 3 5.7V17c0 .6.4 1 1 1h6c.6 0 1-.4 1-1v-2.3c1.8-1.3 3-3.4 3-5.7a7 7 0 00-7-7zm2 15h-4v-1h4v1zm0-2h-4v-1h4v1zm1.3-4.7l-.3.3V13h-4v-1.4l-.3-.3A5 5 0 1115.3 10.3z" />
         </svg>
       )}
       {type === 'love' && (
-        <svg viewBox="0 0 16 16" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
-          <path d="M8 13.7 2.5 8.3C1 6.8 1 4.3 2.5 2.8c1.5-1.5 3.9-1.5 5.5 0 1.6-1.5 4-1.5 5.5 0 1.5 1.5 1.5 4 0 5.5L8 13.7z" />
+        /* Heart — Strong emotional connection and love */
+        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      )}
+      {type === 'curious' && (
+        /* Thinking Curious Face — Curious to learn or investigate more */
+        <svg viewBox="0 0 24 24" className="size-[64%] fill-current drop-shadow-xs" aria-hidden>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-3-9c.83 0 1.5-.67 1.5-1.5S9.83 8 9 8s-1.5.67-1.5 1.5S8.17 11 9 11zm6 0c.83 0 1.5-.67 1.5-1.5S15.83 8 15 8s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-3 4c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
         </svg>
       )}
     </span>
@@ -365,7 +365,7 @@ export function LinkedInReactionPickerButton({
           />
         )}
         <span>{activeMeta ? activeMeta.labelBn : 'লাইক'}</span>
-        {countLabel && <span className="font-bangla font-bold text-[12px] opacity-90">({countLabel})</span>}
+        {countLabel && <span className="font-bangla font-bold text-[12px] opacity-90">(<Num>{countLabel}</Num>)</span>}
       </button>
     </div>
   );

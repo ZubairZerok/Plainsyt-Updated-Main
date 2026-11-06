@@ -21,8 +21,8 @@ export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
     labelBn: 'পছন্দ',
     desc: 'Standard agreement',
     descBn: 'সাধারণ সম্মতি',
-    color: '#03EF62',
-    bg: '#03EF62',
+    color: '#0A66C2',
+    bg: '#0A66C2',
     emoji: '👍',
   },
   {
@@ -31,7 +31,7 @@ export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
     labelBn: 'তথ্যবহুল',
     desc: 'Learned something new',
     descBn: 'নতুন শিক্ষা',
-    color: '#F59E0B',
+    color: '#D97706',
     bg: '#D97706',
     emoji: '💡',
   },
@@ -41,8 +41,8 @@ export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
     labelBn: 'সমর্থন',
     desc: 'Backing the initiative or policy stance',
     descBn: 'উদ্যোগে সমর্থন',
-    color: '#0D9488',
-    bg: '#0F766E',
+    color: '#705BAF',
+    bg: '#705BAF',
     emoji: '🤝',
   },
   {
@@ -51,8 +51,8 @@ export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
     labelBn: 'অভিনন্দন',
     desc: 'For milestones, breakthroughs, or success stories',
     descBn: 'মাইলফলক ও সাফল্য',
-    color: '#8B5CF6',
-    bg: '#7C3AED',
+    color: '#368853',
+    bg: '#368853',
     emoji: '👏',
   },
   {
@@ -61,8 +61,8 @@ export const LINKEDIN_REACTIONS: ReactionDefinition[] = [
     labelBn: 'কৌতূহলী',
     desc: 'Want to see more data / follow-ups on this',
     descBn: 'আরও তথ্য চাই',
-    color: '#3B82F6',
-    bg: '#2563EB',
+    color: '#2977C9',
+    bg: '#2977C9',
     emoji: '🔍',
   },
 ];
@@ -230,6 +230,8 @@ export const makeComment = (
   user: UserProfile,
   targetType?: 'article' | 'post' | 'reel',
   targetId?: string,
+  parentId?: string | null,
+  replyToAuthor?: string,
 ): Comment => ({
   id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
   targetType,
@@ -243,6 +245,8 @@ export const makeComment = (
   likes: 0,
   reactionCounts: {},
   userReaction: null,
+  parentId: parentId || null,
+  replyToAuthor: replyToAuthor || undefined,
 });
 
 export const aggregateReactions = (records: ReactionRecord[], targetType: string, targetId: string, currentUserId: string) => {

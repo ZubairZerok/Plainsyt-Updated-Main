@@ -118,7 +118,9 @@ export const BINA_ARTICLE: Article = {
     journalOrInst: 'বাংলাদেশ পরমাণু কৃষি গবেষণা ইনস্টিটিউট (বিনা) ও MoFL',
     doiOrSource: 'BINA Regional Research Center, Bhabanipur, Gazipur',
     keyMetric: '500 kCi Cobalt-60 Gamma Source',
+    sourceUrl: 'http://bina.gov.bd/',
   },
+  externalLink: 'http://bina.gov.bd/',
   stats: {
     views: 0,
     likes: 0,
@@ -175,9 +177,11 @@ export const JAPAN_ROBOT_ARTICLE: Article = {
   ],
   researchBasis: {
     journalOrInst: 'ইয়াসকাওয়া ইলেকট্রিক ও জাপান ন্যাশনাল ফেডারেশন অব এগ্রিকালচারাল কো-অপারেটিভস (জেএ জেন-নোহ)',
-    doiOrSource: 'Yume Farm JA Zen-Noh, Saga Prefecture, Japan',
+    doiOrSource: 'Yume Farm JA Zen-Noh, Saga Prefecture, Japan · Yaskawa Smart Robotics',
     keyMetric: '120 Cucumbers / 40 min (80% Precision Vision AI)',
+    sourceUrl: 'https://www.zen-noh.or.jp/',
   },
+  externalLink: 'https://www.zen-noh.or.jp/',
   stats: {
     views: 0,
     likes: 0,
@@ -838,9 +842,17 @@ export async function fetchFromSupabase(limit = 60): Promise<{
     ]);
 
     const profiles = (probe.data ?? []).map((r) => fromProfileRow(r as Record<string, unknown>));
-    const currentUserId = local.currentUserId && profiles.some((p) => p.id === local.currentUserId)
-      ? local.currentUserId
-      : '';
+    let storedAuthUserId = '';
+    if (typeof window !== 'undefined') {
+      try {
+        const rawAuth = localStorage.getItem('plainsyt_auth_session');
+        if (rawAuth) {
+          const parsed = JSON.parse(rawAuth);
+          if (parsed?.user?.id) storedAuthUserId = parsed.user.id;
+        }
+      } catch {}
+    }
+    const currentUserId = storedAuthUserId || local.currentUserId || '';
 
     const comments: Comment[] = (commentsRes.data ?? []).map((r: Record<string, unknown>) => ({
       id: String(r.id),
@@ -854,6 +866,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       timestamp: String(r.timestamp_label ?? ''),
       likes: Number(r.likes ?? 0),
       reactionCounts: (r.reaction_counts as Comment['reactionCounts']) ?? {},
+      parentId: r.parent_id ? String(r.parent_id) : undefined,
     }));
 
     const reactions: ReactionRecord[] = (reactionsRes.data ?? []).map((r: Record<string, unknown>) => ({
@@ -868,11 +881,58 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       createdAt: String(r.created_at ?? ''),
     }));
 
+    // Resilient reaction merge: never wipe out user's reactions on refresh or network lag
+    const reactionMap = new Map<string, ReactionRecord>();
+    for (const rx of (local.reactions ?? [])) {
+      if (rx && rx.targetType && rx.targetId && rx.userId) {
+        reactionMap.set(`${rx.targetType}:${rx.targetId}:${rx.userId}`, rx);
+      }
+    }
+    for (const rx of (reactionsRes.data ? reactions : [])) {
+      if (rx && rx.targetType && rx.targetId && rx.userId) {
+        reactionMap.set(`${rx.targetType}:${rx.targetId}:${rx.userId}`, rx);
+      }
+    }
+    const finalReactions = Array.from(reactionMap.values());
+
+    // Resilient comment merge: index from local comments, article comments, post comments and Supabase
+    const commentMap = new Map<string, Comment>();
+    for (const c of (local.comments ?? [])) {
+      if (c && c.id) commentMap.set(c.id, c);
+    }
+    for (const a of (local.articles ?? [])) {
+      for (const c of (a.comments ?? [])) {
+        if (c && c.id) commentMap.set(c.id, { ...c, targetType: 'article', targetId: a.id });
+      }
+    }
+    for (const p of (local.posts ?? [])) {
+      for (const c of (p.comments ?? [])) {
+        if (c && c.id) commentMap.set(c.id, { ...c, targetType: 'post', targetId: p.id });
+      }
+    }
+    for (const c of (commentsRes.data ? comments : [])) {
+      if (c && c.id) commentMap.set(c.id, c);
+    }
+    const finalComments = Array.from(commentMap.values()).map((c) => {
+      const cReacts = finalReactions.filter((rx) => rx.targetType === 'comment' && rx.targetId === c.id);
+      const cCounts: Partial<Record<LinkedInReactionType, number>> = { ...(c.reactionCounts ?? {}) };
+      for (const rx of cReacts) {
+        cCounts[rx.type] = (cCounts[rx.type] || 0) + 1;
+      }
+      const cUserRx = currentUserId ? (cReacts.find((rx) => rx.userId === currentUserId)?.type ?? null) : null;
+      return {
+        ...c,
+        reactionCounts: cCounts,
+        userReaction: cUserRx ?? c.userReaction ?? null,
+        likes: Math.max(c.likes || 0, cReacts.length),
+      };
+    });
+
     const articles = (articlesRes.data ?? []).map((r) =>
-      fromArticleRow(r as Record<string, unknown>, comments, reactions, currentUserId),
+      fromArticleRow(r as Record<string, unknown>, finalComments, finalReactions, currentUserId),
     );
     const posts = (postsRes.data ?? []).map((r) =>
-      fromPostRow(r as Record<string, unknown>, comments, reactions, currentUserId),
+      fromPostRow(r as Record<string, unknown>, finalComments, finalReactions, currentUserId),
     );
     const reels: StoryReel[] = (reelsRes.data ?? []).map((r: Record<string, unknown>) => ({
       id: String(r.id),
@@ -1103,8 +1163,8 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       followingIds: userFollows,
       articles: sanitizedArticles.length > 0 ? sanitizedArticles : DEFAULT_SEED_SNAPSHOT.articles,
       posts: finalPosts,
-      comments: commentsRes.data !== null && commentsRes.data !== undefined ? comments : local.comments,
-      reactions: reactionsRes.data !== null && reactionsRes.data !== undefined ? reactions : local.reactions,
+      comments: finalComments,
+      reactions: finalReactions,
       reels: (() => {
         const base = reels.length > 0 ? reels : local.reels;
         const combined = [...base];
@@ -1185,6 +1245,7 @@ export async function dbInsertComment(comment: Comment) {
       timestamp_label: comment.timestamp,
       likes: comment.likes,
       reaction_counts: comment.reactionCounts ?? {},
+      parent_id: comment.parentId ?? null,
     });
   } catch {
     // local-first fallback
@@ -1206,20 +1267,24 @@ export async function dbSetReaction(
         .delete()
         .match({ target_type: targetType, target_id: targetId, user_id: user.id });
     } else {
-      await supabase.from('reactions').upsert(
-        {
-          id: `rx-${targetType}-${targetId}-${user.id}`,
-          target_type: targetType,
-          target_id: targetId,
-          user_id: user.id,
-          user_name: user.name,
-          user_avatar: user.avatar,
-          user_role: `${user.role}${user.organization ? ` · ${user.organization}` : ''}`,
-          type: reactionType,
-          created_at: new Date().toISOString(),
-        },
+      const rxRow = {
+        id: `rx-${targetType}-${targetId}-${user.id}`,
+        target_type: targetType,
+        target_id: targetId,
+        user_id: user.id,
+        user_name: user.name,
+        user_avatar: user.avatar,
+        user_role: `${user.role}${user.organization ? ` · ${user.organization}` : ''}`,
+        type: reactionType,
+        created_at: new Date().toISOString(),
+      };
+      const { error: upsertErr } = await supabase.from('reactions').upsert(
+        rxRow,
         { onConflict: 'target_type,target_id,user_id' },
       );
+      if (upsertErr) {
+        await supabase.from('reactions').insert(rxRow);
+      }
     }
     if (targetType === 'article') {
       await supabase
@@ -1498,32 +1563,60 @@ export function mutateSnapshotReaction(
   let counts: Partial<Record<LinkedInReactionType, number>> = {};
   let total = 0;
 
+  // Update articles & any article comments that matched
   const nextArticles = snap.articles.map((a) => {
-    if (targetType !== 'article' || a.id !== targetId) return a;
-    counts = applyReactionChange(a.reactionCounts, existing?.type ?? a.userReaction, finalReaction);
-    const delta = (finalReaction ? 1 : 0) - (existing?.type || a.userReaction ? 1 : 0);
-    total = Math.max(0, a.stats.likes + delta);
-    return {
-      ...a,
-      reactionCounts: counts,
-      userReaction: finalReaction,
-      userLiked: !!finalReaction,
-      stats: { ...a.stats, likes: total },
-    };
+    let artComments = (a.comments ?? []).map((c) => {
+      if (targetType === 'comment' && c.id === targetId) {
+        counts = applyReactionChange(c.reactionCounts, existing?.type ?? c.userReaction, finalReaction);
+        const delta = (finalReaction ? 1 : 0) - (existing?.type || c.userReaction ? 1 : 0);
+        total = Math.max(0, (c.likes || 0) + delta);
+        return { ...c, reactionCounts: counts, userReaction: finalReaction, likes: total };
+      }
+      return c;
+    });
+
+    if (targetType === 'article' && a.id === targetId) {
+      counts = applyReactionChange(a.reactionCounts, existing?.type ?? a.userReaction, finalReaction);
+      const delta = (finalReaction ? 1 : 0) - (existing?.type || a.userReaction ? 1 : 0);
+      total = Math.max(0, a.stats.likes + delta);
+      return {
+        ...a,
+        reactionCounts: counts,
+        userReaction: finalReaction,
+        userLiked: !!finalReaction,
+        stats: { ...a.stats, likes: total },
+        comments: artComments,
+      };
+    }
+    return { ...a, comments: artComments };
   });
 
+  // Update posts & any post comments that matched
   const nextPosts = snap.posts.map((p) => {
-    if (targetType !== 'post' || p.id !== targetId) return p;
-    counts = applyReactionChange(p.reactionCounts, existing?.type ?? p.userReaction, finalReaction);
-    const delta = (finalReaction ? 1 : 0) - (existing?.type || p.userReaction ? 1 : 0);
-    total = Math.max(0, p.stats.likes + delta);
-    return {
-      ...p,
-      reactionCounts: counts,
-      userReaction: finalReaction,
-      userLiked: !!finalReaction,
-      stats: { ...p.stats, likes: total },
-    };
+    let postComments = (p.comments ?? []).map((c) => {
+      if (targetType === 'comment' && c.id === targetId) {
+        counts = applyReactionChange(c.reactionCounts, existing?.type ?? c.userReaction, finalReaction);
+        const delta = (finalReaction ? 1 : 0) - (existing?.type || c.userReaction ? 1 : 0);
+        total = Math.max(0, (c.likes || 0) + delta);
+        return { ...c, reactionCounts: counts, userReaction: finalReaction, likes: total };
+      }
+      return c;
+    });
+
+    if (targetType === 'post' && p.id === targetId) {
+      counts = applyReactionChange(p.reactionCounts, existing?.type ?? p.userReaction, finalReaction);
+      const delta = (finalReaction ? 1 : 0) - (existing?.type || p.userReaction ? 1 : 0);
+      total = Math.max(0, p.stats.likes + delta);
+      return {
+        ...p,
+        reactionCounts: counts,
+        userReaction: finalReaction,
+        userLiked: !!finalReaction,
+        stats: { ...p.stats, likes: total },
+        comments: postComments,
+      };
+    }
+    return { ...p, comments: postComments };
   });
 
   const nextReels = snap.reels.map((r) => {
@@ -1539,11 +1632,11 @@ export function mutateSnapshotReaction(
     };
   });
 
-  const nextComments = snap.comments.map((c) => {
+  const nextComments = (snap.comments ?? []).map((c) => {
     if (targetType !== 'comment' || c.id !== targetId) return c;
     counts = applyReactionChange(c.reactionCounts, existing?.type ?? c.userReaction, finalReaction);
     const delta = (finalReaction ? 1 : 0) - (existing?.type || c.userReaction ? 1 : 0);
-    total = Math.max(0, c.likes + delta);
+    total = Math.max(0, (c.likes || 0) + delta);
     return {
       ...c,
       reactionCounts: counts,
@@ -1555,14 +1648,8 @@ export function mutateSnapshotReaction(
   const next: DatabaseSnapshot = {
     ...snap,
     reactions: nextReactions,
-    articles: nextArticles.map((a) => ({
-      ...a,
-      comments: nextComments.filter((c) => c.targetType === 'article' && c.targetId === a.id),
-    })),
-    posts: nextPosts.map((p) => ({
-      ...p,
-      comments: nextComments.filter((c) => c.targetType === 'post' && c.targetId === p.id),
-    })),
+    articles: nextArticles,
+    posts: nextPosts,
     reels: nextReels,
     comments: nextComments,
   };
