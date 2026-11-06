@@ -468,6 +468,9 @@ assert(fs.existsSync(wranglerPath), 'wrangler.jsonc exists');
 const wranglerContent = fs.readFileSync(wranglerPath, 'utf-8');
 assert(wranglerContent.includes('single-page-application') && wranglerContent.includes('./dist'), 'wrangler.jsonc configures SPA distribution directory');
 
+assert(fs.existsSync(path.join(rootDir, '.nvmrc')), 'Cloudflare .nvmrc specifies Node 20 LTS');
+assert(fs.existsSync(path.join(rootDir, '.node-version')), 'Cloudflare .node-version specifies Node 20.18 LTS');
+
 
 
 
