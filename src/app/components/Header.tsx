@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, Store, Lightbulb,
   Clapperboard, Sparkles, FileText, ArrowUpRight, ShoppingBag, Trash2, LogIn, User, LogOut,
-  Settings, Check, BarChart3, History, ShieldCheck, HelpCircle, CheckCircle2,
+  Settings, Check, ShieldCheck, HelpCircle, CheckCircle2,
 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, TopicStory, UserProfile } from '../types';
 import { PlainsytLogo } from './PlainsytLogo';
@@ -17,8 +17,6 @@ export type View =
   | 'notifications'
   | 'profile'
   | 'publications'
-  | 'analytics'
-  | 'reading-history'
   | 'security'
   | 'help';
 
@@ -641,44 +639,7 @@ export function Header(p: Props) {
                 </span>
               </button>
 
-              {/* 3. Researcher Analytics & Impact */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onNavigate('/me/analytics');
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                    <BarChart3 className="size-4" />
-                  </span>
-                  <span className="truncate">গবেষক অ্যানালিটিক্স ও রিচ</span>
-                </div>
-                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#03EF62]">
-                  +১৮%
-                </span>
-              </button>
-
-              {/* 4. Reading History & Citations */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onNavigate('/me/reading-history');
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
-                    <History className="size-4" />
-                  </span>
-                  <span className="truncate">পড়ার ইতিহাস ও রেফারেন্স</span>
-                </div>
-              </button>
-
-              {/* 5. Account Security & Devices */}
+              {/* 3. Account Security & Devices */}
               <button
                 type="button"
                 onClick={() => {

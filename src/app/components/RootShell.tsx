@@ -33,7 +33,7 @@ import { SavedArticlesModal } from './SavedArticlesModal';
 import { CreatePostModal } from './CreatePostModal';
 import { ExploreView, EventsView, StoreView, IdeasView, NotificationsView, ProfileView } from './Views';
 import {
-  PublicationsStudioView, ResearcherAnalyticsView, ReadingHistoryView,
+  PublicationsStudioView,
   AccountSecurityView, EditorialHelpView,
 } from './ResearcherViews';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
@@ -652,8 +652,6 @@ export function RootShell() {
     if (p.startsWith('/notifications')) return 'notifications';
     if (p.startsWith('/profile')) return 'profile';
     if (p.startsWith('/me/publications')) return 'publications';
-    if (p.startsWith('/me/analytics')) return 'analytics';
-    if (p.startsWith('/me/reading-history')) return 'reading-history';
     if (p.startsWith('/me/security')) return 'security';
     if (p.startsWith('/help')) return 'help';
     return 'home';
@@ -1545,8 +1543,6 @@ export function RootShell() {
         case 'profile':
           return <ProfilePageSkeleton />;
         case 'publications':
-        case 'analytics':
-        case 'reading-history':
         case 'security':
         case 'help':
           return <ResearcherStudioSkeleton />;
@@ -1851,20 +1847,6 @@ export function RootShell() {
             onOpenArticlePopup={handleOpenArticlePopup}
             onNavigate={goNavigate}
             onNavigateProfile={navigateToProfile}
-          />
-        );
-      case 'analytics':
-        return (
-          <ResearcherAnalyticsView
-            currentUser={currentUser}
-          />
-        );
-      case 'reading-history':
-        return (
-          <ReadingHistoryView
-            articles={snap.articles ?? []}
-            onOpenArticlePopup={handleOpenArticlePopup}
-            onNavigate={goNavigate}
           />
         );
       case 'security':

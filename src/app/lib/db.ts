@@ -1545,19 +1545,19 @@ export function mutateSnapshotReaction(
   );
   const nextReactions: ReactionRecord[] = finalReaction
     ? [
-        {
-          id: `rx-${targetType}-${targetId}-${user.id}`,
-          targetType,
-          targetId,
-          userId: user.id,
-          userName: user.name,
-          userAvatar: user.avatar,
-          userRole: `${user.role}${user.organization ? ` · ${user.organization}` : ''}`,
-          type: finalReaction,
-          createdAt: new Date().toISOString(),
-        },
-        ...filtered,
-      ]
+      {
+        id: `rx-${targetType}-${targetId}-${user.id}`,
+        targetType,
+        targetId,
+        userId: user.id,
+        userName: user.name,
+        userAvatar: user.avatar,
+        userRole: `${user.role}${user.organization ? ` · ${user.organization}` : ''}`,
+        type: finalReaction,
+        createdAt: new Date().toISOString(),
+      },
+      ...filtered,
+    ]
     : filtered;
 
   let counts: Partial<Record<LinkedInReactionType, number>> = {};

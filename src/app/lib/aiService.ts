@@ -26,7 +26,7 @@ export interface AIMessage {
 
 export interface AIResponse {
   answer: string;
-  source: string;
+  source?: string;
   model: string;
   isOnline: boolean;
 }
@@ -75,7 +75,6 @@ export async function queryPlainsytAI(
       if (content && typeof content === 'string' && content.trim().length > 0) {
         return {
           answer: content.trim(),
-          source: `PLAiNSYT AI (${model.split('/')[1] || 'LLM'}) · BRRI / BARI / SRDI নির্দেশিকা`,
           model,
           isOnline: true,
         };
@@ -88,7 +87,6 @@ export async function queryPlainsytAI(
   // Fallback to local curated agronomy engine if external API is unreachable
   return {
     answer: getLocalAgronomyFallback(userQuery),
-    source: 'PLAiNSYT AI · লোকাল এগ্রোনমি নলেজ ইঞ্জিন',
     model: 'local-knowledge-base',
     isOnline: false,
   };

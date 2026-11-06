@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Sparkles, Send, Bot, BookOpen } from 'lucide-react';
+import { Sparkles, Send, Bot } from 'lucide-react';
 import type { UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, cn } from './Primitives';
 import { PlainsytWordmark } from './PlainsytLogo';
@@ -7,7 +7,6 @@ import { PlainsytWordmark } from './PlainsytLogo';
 interface Msg {
   role: 'user' | 'ai';
   text: string;
-  source?: string;
 }
 
 const KB: { keys: string[]; answer: string; source: string }[] = [
@@ -78,7 +77,6 @@ export function AskAIModal({
     {
       role: 'ai',
       text: 'আসসালামু আলাইকুম! আমি Plainsyt AI কৃষি সহকারী। মাটি, ফসল, রোগবালাই, ড্রোন সেন্সিং বা কৃষিপ্রযুক্তি — যেকোনো প্রশ্ন বাংলায় করতে পারেন।',
-      source: 'PLAiNSYT AI · OpenRouter Connected',
     },
   ]);
   const [input, setInput] = useState('');
@@ -109,7 +107,7 @@ export function AskAIModal({
         if (i >= res.answer.length) {
           window.clearInterval(timer.current);
           setTyping(null);
-          setMsgs((m) => [...m, { role: 'ai', text: res.answer, source: res.source }]);
+          setMsgs((m) => [...m, { role: 'ai', text: res.answer }]);
         } else {
           setTyping(res.answer.slice(0, i));
         }
@@ -117,7 +115,7 @@ export function AskAIModal({
     } catch {
       setThinking(false);
       const fallback = answer(userMsg);
-      setMsgs((m) => [...m, { role: 'ai', text: fallback.answer, source: fallback.source }]);
+      setMsgs((m) => [...m, { role: 'ai', text: fallback.answer }]);
     }
   };
 
@@ -160,12 +158,6 @@ export function AskAIModal({
                 )}
               >
                 {m.text}
-                {m.source && (
-                  <p className="mt-2 flex items-center gap-1 border-t border-dashed border-canvas-border pt-1.5 font-mono text-[10px] text-pine-600">
-                    <BookOpen className="size-3" />
-                    {m.source}
-                  </p>
-                )}
               </div>
             </div>
           ))}

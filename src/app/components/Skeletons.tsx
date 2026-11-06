@@ -547,7 +547,7 @@ export function ProfilePageSkeleton() {
 }
 
 /**
- * Researcher Studio Skeleton (/publications, /analytics, etc.)
+ * Researcher Studio Skeleton (/me/publications, etc.)
  */
 export function ResearcherStudioSkeleton() {
   return (

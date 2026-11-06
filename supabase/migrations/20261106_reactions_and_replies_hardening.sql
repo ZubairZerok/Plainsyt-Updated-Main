@@ -23,3 +23,4 @@ create policy "reactions_write_auth" on public.reactions
 
 -- 3. Ensure reaction counts update on target entities can be called safely
 comment on table public.reactions is 'PLAiNSYT reactions table with resilient auth-based write permissions';
+

@@ -313,6 +313,26 @@ assert(fs.existsSync(repliesMigrationPath), 'Hardened reactions RLS and comments
 const repliesMigrationSource = fs.readFileSync(repliesMigrationPath, 'utf-8');
 assert(repliesMigrationSource.includes('parent_id') && repliesMigrationSource.includes('reactions_write_auth'), 'Migration defines parent_id on comments and reactions_write_auth on reactions');
 
+console.log('\n▶ Suite 12: Route Purging & AI Chat Clean Attribution Invariants');
+const routesSource = fs.readFileSync(path.join(rootDir, 'src/app/routes.ts'), 'utf-8');
+assert(!routesSource.includes('/me/analytics'), 'Route /me/analytics is completely removed from routes.ts');
+assert(!routesSource.includes('/me/reading-history'), 'Route /me/reading-history is completely removed from routes.ts');
+
+const updatedHeaderSource = fs.readFileSync(path.join(rootDir, 'src/app/components/Header.tsx'), 'utf-8');
+assert(!updatedHeaderSource.includes('/me/analytics'), 'Route /me/analytics is removed from Header user navigation');
+assert(!updatedHeaderSource.includes('/me/reading-history'), 'Route /me/reading-history is removed from Header user navigation');
+assert(!updatedHeaderSource.includes("'analytics'") && !updatedHeaderSource.includes("'reading-history'"), 'Header View type purged analytics and reading-history');
+
+assert(!updatedRootShell.includes('/me/analytics') && !updatedRootShell.includes('/me/reading-history'), 'RootShell route matcher purged analytics and reading-history');
+
+const aiModalSource = fs.readFileSync(path.join(rootDir, 'src/app/components/AskAIModal.tsx'), 'utf-8');
+assert(!aiModalSource.includes('লোকাল এগ্রোনমি'), 'AskAIModal purged local agronomy engine attribution text');
+assert(!aiModalSource.includes('m.source'), 'AskAIModal purged bottom source attribution block from chat messages');
+
+const aiServiceSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/aiService.ts'), 'utf-8');
+assert(!aiServiceSource.includes('লোকাল এগ্রোনমি'), 'aiService.ts purged local agronomy engine attribution text');
+
+
 
 
 console.log('\n====================================================');
