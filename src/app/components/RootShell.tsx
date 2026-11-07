@@ -21,6 +21,7 @@ import {
   toggleBookmarkId, appendArticleComment, appendPostComment, makeComment, toBengaliNumerals,
 } from '../utils/pureLogic';
 import { Header, LAYOUT_GRID, FEED_WIDTH, type View } from './Header';
+import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { CentralFeed } from './CentralFeed';
 import { FacebookCreatePostModal } from './FacebookCreatePostModal';
@@ -2205,8 +2206,25 @@ export function RootShell() {
       />
 
       {isHomePage ? (
-        <div className="relative w-full min-h-[calc(100vh-65px)]">
-          <main className="min-w-0 pb-12 pt-3 px-3 sm:px-4 lg:mr-68 xl:mr-76 max-w-2xl xl:max-w-3xl mx-auto">
+        <div className="max-w-[1440px] mx-auto px-2 sm:px-4 flex justify-center gap-4 xl:gap-6 relative min-h-[calc(100vh-65px)]">
+          <LeftSidebar
+            currentUser={currentUser}
+            articles={snap.articles}
+            reels={snap.reels}
+            savedCount={savedCount}
+            onOpenSaved={() => setSavedOpen(true)}
+            onOpenReels={() => {
+              if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
+              else setReelUploadOpen(true);
+            }}
+            onOpenProfileSettings={() => setProfileSettingsOpen(true)}
+            onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
+            onNavigate={goNavigate}
+            activePillar={pillar}
+            onPillar={setPillar}
+          />
+
+          <main className="min-w-0 flex-1 max-w-2xl xl:max-w-3xl pb-12 pt-3">
             {mainContent}
           </main>
 
@@ -2214,6 +2232,7 @@ export function RootShell() {
             articles={snap.articles}
             events={snap.events}
             profiles={allKnownProfiles}
+            stories={snap.stories}
             currentUserId={currentUser?.id || ''}
             followingIds={snap.followingIds}
             onToggleEvent={(id) => {
@@ -2233,14 +2252,20 @@ export function RootShell() {
             onOpenArticlePopup={handleOpenArticlePopup}
             onNavigateProfile={navigateToProfile}
             onNavigate={goNavigate}
+            onOpenStory={(storyId) => {
+              const idx = (snap.stories || []).findIndex((s) => s.id === storyId);
+              if (idx !== -1) {
+                setStoryModal({ stories: snap.stories, initialIndex: idx });
+              }
+            }}
             onOpenPhoto={(src, title, authorName, authorId) =>
               openPhotoPopup([src], 0, title, undefined, authorName, authorId)
             }
           />
         </div>
       ) : (
-        <div className="relative w-full min-h-[calc(100vh-65px)]">
-          <main className="min-w-0 pb-12 pt-4 px-4 max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4 min-h-[calc(100vh-65px)]">
+          <main className="min-w-0 pb-12 pt-4">
             {mainContent}
           </main>
         </div>

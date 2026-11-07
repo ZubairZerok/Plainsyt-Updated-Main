@@ -123,3 +123,14 @@
        url('https://fonts.gstatic.com/s/hindsiliguri/v14/ijwOs5juQtsyLLR5jN4cxBEoRCf_0uYVKw.woff2') format('woff2');
   unicode-range: U+0030-0039;
 }
+
+/* Ensure OpenType Bengali ligatures, kerning, and word spacing render flawlessly without breaking */
+body, [class*="font-bangla"], .font-bangla {
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
