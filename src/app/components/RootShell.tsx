@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, isZubairIdentifier, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, canCreateStory } from '../lib/auth';
+import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, isZubairIdentifier, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, canCreateStory, isFollowableAccount } from '../lib/auth';
 import {
   readSnapshot, writeSnapshot, fetchFromSupabase, syncLocalToSupabase, mutateSnapshotReaction,
   DEFAULT_SEED_SNAPSHOT,
@@ -21,7 +21,6 @@ import {
   toggleBookmarkId, appendArticleComment, appendPostComment, makeComment, toBengaliNumerals,
 } from '../utils/pureLogic';
 import { Header, LAYOUT_GRID, FEED_WIDTH, type View } from './Header';
-import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { CentralFeed } from './CentralFeed';
 import { FacebookCreatePostModal } from './FacebookCreatePostModal';
@@ -1465,6 +1464,11 @@ export function RootShell() {
       if (currentUser.id === targetUserId) {
         return;
       }
+      const targetProfile = snap.profiles.find((p) => p.id === targetUserId);
+      if (targetProfile && !isFollowableAccount(targetProfile)) {
+        toast.error('শুধুমাত্র ভেরিফাইড সম্পাদকীয় অ্যাকাউন্ট অনুসরণ করা সম্ভব');
+        return;
+      }
       const was = (snap.followingIds ?? []).includes(targetUserId);
       const nextFollowingIds = toggleBookmarkId(snap.followingIds, targetUserId);
       commit((prev) => {
@@ -1492,7 +1496,6 @@ export function RootShell() {
         };
       });
       dbToggleFollow(currentUser.id, targetUserId, !was);
-      const targetProfile = snap.profiles.find((p) => p.id === targetUserId);
       toast(was ? 'আনফলো করা হয়েছে' : `${targetProfile?.name || 'গবেষক'}-কে ফলো করছেন`, { duration: 1600 });
 
       if (!was) {
@@ -2203,31 +2206,14 @@ export function RootShell() {
 
       {isHomePage ? (
         <div className="relative w-full min-h-[calc(100vh-65px)]">
-          <LeftSidebar
-            currentUser={currentUser}
-            articles={snap.articles}
-            reels={snap.reels}
-            savedCount={savedCount}
-            onOpenSaved={() => setSavedOpen(true)}
-            onOpenReels={() => {
-              if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
-              else setReelUploadOpen(true);
-            }}
-            onOpenProfileSettings={() => setProfileSettingsOpen(true)}
-            onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
-            onNavigate={goNavigate}
-            activePillar={pillar}
-            onPillar={setPillar}
-          />
-
-          <main className="min-w-0 pb-12 pt-3 px-3 sm:px-4 lg:ml-56 xl:ml-64 lg:mr-68 xl:mr-76 max-w-2xl xl:max-w-3xl mx-auto">
+          <main className="min-w-0 pb-12 pt-3 px-3 sm:px-4 lg:mr-68 xl:mr-76 max-w-2xl xl:max-w-3xl mx-auto">
             {mainContent}
           </main>
 
           <RightSidebar
             articles={snap.articles}
             events={snap.events}
-            profiles={snap.profiles}
+            profiles={allKnownProfiles}
             currentUserId={currentUser?.id || ''}
             followingIds={snap.followingIds}
             onToggleEvent={(id) => {
@@ -2254,22 +2240,7 @@ export function RootShell() {
         </div>
       ) : (
         <div className="relative w-full min-h-[calc(100vh-65px)]">
-          <LeftSidebar
-            currentUser={currentUser}
-            articles={snap.articles}
-            reels={snap.reels}
-            savedCount={savedCount}
-            onOpenSaved={() => setSavedOpen(true)}
-            onOpenReels={() => {
-              if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
-              else setReelUploadOpen(true);
-            }}
-            onOpenProfileSettings={() => setProfileSettingsOpen(true)}
-            onNavigate={goNavigate}
-            activePillar={pillar}
-            onPillar={setPillar}
-          />
-          <main className="min-w-0 pb-12 pt-4 px-4 lg:ml-56 xl:ml-64 max-w-4xl mx-auto">
+          <main className="min-w-0 pb-12 pt-4 px-4 max-w-4xl mx-auto">
             {mainContent}
           </main>
         </div>

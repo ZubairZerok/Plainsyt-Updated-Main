@@ -203,25 +203,6 @@ export function Header(p: Props) {
             ))}
           </>
         )}
-
-        {/* Gray styled Tags list */}
-        <div className="mt-1 border-t border-slate-100 dark:border-white/10 px-2 pt-2.5 pb-1">
-          <p className="pb-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 font-semibold">
-            Tags
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {['কৃষি-প্রযুক্তি', 'গবেষণা', 'জীবাণুনাশ', 'পারমাণবিক কৃষি', 'আইওটি', 'জলবায়ু'].map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => setQ(tag)}
-                className="rounded-full bg-slate-100 dark:bg-white/10 px-2.5 py-0.5 font-bangla text-[11.5px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/20 transition"
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </>
   );

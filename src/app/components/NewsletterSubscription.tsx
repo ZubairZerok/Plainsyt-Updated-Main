@@ -151,3 +151,4 @@ export function NewsletterSubscription({ className, variant = 'card' }: Props) {
     </section>
   );
 }
+

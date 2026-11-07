@@ -1,5 +1,5 @@
 import { supabase, BKASH_RECEIVER_NUMBER } from './supabase';
-import { isZubairIdentifier, ZUBAIR_PROD_ID, ZUBAIR_PROD_PROFILE, ADMIN_PROFILE, ZUBAIR_PROFILE, HASAN_ZUBAIR_AVATAR } from './auth';
+import { isZubairIdentifier, ZUBAIR_PROD_ID, ZUBAIR_PROD_PROFILE, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_BAU_PROFILE, HASAN_ZUBAIR_AVATAR } from './auth';
 import type {
   Article, BkashOrder, CartItem, Comment, CommunityIdea, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionRecord, ReactionTargetType, ResearchPaper, StoryReel,
@@ -7,7 +7,7 @@ import type {
 } from '../types';
 import { applyReactionChange } from '../utils/pureLogic';
 
-export { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, isZubairIdentifier };
+export { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, ZUBAIR_BAU_PROFILE, isZubairIdentifier };
 
 export type SupabaseConnectionStatus = 'checking' | 'connected' | 'schema_missing' | 'offline';
 
@@ -164,7 +164,7 @@ export const JAPAN_ROBOT_ARTICLE: Article = {
 };
 
 export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
-  profiles: [ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE],
+  profiles: [ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, ZUBAIR_BAU_PROFILE],
   currentUserId: '',
   articles: [
     JAPAN_ROBOT_ARTICLE,
@@ -1126,17 +1126,27 @@ export async function fetchFromSupabase(limit = 60): Promise<{
               organization: p.organization && p.organization !== 'PLAiNSYT Platform' ? p.organization : ZUBAIR_PROFILE.organization,
               bio: p.bio && !p.bio.includes('সদস্য প্রোফাইল') ? p.bio : ZUBAIR_PROFILE.bio,
               avatar: chosenAvatar,
+              isVerified: true,
               followersCount: realFollowers,
               followingCount: realFollowing,
               publicationsCount: p.publicationsCount || 0,
             };
           }
-          if (p.id === 'usr-plainsyt-admin') {
+          if (p.id === 'usr-plainsyt-admin' || p.email === 'plaiinsyt@gmail.com') {
             return {
               ...p,
+              isVerified: true,
               followersCount: realFollowers,
               followingCount: realFollowing,
               publicationsCount: p.publicationsCount || 2,
+            };
+          }
+          if (p.id === 'usr-zubair-bau' || p.email === 'zubair.bau.01@gmail.com') {
+            return {
+              ...p,
+              isVerified: true,
+              followersCount: realFollowers,
+              followingCount: realFollowing,
             };
           }
           return {

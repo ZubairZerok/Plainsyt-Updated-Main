@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { MapPin, Users, Check, MessageCircle, Eye, ExternalLink, Calendar } from 'lucide-react';
 import type { Article, UpcomingEvent, UserProfile } from '../types';
-import { Avatar, CARD, FollowIconButton, Num, SectionLabel, cn } from './Primitives';
+import { Avatar, CARD, FollowIconButton, Num, SectionLabel, VerifiedBadge, cn } from './Primitives';
 import { SeeAllLink } from './Header';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
+import { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_BAU_PROFILE, isEditorialAuthorized } from '../lib/auth';
 
 interface Props {
   articles: Article[];
@@ -163,8 +164,32 @@ export function EventRow({
 }
 
 export function RightSidebar(p: Props) {
-  // Only display real backend profiles if available; do not show fake mock users
-  const otherProfiles = p.profiles.filter((u) => u.id !== p.currentUserId && !u.id.startsWith('mock_')).slice(0, 4);
+  // Only the 3 authorized editorial accounts (Hasan Zubair / PLAiNSYT / BAU) can be suggested and followed
+  const editorialProfiles = useMemo(() => {
+    const defaultList = [ZUBAIR_PROFILE, ADMIN_PROFILE, ZUBAIR_BAU_PROFILE];
+    const map = new Map<string, UserProfile>();
+
+    for (const d of defaultList) {
+      map.set(d.email.toLowerCase(), { ...d, isVerified: true });
+    }
+
+    // Overlay any live updates from p.profiles for these 3 accounts
+    for (const u of p.profiles) {
+      const email = (u.email || '').toLowerCase().trim();
+      if (
+        email === 'z65gt9@gmail.com' ||
+        email === 'plaiinsyt@gmail.com' ||
+        email === 'zubair.bau.01@gmail.com' ||
+        isEditorialAuthorized(u)
+      ) {
+        const key = email || u.id;
+        const existing = map.get(email);
+        map.set(key, { ...(existing || u), ...u, isVerified: true });
+      }
+    }
+
+    return Array.from(map.values()).filter((u) => u.id !== p.currentUserId);
+  }, [p.profiles, p.currentUserId]);
 
   return (
     <aside
@@ -251,12 +276,12 @@ export function RightSidebar(p: Props) {
             </div>
           </div>
 
-          {/* User Profiles to follow */}
-          {otherProfiles.length > 0 && (
+          {/* User Profiles to follow - strictly only the 3 verified editorial accounts */}
+          {editorialProfiles.length > 0 && (
             <div className="pt-2 border-t border-slate-100 dark:border-white/5">
-              <p className="font-mono text-[9.5px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">গবেষক ও লেখক</p>
+              <p className="font-mono text-[9.5px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">ভেরিফাইড গবেষক ও লেখক</p>
               <ul className="divide-y divide-slate-100 dark:divide-white/5">
-                {otherProfiles.map((s) => {
+                {editorialProfiles.map((s) => {
                   const isFollowing = (p.followingIds ?? []).includes(s.id);
                   return (
                     <li key={s.id} className="flex items-center gap-2 py-2">
@@ -265,16 +290,19 @@ export function RightSidebar(p: Props) {
                         onClick={() => p.onNavigateProfile(s.id)}
                         className="shrink-0"
                       >
-                        <Avatar src={s.avatar || 'PS'} name={s.name} size="size-7" />
+                        <Avatar src={s.avatar || 'PS'} name={s.name} size="size-7" ring className="ring-[#03EF62]/50" />
                       </button>
                       <span className="min-w-0 flex-1">
-                        <button
-                          type="button"
-                          onClick={() => p.onNavigateProfile(s.id)}
-                          className="block truncate text-left text-xs font-semibold text-slate-900 dark:text-white hover:underline"
-                        >
-                          {s.name}
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => p.onNavigateProfile(s.id)}
+                            className="block truncate text-left text-xs font-semibold text-slate-900 dark:text-white hover:underline"
+                          >
+                            {s.name}
+                          </button>
+                          <VerifiedBadge />
+                        </div>
                         <span className="block truncate text-[10px] text-slate-400">
                           {s.focusArea || s.role || 'লেখক'}
                         </span>

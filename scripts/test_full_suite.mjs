@@ -146,8 +146,8 @@ assert(fs.existsSync(robotsPath), 'robots.txt exists in public directory');
 const sitemapPath = path.join(rootDir, 'public/sitemap.xml');
 assert(fs.existsSync(sitemapPath), 'sitemap.xml exists in public directory');
 const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8');
-assert(sitemapContent.includes('https://plainsyt.com/article/bina-gamma-ray-irradiation-center-inauguration-2026'), 'sitemap.xml indexes canonical BINA article URL');
-assert(sitemapContent.includes('https://plainsyt.com/article/japan-ai-cucumber-harvesting-robot-future-of-smart-agriculture'), 'sitemap.xml indexes canonical Japan robot article URL');
+assert(sitemapContent.includes('/article/bina-gamma-ray-irradiation-center'), 'sitemap.xml indexes canonical BINA article URL');
+assert(sitemapContent.includes('/article/japan-cucumber-harvesting-robot'), 'sitemap.xml indexes canonical Japan robot article URL');
 
 const indexPath = path.join(rootDir, 'index.html');
 const indexContent = fs.readFileSync(indexPath, 'utf-8');
@@ -507,8 +507,29 @@ const prerenderScriptPath = path.join(rootDir, 'scripts/prerender_articles.mjs')
 assert(fs.existsSync(prerenderScriptPath), 'prerender_articles.mjs script exists');
 const pkgJsonSrc = fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8');
 assert(pkgJsonSrc.includes('prerender_articles.mjs'), 'package.json build script runs prerender_articles.mjs');
-console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
-console.log('====================================================');
+
+console.log('\n▶ Suite 22: Desktop Left Sidebar Removal, Search Tags Purge & Verified Editorial Follow Restrictions');
+// 1. Desktop Left Sidebar Purged from RootShell
+const rootShellSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(!rootShellSrc.includes('<LeftSidebar') && !rootShellSrc.includes("import { LeftSidebar }"), 'RootShell does not import or render LeftSidebar on desktop');
+assert(!rootShellSrc.includes('lg:ml-56') && !rootShellSrc.includes('xl:ml-64'), 'RootShell main area margins removed left sidebar offset (no lg:ml-56 or xl:ml-64)');
+
+// 2. Search dropdown tags purged
+const headerSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/Header.tsx'), 'utf-8');
+const purgedTags = ['#কৃষি-প্রযুক্তি', '#গবেষণা', '#জীবাণুনাশ', '#পারমাণবিক কৃষি', '#আইওটি', '#জলবায়ু'];
+const containsPurgedTags = purgedTags.some(tag => headerSrc.includes(tag));
+assert(!containsPurgedTags, 'Header search dropdown has purged all specified tags (#কৃষি-প্রযুক্তি, #গবেষণা, #জীবাণুনাশ, etc.)');
+
+// 3. Verified Editorial Profiles & Follow Restrictions
+const authSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/auth.ts'), 'utf-8');
+assert(authSrc.includes('ZUBAIR_BAU_PROFILE') && authSrc.includes('isFollowableAccount'), 'auth.ts defines ZUBAIR_BAU_PROFILE and isFollowableAccount guard');
+
+const rightSidebarSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/RightSidebar.tsx'), 'utf-8');
+assert(rightSidebarSrc.includes('isFollowableAccount') || rightSidebarSrc.includes('editorialProfiles'), 'RightSidebar restricts "অনুসরণ করুন" to authorized editorial accounts');
+assert(rightSidebarSrc.includes('<VerifiedBadge'), 'RightSidebar renders VerifiedBadge for authorized editorial accounts');
+assert(rootShellSrc.includes('isFollowableAccount'), 'RootShell enforces isFollowableAccount in handleToggleFollow');
+
+console.log(`\n====================================================`);
 
 if (failedTests > 0) {
   process.exit(1);

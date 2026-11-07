@@ -16,3 +16,4 @@ create policy "newsletter_insert_public" on public.newsletter_subscribers
 drop policy if exists "newsletter_select_editorial" on public.newsletter_subscribers;
 create policy "newsletter_select_editorial" on public.newsletter_subscribers
   for select using (true);
+

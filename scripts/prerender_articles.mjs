@@ -161,3 +161,4 @@ const publicSitemap = path.join(rootDir, 'public', 'sitemap.xml');
 fs.writeFileSync(publicSitemap, sitemapXml, 'utf-8');
 
 console.log('✓ Prerendering & sitemap complete.');
+

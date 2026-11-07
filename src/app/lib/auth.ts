@@ -25,6 +25,8 @@ export function isZubairIdentifier(idOrEmailOrHandle?: string | null): boolean {
   const val = String(idOrEmailOrHandle).toLowerCase().trim().replace(/^@/, '');
   return (
     val === 'usr-zubair' ||
+    val === 'usr-zubair-bau' ||
+    val === 'zubair.bau' ||
     val === '55dba730-185d-4c61-bee8-6b9ab22e3703' ||
     val === '688ac4e8-af95-4458-8623-13b5e1ae41ba' ||
     val === '70e85603-ca08-476a-a73d-98ef214c7dab' ||
@@ -106,7 +108,43 @@ export const ZUBAIR_PROD_PROFILE: UserProfile = {
   ...ZUBAIR_PROFILE,
   id: ZUBAIR_PROD_ID,
   handle: 'hasanzubair',
+  isVerified: true,
 };
+
+export const ZUBAIR_BAU_ID = 'usr-zubair-bau';
+
+export const ZUBAIR_BAU_PROFILE: UserProfile = {
+  id: ZUBAIR_BAU_ID,
+  name: 'Hasan Zubair (BAU)',
+  nameBn: 'হাসান জুবায়ের (বাকৃবি)',
+  handle: 'zubair.bau',
+  role: 'Research Fellow',
+  organization: 'Bangladesh Agricultural University (BAU)',
+  location: 'ময়মনসিংহ, বাংলাদেশ',
+  bio: 'গবেষক, বাংলাদেশ কৃষি বিশ্ববিদ্যালয় (বাকৃবি)। নিউক্লিয়ার এগ্রোনমি ও স্মার্ট এগ্রিকালচার গবেষক।',
+  avatar: HASAN_ZUBAIR_AVATAR,
+  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
+  isVerified: true,
+  focusArea: 'Nuclear Agronomy & Smart Agriculture',
+  publicationsCount: 0,
+  followersCount: 0,
+  followingCount: 0,
+  email: 'zubair.bau.01@gmail.com',
+  createdAt: '2026-02-01T00:00:00.000Z',
+};
+
+export function isFollowableAccount(user?: UserProfile | null): boolean {
+  if (!user) return false;
+  const email = (user.email || '').toLowerCase().trim();
+  if (
+    email === 'z65gt9@gmail.com' ||
+    email === 'plaiinsyt@gmail.com' ||
+    email === 'zubair.bau.01@gmail.com'
+  ) {
+    return true;
+  }
+  return isEditorialAuthorized(user);
+}
 
 const AUTH_STORAGE_KEY = 'plainsyt_auth_session_v1';
 

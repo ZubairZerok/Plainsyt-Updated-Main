@@ -320,3 +320,4 @@ export function EditorialDashboard({ currentUser, articles, onNavigate }: Props)
     </div>
   );
 }
+
