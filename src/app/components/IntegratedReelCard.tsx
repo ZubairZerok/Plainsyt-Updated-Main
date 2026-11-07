@@ -13,6 +13,7 @@ import {
 import type { LinkedInReactionType, StoryReel } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, FollowIconButton, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
+import { SharePopoverButton } from './ShareModal';
 import { formatBengaliNumberCompact, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
 import { getYouTubeEmbedInfo } from './ReelPlayerModal';
 import {
@@ -361,10 +362,17 @@ export function IntegratedReelCard({
 
           {/* Right action stack: Like → Comment → Share → Save → Mute */}
           <div
-            className="absolute bottom-10 right-1.5 z-30 flex flex-col items-center gap-1.5"
+            className="absolute bottom-10 right-1.5 z-40 flex flex-col items-center gap-1.5 pointer-events-auto select-none"
+            style={{ touchAction: 'manipulation' }}
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
           >
-            <div className={actionBtn}>
+            <div
+              className={actionBtn}
+              onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+            >
               <LinkedInReactionPickerButton
                 userReaction={reel.userReaction}
                 onSelect={onReact}
@@ -375,18 +383,37 @@ export function IntegratedReelCard({
               <span className="font-bangla font-bold text-[11px] drop-shadow">{formatBengaliNumberCompact(rxTotal)}</span>
             </div>
 
-            <button type="button" onClick={onPlay} className={actionBtn} aria-label="Comment" title="মন্তব্য">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlay();
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                onPlay();
+              }}
+              className={actionBtn}
+              aria-label="Comment"
+              title="মন্তব্য"
+            >
               <span className={actionIcon}>
                 <MessageCircle className="size-[18px]" />
               </span>
             </button>
 
-            <button type="button" onClick={onShare} className={actionBtn} aria-label="Share">
-              <span className={actionIcon}>
-                <Share2 className="size-[18px]" />
-              </span>
-              <span className="font-bangla text-[10.5px] font-medium drop-shadow">Share</span>
-            </button>
+            <SharePopoverButton
+              title={reel.title}
+              url={`/reel/${reel.id}`}
+              floating
+            >
+              <div className={actionBtn} aria-label="Share">
+                <span className={actionIcon}>
+                  <Share2 className="size-[18px]" />
+                </span>
+                <span className="font-bangla text-[10.5px] font-medium drop-shadow">Share</span>
+              </div>
+            </SharePopoverButton>
 
             <button type="button" onClick={onSave} className={actionBtn} aria-label="Save">
               <span className={actionIcon}>

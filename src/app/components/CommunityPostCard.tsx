@@ -4,6 +4,7 @@ import { Globe2, MoreHorizontal, MessageCircle, Share2, Send, Bookmark, Bot, Ext
 import type { CommunityPost, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
+import { SharePopoverButton } from './ShareModal';
 import { toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 export const TEXT_THEMES = [
@@ -294,14 +295,18 @@ export function CommunityPostCard({
             </span>
           )}
         </button>
-        <button
-          type="button"
-          onClick={onShare}
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+        <SharePopoverButton
+          title={post.content.slice(0, 60)}
+          url={`/post/${post.id}`}
         >
-          <Share2 className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
-          <span className="truncate">Share</span>
-        </button>
+          <button
+            type="button"
+            className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          >
+            <Share2 className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
+            <span className="truncate">Share</span>
+          </button>
+        </SharePopoverButton>
         <button
           type="button"
           onClick={onSave}

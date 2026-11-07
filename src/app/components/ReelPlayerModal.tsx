@@ -17,6 +17,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { Avatar, cn } from './Primitives';
+import { SharePopoverButton } from './ShareModal';
 import type { CommentItem, UserProfile } from '../types';
 import { toBengaliNumerals } from '../utils/pureLogic';
 import {
@@ -60,7 +61,7 @@ interface Props {
   onClose: () => void;
   onShare: (t: string) => void;
   onOpenAuth?: () => void;
-  onComment?: (targetId: string, text: string) => void;
+  onComment?: (targetId: string, text: string, parentId?: string, replyToAuthor?: string) => void;
   onEditComment?: (id: string, newText: string) => void;
   onDeleteComment?: (id: string) => void;
   onReactStory?: (targetId: string) => void;
@@ -87,6 +88,7 @@ export function ReelPlayerModal({
   const [showCenterIcon, setShowCenterIcon] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<{ id: string; author: string } | null>(null);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
   const [liked, setLiked] = useState<Record<string, boolean>>({});
@@ -273,8 +275,9 @@ export function ReelPlayerModal({
     }
     const val = commentText.trim();
     if (!val) return;
-    onComment?.(it.id, val);
+    onComment?.(it.id, val, replyingTo?.id, replyingTo?.author);
     setCommentText('');
+    setReplyingTo(null);
   };
 
   const handleLikeComment = (cid: string) => {
@@ -393,12 +396,18 @@ export function ReelPlayerModal({
               <span className="font-bangla font-bold text-[11px]">{toBengaliNumerals(itemComments.length)}</span>
             </button>
 
-            <button type="button" onClick={() => onShare(it.title)} className={actionBtn}>
-              <span className={actionIcon}>
-                <Share2 className="size-5" />
-              </span>
-              <span className="font-mono text-[10px]">Share</span>
-            </button>
+            <SharePopoverButton
+              title={it.title}
+              url={`/reel/${it.id}`}
+              floating
+            >
+              <div className={actionBtn}>
+                <span className={actionIcon}>
+                  <Share2 className="size-5" />
+                </span>
+                <span className="font-mono text-[10px]">Share</span>
+              </div>
+            </SharePopoverButton>
 
             <button type="button" onClick={handleSaveStory} className={actionBtn}>
               <span className={cn(actionIcon, isSaved && 'bg-white/20')}>
@@ -498,7 +507,7 @@ export function ReelPlayerModal({
                   এখনো কোনো মন্তব্য নেই। প্রথম মন্তব্যটি আপনিই করুন!
                 </div>
               ) : (
-                itemComments.map((c) => {
+                itemComments.filter((c) => !c.parentId).map((c) => {
                   const likes = (c.likes ?? 0) + (commentLikes[c.id] ?? 0);
                   const canManage = Boolean(
                     currentUser &&
@@ -507,103 +516,178 @@ export function ReelPlayerModal({
                       (currentUser.id === c.authorId ||
                         (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
                   );
+                  const replies = itemComments.filter((r) => r.parentId === c.id);
+
                   return (
-                    <div key={c.id} className="pt-3 first:pt-0 flex items-start gap-2.5">
-                      <Avatar src={c.avatar} name={c.author} size="size-8" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-1">
-                          <span className="font-bangla text-[13px] font-bold text-white truncate">{c.author}</span>
-                          <span className="font-bangla text-[11px] font-medium text-emerald-300 shrink-0">
-                            {c.timestampLabel || 'এখন'}
-                          </span>
-                        </div>
-                        {editingCommentId === c.id ? (
-                          <form
-                            onSubmit={(e) => {
-                              e.preventDefault();
-                              const clean = editingText.trim();
-                              if (clean && clean !== c.text) {
-                                onEditComment?.(c.id, clean);
-                              }
-                              setEditingCommentId(null);
-                            }}
-                            className="mt-1 space-y-1.5"
-                          >
-                            <input
-                              type="text"
-                              value={editingText}
-                              onChange={(e) => setEditingText(e.target.value)}
-                              autoFocus
-                              className="w-full rounded-lg border border-white/20 bg-black/40 px-2 py-1 font-bangla text-xs text-white outline-none focus:border-[#03EF62]"
-                            />
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="submit"
-                                disabled={!editingText.trim()}
-                                className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
-                              >
-                                সংরক্ষণ
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingCommentId(null)}
-                                className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
-                              >
-                                বাতিল
-                              </button>
+                    <div key={c.id} className="pt-3 first:pt-0 space-y-2">
+                      <div className="flex items-start gap-2.5">
+                        <Avatar src={c.avatar} name={c.author} size="size-8" />
+                        <div className="min-w-0 flex-1">
+                          <div className="rounded-2xl bg-white/5 border border-white/10 px-3 py-2">
+                            <div className="flex items-baseline justify-between gap-1">
+                              <span className="font-bangla text-[13px] font-bold text-white truncate">{c.author}</span>
+                              <span className="font-bangla text-[11px] font-medium text-emerald-300 shrink-0">
+                                {c.timestampLabel || 'এখন'}
+                              </span>
                             </div>
-                          </form>
-                        ) : (
-                          <p className="mt-0.5 font-bangla text-[13px] text-white/85 leading-relaxed break-words">
-                            {c.text}
-                            {c.isEdited && (
-                              <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
-                            )}
-                          </p>
-                        )}
-                        <div className="mt-1 flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => handleLikeComment(c.id)}
-                            className="inline-flex items-center gap-1 font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition"
-                          >
-                            <ThumbsUp className="size-3" />
-                            <span>{likes > 0 ? toBengaliNumerals(likes) : 'লাইক'}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (!currentUser && onOpenAuth) onOpenAuth();
-                              else commentInputRef.current?.focus();
-                            }}
-                            className="font-bangla text-[11px] font-medium text-white/60 hover:text-white transition"
-                          >
-                            উত্তর দিন
-                          </button>
-                          {canManage && editingCommentId !== c.id && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditingCommentId(c.id);
-                                  setEditingText(c.text);
-                                }}
-                                className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition cursor-pointer"
-                              >
-                                এডিট
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
-                                    onDeleteComment?.(c.id);
+                            {editingCommentId === c.id ? (
+                              <form
+                                onSubmit={(e) => {
+                                  e.preventDefault();
+                                  const clean = editingText.trim();
+                                  if (clean && clean !== c.text) {
+                                    onEditComment?.(c.id, clean);
                                   }
+                                  setEditingCommentId(null);
                                 }}
-                                className="font-bangla text-[11px] font-medium text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                                className="mt-1 space-y-1.5"
                               >
-                                মুছুন
-                              </button>
-                            </>
+                                <input
+                                  type="text"
+                                  value={editingText}
+                                  onChange={(e) => setEditingText(e.target.value)}
+                                  autoFocus
+                                  className="w-full rounded-lg border border-white/20 bg-black/40 px-2 py-1 font-bangla text-xs text-white outline-none focus:border-[#03EF62]"
+                                />
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="submit"
+                                    disabled={!editingText.trim()}
+                                    className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
+                                  >
+                                    সংরক্ষণ
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingCommentId(null)}
+                                    className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
+                                  >
+                                    বাতিল
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <p className="mt-0.5 font-bangla text-[13px] text-white/90 leading-relaxed break-words">
+                                {c.text}
+                                {c.isEdited && (
+                                  <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
+                                )}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="ml-2 mt-1 flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleLikeComment(c.id)}
+                              className="inline-flex items-center gap-1 font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition"
+                            >
+                              <ThumbsUp className="size-3" />
+                              <span>{likes > 0 ? toBengaliNumerals(likes) : 'লাইক'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!currentUser && onOpenAuth) {
+                                  onOpenAuth();
+                                  return;
+                                }
+                                setReplyingTo({ id: c.id, author: c.author });
+                                setCommentText(`@${c.author} `);
+                                commentInputRef.current?.focus();
+                              }}
+                              className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition cursor-pointer"
+                            >
+                              উত্তর দিন
+                            </button>
+                            {canManage && editingCommentId !== c.id && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingCommentId(c.id);
+                                    setEditingText(c.text);
+                                  }}
+                                  className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition cursor-pointer"
+                                >
+                                  এডিট
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
+                                      onDeleteComment?.(c.id);
+                                    }
+                                  }}
+                                  className="font-bangla text-[11px] font-medium text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                                >
+                                  মুছুন
+                                </button>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Nested Replies */}
+                          {replies.length > 0 && (
+                            <div className="mt-2.5 ml-2 pl-3 border-l-2 border-emerald-500/30 space-y-2">
+                              {replies.map((r) => {
+                                const rLikes = (r.likes ?? 0) + (commentLikes[r.id] ?? 0);
+                                const canManageReply = Boolean(
+                                  currentUser &&
+                                    currentUser.id &&
+                                    r.authorId &&
+                                    (currentUser.id === r.authorId ||
+                                      (isZubairIdentifier(currentUser.id) && isZubairIdentifier(r.authorId))),
+                                );
+                                return (
+                                  <div key={r.id} className="flex items-start gap-2">
+                                    <Avatar src={r.avatar} name={r.author} size="size-7" />
+                                    <div className="min-w-0 flex-1">
+                                      <div className="rounded-xl bg-white/5 border border-white/5 px-2.5 py-1.5">
+                                        <div className="flex items-baseline justify-between gap-1">
+                                          <span className="font-bangla text-[12px] font-bold text-white truncate">{r.author}</span>
+                                          <span className="font-bangla text-[10px] text-emerald-300 shrink-0">{r.timestampLabel || 'এখন'}</span>
+                                        </div>
+                                        <p className="mt-0.5 font-bangla text-[12px] text-white/85 leading-snug break-words">{r.text}</p>
+                                      </div>
+                                      <div className="ml-1.5 mt-0.5 flex items-center gap-2.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleLikeComment(r.id)}
+                                          className="font-bangla text-[10px] font-medium text-white/60 hover:text-[#03EF62] transition"
+                                        >
+                                          লাইক {rLikes > 0 && `(${toBengaliNumerals(rLikes)})`}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setReplyingTo({ id: c.id, author: r.author });
+                                            setCommentText(`@${r.author} `);
+                                            commentInputRef.current?.focus();
+                                          }}
+                                          className="font-bangla text-[10px] font-medium text-white/60 hover:text-[#03EF62] transition"
+                                        >
+                                          উত্তর দিন
+                                        </button>
+                                        {canManageReply && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              if (typeof window !== 'undefined' && window.confirm('রিপ্লাইটি মুছে ফেলবেন?')) {
+                                                onDeleteComment?.(r.id);
+                                              }
+                                            }}
+                                            className="font-bangla text-[10px] text-rose-400 hover:text-rose-300"
+                                          >
+                                            মুছুন
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -614,6 +698,22 @@ export function ReelPlayerModal({
             </div>
 
             <div className="border-t border-white/10 p-3 bg-[#0a1f2b]/80 rounded-b-2xl">
+              {replyingTo && (
+                <div className="flex items-center justify-between px-3 py-1 mb-2 bg-[#03EF62]/10 border border-[#03EF62]/30 rounded-xl text-xs font-bangla text-[#03EF62]">
+                  <span>{replyingTo.author}-কে উত্তর দেওয়া হচ্ছে…</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReplyingTo(null);
+                      setCommentText('');
+                    }}
+                    className="text-white/60 hover:text-white ml-2 text-sm leading-none"
+                    title="বাতিল করুন"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
               {currentUser ? (
                 <form onSubmit={handleSendComment} className="flex items-center gap-2">
                   <Avatar src={currentUser.avatar} name={currentUser.name} size="size-8" />
@@ -627,7 +727,7 @@ export function ReelPlayerModal({
                   <button
                     type="submit"
                     disabled={!commentText.trim()}
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#03EF62] text-[#061621] transition hover:bg-[#02d955] disabled:opacity-40 active:scale-95"
+                    className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#03EF62] text-[#061621] transition hover:bg-[#02d955] disabled:opacity-40 active:scale-95 cursor-pointer"
                   >
                     <Send className="size-4" />
                   </button>

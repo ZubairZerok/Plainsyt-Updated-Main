@@ -54,6 +54,21 @@ export const router = createBrowserRouter([
     ErrorBoundary: RouteErrorBoundary,
   },
   {
+    path: '/post/:postId',
+    Component: RootShell,
+    ErrorBoundary: RouteErrorBoundary,
+  },
+  {
+    path: '/reel/:reelId',
+    Component: RootShell,
+    ErrorBoundary: RouteErrorBoundary,
+  },
+  {
+    path: '/reels/:reelId',
+    Component: RootShell,
+    ErrorBoundary: RouteErrorBoundary,
+  },
+  {
     path: '/me/security',
     Component: RootShell,
     ErrorBoundary: RouteErrorBoundary,

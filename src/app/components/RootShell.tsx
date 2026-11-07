@@ -685,6 +685,19 @@ export function RootShell() {
     }
   }, [location.pathname]);
 
+  // Deep-link direct URL access for reels (/reel/:id or /reels/:id)
+  useEffect(() => {
+    const p = location.pathname;
+    if (p.startsWith('/reel/') || p.startsWith('/reels/')) {
+      const rid = decodeURIComponent(p.replace(/^\/reels?\//, ''));
+      const rIdx = snap.reels.findIndex((r) => r.id === rid);
+      if (rIdx >= 0) {
+        setPlayerStart(rIdx);
+        setPlayerOpen(true);
+      }
+    }
+  }, [location.pathname, snap.reels]);
+
   const goNavigate = useCallback(
     (path: string) => {
       setReaderId(null);
@@ -751,9 +764,28 @@ export function RootShell() {
             const post = snap.posts.find((p) => p.id === targetId);
             authorId = post?.authorId || post?.author?.id || '';
             targetTitle = post?.content.slice(0, 30) ?? 'পোস্ট';
+          } else if (targetType === 'comment') {
+            let foundComment: Comment | undefined = snap.comments.find((c) => c.id === targetId);
+            if (!foundComment) {
+              for (const a of snap.articles) {
+                foundComment = a.comments?.find((c) => c.id === targetId);
+                if (foundComment) break;
+              }
+            }
+            if (!foundComment) {
+              for (const p of snap.posts) {
+                foundComment = p.comments?.find((c) => c.id === targetId);
+                if (foundComment) break;
+              }
+            }
+            if (foundComment) {
+              authorId = foundComment.authorId;
+              targetTitle = foundComment.text.slice(0, 30);
+            }
           }
           // Ultra guard: Never notify self for own actions
           if (authorId && authorId !== actor.id) {
+            const isComment = targetType === 'comment';
             const notif: NotificationItem = {
               id: `notif-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
               recipientId: authorId,
@@ -762,11 +794,13 @@ export function RootShell() {
               actorName: actor.name,
               actorAvatar: actor.avatar,
               type: 'reaction',
-              entityType: targetType === 'comment' ? 'comment' : targetType,
+              entityType: isComment ? 'comment' : targetType,
               entityId: targetId,
-              targetUrl: targetType === 'article' ? `/article/${targetId}` : `/#post-${targetId}`,
-              message: `${actor.name} আপনার "${targetTitle}" বিষয়ে প্রতিক্রিয়া জানিয়েছেন।`,
-              title: 'নতুন প্রতিক্রিয়া',
+              targetUrl: isComment ? `/#comment-${targetId}` : targetType === 'article' ? `/article/${targetId}` : `/#post-${targetId}`,
+              message: isComment
+                ? `${actor.name} আপনার মন্তব্যে প্রতিক্রিয়া জানিয়েছেন: "${targetTitle}..."`
+                : `${actor.name} আপনার "${targetTitle}" বিষয়ে প্রতিক্রিয়া জানিয়েছেন।`,
+              title: isComment ? 'মন্তব্যে নতুন প্রতিক্রিয়া' : 'নতুন প্রতিক্রিয়া',
               source: actor.name,
               time: 'মাত্র এখন',
               isRead: false,
@@ -849,6 +883,34 @@ export function RootShell() {
         };
         dbInsertNotification(notif);
       }
+
+      // If replying to a comment, notify parent comment author
+      if (parentId) {
+        const parentComment = snap.comments.find((c) => c.id === parentId) ||
+          snap.articles.flatMap((a) => a.comments || []).find((c) => c.id === parentId);
+        if (parentComment && parentComment.authorId && parentComment.authorId !== actor.id && parentComment.authorId !== authorId) {
+          const replyNotif: NotificationItem = {
+            id: `notif-reply-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+            recipientId: parentComment.authorId,
+            userId: parentComment.authorId,
+            actorId: actor.id,
+            actorName: actor.name,
+            actorAvatar: actor.avatar,
+            type: 'comment',
+            entityType: 'comment',
+            entityId: parentId,
+            targetUrl: `/article/${articleId}`,
+            message: `${actor.name} আপনার মন্তব্যের উত্তর দিয়েছেন: "${text.slice(0, 35)}..."`,
+            title: 'মন্তব্যের উত্তর',
+            source: actor.name,
+            time: 'মাত্র এখন',
+            isRead: false,
+            unread: true,
+            createdAt: new Date().toISOString(),
+          };
+          dbInsertNotification(replyNotif);
+        }
+      }
     },
     [commit, currentUser, requestAuth, snap.articles],
   );
@@ -893,7 +955,7 @@ export function RootShell() {
           type: 'comment',
           entityType: 'post',
           entityId: postId,
-          targetUrl: `/#post-${postId}`,
+          targetUrl: `/post/${postId}`,
           message: `${actor.name} আপনার পোস্টে মন্তব্য করেছেন: "${text.slice(0, 35)}..."`,
           title: 'নতুন মন্তব্য',
           source: actor.name,
@@ -903,6 +965,34 @@ export function RootShell() {
           createdAt: new Date().toISOString(),
         };
         dbInsertNotification(notif);
+      }
+
+      // If replying to a comment, notify parent comment author
+      if (parentId) {
+        const parentComment = snap.comments.find((c) => c.id === parentId) ||
+          snap.posts.flatMap((p) => p.comments || []).find((c) => c.id === parentId);
+        if (parentComment && parentComment.authorId && parentComment.authorId !== actor.id && parentComment.authorId !== authorId) {
+          const replyNotif: NotificationItem = {
+            id: `notif-reply-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+            recipientId: parentComment.authorId,
+            userId: parentComment.authorId,
+            actorId: actor.id,
+            actorName: actor.name,
+            actorAvatar: actor.avatar,
+            type: 'comment',
+            entityType: 'comment',
+            entityId: parentId,
+            targetUrl: `/post/${postId}`,
+            message: `${actor.name} আপনার মন্তব্যের উত্তর দিয়েছেন: "${text.slice(0, 35)}..."`,
+            title: 'মন্তব্যের উত্তর',
+            source: actor.name,
+            time: 'মাত্র এখন',
+            isRead: false,
+            unread: true,
+            createdAt: new Date().toISOString(),
+          };
+          dbInsertNotification(replyNotif);
+        }
       }
     },
     [commit, currentUser, requestAuth, snap.posts],
@@ -1052,10 +1142,10 @@ export function RootShell() {
   );
 
   const handleCommentStoryOrReel = useCallback(
-    (targetId: string, text: string) => {
+    (targetId: string, text: string, parentId?: string, replyToAuthor?: string) => {
       if (!currentUser) {
         requestAuth('মন্তব্য করতে অনুগ্রহ করে আপনার অ্যাকাউন্টে লগইন করুন।', () => {
-          handleCommentStoryOrReel(targetId, text);
+          handleCommentStoryOrReel(targetId, text, parentId, replyToAuthor);
         });
         return;
       }
@@ -1063,23 +1153,49 @@ export function RootShell() {
       const matchedStory = snap.stories.find((s) => s.id === targetId || s.articleId === targetId);
       const articleId = matchedStory?.articleId || (snap.articles.some((a) => a.id === targetId) ? targetId : null);
       if (articleId) {
-        handleCommentArticle(articleId, text);
+        handleCommentArticle(articleId, text, parentId, replyToAuthor);
         return;
       }
       const isPost = snap.posts.some((p) => p.id === targetId);
       if (isPost) {
-        handleCommentPost(targetId, text);
+        handleCommentPost(targetId, text, parentId, replyToAuthor);
         return;
       }
 
-      const newComment = makeComment(text, currentUser, 'reel', targetId);
+      const newComment = makeComment(text, currentUser, 'reel', targetId, parentId, replyToAuthor);
       commit((prev) => ({
         ...prev,
         comments: [newComment, ...prev.comments],
       }));
       dbInsertComment(newComment);
+
+      if (parentId) {
+        const parentComment = snap.comments.find((c) => c.id === parentId);
+        if (parentComment && parentComment.authorId && parentComment.authorId !== currentUser.id) {
+          const replyNotif: NotificationItem = {
+            id: `notif-reply-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+            recipientId: parentComment.authorId,
+            userId: parentComment.authorId,
+            actorId: currentUser.id,
+            actorName: currentUser.name,
+            actorAvatar: currentUser.avatar,
+            type: 'comment',
+            entityType: 'comment',
+            entityId: parentId,
+            targetUrl: `/reel/${targetId}`,
+            message: `${currentUser.name} আপনার মন্তব্যের উত্তর দিয়েছেন: "${text.slice(0, 35)}..."`,
+            title: 'মন্তব্যের উত্তর',
+            source: currentUser.name,
+            time: 'মাত্র এখন',
+            isRead: false,
+            unread: true,
+            createdAt: new Date().toISOString(),
+          };
+          dbInsertNotification(replyNotif);
+        }
+      }
     },
-    [commit, currentUser, requestAuth, snap.stories, snap.articles, snap.posts, handleCommentArticle, handleCommentPost],
+    [commit, currentUser, requestAuth, snap.stories, snap.articles, snap.posts, snap.comments, handleCommentArticle, handleCommentPost],
   );
 
   const handleReactStoryOrReel = useCallback(
@@ -1825,6 +1941,61 @@ export function RootShell() {
           onNavigate={goNavigate}
           onOpenRegister={(ev) => setRegistrationEvent(ev)}
         />
+      );
+    }
+
+    if (location.pathname.startsWith('/post/')) {
+      const postId = decodeURIComponent(location.pathname.replace('/post/', ''));
+      const foundPost = snap.posts.find((p) => p.id === postId);
+      if (!foundPost) {
+        return (
+          <section className={cn(FEED_CARD, 'p-8 text-center')}>
+            <h1 className="font-display text-[22px] font-bold text-pine-950 dark:text-white">
+              পোস্টটি পাওয়া যায়নি
+            </h1>
+            <p className="mt-1 font-bangla text-[14px] text-pine-900/65 dark:text-white/60">
+              এই পোস্টটি বর্তমানে পাওয়া যাচ্ছে না বা মুছে ফেলা হয়েছে।
+            </p>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={() => goNavigate('/')}
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-pine-900 dark:bg-[#03EF62] text-canvas dark:text-[#061621] px-4 text-[13.5px] font-semibold"
+              >
+                <ArrowLeft className="size-4" /> হোম ফিডে ফিরুন
+              </button>
+            </div>
+          </section>
+        );
+      }
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2 sm:px-0 mb-3">
+            <button
+              type="button"
+              onClick={() => goNavigate('/')}
+              className="inline-flex items-center justify-center gap-2 rounded-full sm:rounded-xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-canvas-card size-9 sm:size-auto sm:px-3.5 sm:py-2 text-xs font-bold text-slate-800 dark:text-slate-100 hover:border-[#03EF62] hover:text-emerald-700 dark:hover:text-[#03EF62] transition shadow-xs active:scale-95 cursor-pointer"
+            >
+              <ArrowLeft className="size-4 shrink-0" />
+              <span className="hidden sm:inline font-bangla text-[13px]">হোম ফিডে ফিরুন</span>
+            </button>
+          </div>
+          <CommunityPostCard
+            key={foundPost.id}
+            post={foundPost}
+            currentUser={currentUser}
+            onReact={(type) => handleReact('post', foundPost.id, type)}
+            onOpenReactionsBreakdown={() => setRxBreakdown({ targetType: 'post', targetId: foundPost.id })}
+            onSave={() => handleSavePost(foundPost.id)}
+            onComment={(t, pid, rta) => handleCommentPost(foundPost.id, t, pid, rta)}
+            onEditComment={handleEditComment}
+            onDeleteComment={handleDeleteComment}
+            onReactComment={(cid, type) => handleReact('comment', cid, type)}
+            onShare={() => handleShare(foundPost.content)}
+            onNavigateProfile={navigateToProfile}
+            onOpenPhoto={(imgs, idx, t, an, ai) => openPhotoPopup(imgs, idx, t, undefined, an, ai)}
+          />
+        </div>
       );
     }
 

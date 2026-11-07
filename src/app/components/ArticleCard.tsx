@@ -5,6 +5,7 @@ import type { Article, LinkedInReactionType, UserProfile } from '../types';
 import { ImageGraphic } from './ImageGraphic';
 import { Avatar, FEED_CARD, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
+import { SharePopoverButton } from './ShareModal';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 interface Props {
@@ -218,14 +219,18 @@ export function ArticleCard({
             </span>
           )}
         </button>
-        <button
-          type="button"
-          onClick={onShare}
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+        <SharePopoverButton
+          title={a.title}
+          url={`/article/${a.slug || a.id}`}
         >
-          <Share2 className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
-          <span className="truncate">Share</span>
-        </button>
+          <button
+            type="button"
+            className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          >
+            <Share2 className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
+            <span className="truncate">Share</span>
+          </button>
+        </SharePopoverButton>
         <button
           type="button"
           onClick={onBookmark}

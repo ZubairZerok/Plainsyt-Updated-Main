@@ -1019,13 +1019,36 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       }
       return a;
     });
-    const finalPosts = (posts.length > 0 ? posts : local.posts).filter(
-      (p) =>
-        p.id !== 'post-zubair-1' &&
-        !p.id.toLowerCase().includes('dummy') &&
-        !p.id.toLowerCase().includes('seed') &&
-        !p.content.toLowerCase().includes('dummy'),
-    );
+    const rawPosts = posts.length > 0 ? posts : local.posts;
+    const finalPosts = rawPosts
+      .filter(
+        (p) =>
+          p.id !== 'post-zubair-1' &&
+          !p.id.toLowerCase().includes('dummy') &&
+          !p.id.toLowerCase().includes('seed') &&
+          !p.content.toLowerCase().includes('dummy'),
+      )
+      .map((p) => {
+        const postComments = finalComments.filter((c) => c.targetType === 'post' && c.targetId === p.id);
+        const postReacts = finalReactions.filter((rx) => rx.targetType === 'post' && rx.targetId === p.id);
+        const counts = { ...(p.reactionCounts ?? {}) };
+        for (const rx of postReacts) {
+          counts[rx.type] = Math.max(counts[rx.type] || 0, postReacts.filter((x) => x.type === rx.type).length);
+        }
+        const userRx = currentUserId ? (postReacts.find((rx) => rx.userId === currentUserId)?.type ?? p.userReaction) : p.userReaction;
+        const totalComments = postComments.length > 0 ? postComments : (p.comments || []);
+        return {
+          ...p,
+          comments: totalComments,
+          stats: {
+            ...p.stats,
+            commentsCount: totalComments.length,
+          },
+          reactionCounts: counts,
+          userReaction: userRx,
+          userLiked: Boolean(userRx),
+        };
+      });
 
     // Filter out removed events and stories
     const cleanEvents = (events.length > 0 ? events : local.events).filter(
@@ -1224,17 +1247,12 @@ export async function dbInsertComment(comment: Comment) {
       timestamp_label: comment.timestamp || 'এখন',
       likes: comment.likes ?? 0,
       reaction_counts: comment.reactionCounts ?? {},
+      parent_id: comment.parentId || null,
     };
     const { error } = await supabase.from('comments').upsert(row);
     if (error && error.code === '42703') {
-      await supabase.from('comments').upsert({
-        id: comment.id,
-        target_type: comment.targetType ?? 'article',
-        target_id: comment.targetId ?? '',
-        author_id: comment.authorId,
-        author: comment.author,
-        text: comment.text,
-      });
+      delete row.parent_id;
+      await supabase.from('comments').upsert(row);
     }
   } catch {
     // local-first fallback
