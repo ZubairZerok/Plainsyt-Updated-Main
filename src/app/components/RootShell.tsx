@@ -10,7 +10,7 @@ import {
   dbUpsertProfile, dbUpsertArticle, dbUpsertPost, dbInsertComment, dbUpdateComment, dbDeleteComment, dbSetReaction,
   dbUpsertReel, dbUpsertStory, dbUpsertProduct, dbInsertOrder, dbUpsertEvent,
   dbUpsertResearchPaper, dbUpsertIdea, dbDeletePost, dbDeleteArticle, dbDeleteStory,
-  dbUpdateNotificationRead, dbDeleteNotification, dbMarkAllNotificationsRead, dbInsertNotification, dbToggleFollow,
+  dbUpdateNotificationRead, dbDeleteNotification, dbMarkAllNotificationsRead, dbInsertNotification, dbToggleFollow, dbToggleBookmark,
   type DatabaseSnapshot, type SupabaseConnectionStatus,
 } from '../lib/db';
 import type {
@@ -21,7 +21,6 @@ import {
   toggleBookmarkId, appendArticleComment, appendPostComment, makeComment, toBengaliNumerals,
 } from '../utils/pureLogic';
 import { Header, LAYOUT_GRID, FEED_WIDTH, type View } from './Header';
-import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { CentralFeed } from './CentralFeed';
 import { FacebookCreatePostModal } from './FacebookCreatePostModal';
@@ -795,10 +794,13 @@ export function RootShell() {
         return;
       }
       const was = (snap.bookmarkedArticleIds ?? []).includes(articleId);
+      const nextBookmarks = toggleBookmarkId(snap.bookmarkedArticleIds, articleId);
       commit((prev) => ({
         ...prev,
-        bookmarkedArticleIds: toggleBookmarkId(prev.bookmarkedArticleIds, articleId),
+        bookmarkedArticleIds: nextBookmarks,
       }));
+      dbToggleBookmark(currentUser.id, 'article', articleId, !was);
+      toast(was ? 'প্রবন্ধটি বুকমার্ক থেকে সরানো হয়েছে' : 'প্রবন্ধটি সফলভাবে বুকমার্ক করা হয়েছে', { duration: 1600 });
     },
     [currentUser, snap.bookmarkedArticleIds, commit, requestAuth],
   );
@@ -1130,12 +1132,21 @@ export function RootShell() {
         });
         return;
       }
+      const wasSaved =
+        (snap.savedPostIds ?? []).includes(postId) ||
+        (snap.posts.find((p) => p.id === postId)?.userSaved ?? false);
+      const nextSavedIds = wasSaved
+        ? (snap.savedPostIds ?? []).filter((id) => id !== postId)
+        : [...(snap.savedPostIds ?? []), postId];
       commit((prev) => ({
         ...prev,
-        posts: prev.posts.map((p) => (p.id === postId ? { ...p, userSaved: !p.userSaved } : p)),
+        savedPostIds: nextSavedIds,
+        posts: prev.posts.map((p) => (p.id === postId ? { ...p, userSaved: !wasSaved } : p)),
       }));
+      dbToggleBookmark(currentUser.id, 'post', postId, !wasSaved);
+      toast(wasSaved ? 'পোস্টটি সংরক্ষিত তালিকা থেকে সরানো হয়েছে' : 'পোস্টটি সফলভাবে সংরক্ষণ করা হয়েছে', { duration: 1600 });
     },
-    [currentUser, commit, requestAuth],
+    [currentUser, snap.savedPostIds, snap.posts, commit, requestAuth],
   );
 
   const handleCommentStoryOrReel = useCallback(
@@ -1560,7 +1571,10 @@ export function RootShell() {
     () => (snap.articles ?? []).filter((a) => (snap.bookmarkedArticleIds ?? []).includes(a.id)),
     [snap.articles, snap.bookmarkedArticleIds],
   );
-  const savedPosts = useMemo(() => snap.posts.filter((p) => p.userSaved), [snap.posts]);
+  const savedPosts = useMemo(
+    () => snap.posts.filter((p) => p.userSaved || (snap.savedPostIds ?? []).includes(p.id)),
+    [snap.posts, snap.savedPostIds],
+  );
   const savedCount = savedArticles.length + savedPosts.length;
   const readerArticle = useMemo(
     () =>
@@ -2206,66 +2220,46 @@ export function RootShell() {
       />
 
       {isHomePage ? (
-        <div className="max-w-[1440px] mx-auto px-2 sm:px-4 flex justify-center gap-4 xl:gap-6 relative min-h-[calc(100vh-65px)]">
-          <LeftSidebar
-            currentUser={currentUser}
-            articles={snap.articles}
-            reels={snap.reels}
-            savedCount={savedCount}
-            onOpenSaved={() => setSavedOpen(true)}
-            onOpenReels={() => {
-              if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
-              else setReelUploadOpen(true);
-            }}
-            onOpenProfileSettings={() => setProfileSettingsOpen(true)}
-            onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
-            onNavigate={goNavigate}
-            activePillar={pillar}
-            onPillar={setPillar}
-          />
-
-          <main className="min-w-0 flex-1 max-w-2xl xl:max-w-3xl pb-12 pt-3">
-            {mainContent}
-          </main>
-
-          <RightSidebar
-            articles={snap.articles}
-            events={snap.events}
-            profiles={allKnownProfiles}
-            stories={snap.stories}
-            currentUserId={currentUser?.id || ''}
-            followingIds={snap.followingIds}
-            onToggleEvent={(id) => {
-              commit((prev) => {
-                const nextReg = toggleBookmarkId(prev.eventRegistrations, id);
-                return {
-                  ...prev,
-                  eventRegistrations: nextReg,
-                  events: prev.events.map((e) =>
-                    e.id === id ? { ...e, isRegistered: nextReg.includes(id) } : e,
-                  ),
-                };
-              });
-            }}
-            onOpenRegister={(ev) => setRegistrationEvent(ev)}
-            onToggleFollow={handleToggleFollow}
-            onOpenArticlePopup={handleOpenArticlePopup}
-            onNavigateProfile={navigateToProfile}
-            onNavigate={goNavigate}
-            onOpenStory={(storyId) => {
-              const idx = (snap.stories || []).findIndex((s) => s.id === storyId);
-              if (idx !== -1) {
-                setStoryModal({ stories: snap.stories, initialIndex: idx });
+        <div className="relative w-full min-h-[calc(100vh-65px)]">
+          <div className="max-w-[1240px] xl:max-w-[1300px] 2xl:max-w-[1380px] mx-auto px-3 sm:px-4 md:px-6 flex justify-center gap-6 xl:gap-8 items-start">
+            {/* Left side: Trending & Follow Panel (widened to use space properly) */}
+            <RightSidebar
+              articles={snap.articles}
+              events={snap.events}
+              profiles={allKnownProfiles}
+              currentUserId={currentUser?.id || ''}
+              followingIds={snap.followingIds}
+              onToggleEvent={(id) => {
+                commit((prev) => {
+                  const nextReg = toggleBookmarkId(prev.eventRegistrations, id);
+                  return {
+                    ...prev,
+                    eventRegistrations: nextReg,
+                    events: prev.events.map((e) =>
+                      e.id === id ? { ...e, isRegistered: nextReg.includes(id) } : e,
+                    ),
+                  };
+                });
+              }}
+              onOpenRegister={(ev) => setRegistrationEvent(ev)}
+              onToggleFollow={handleToggleFollow}
+              onOpenArticlePopup={handleOpenArticlePopup}
+              onNavigateProfile={navigateToProfile}
+              onNavigate={goNavigate}
+              onOpenPhoto={(src, title, authorName, authorId) =>
+                openPhotoPopup([src], 0, title, undefined, authorName, authorId)
               }
-            }}
-            onOpenPhoto={(src, title, authorName, authorId) =>
-              openPhotoPopup([src], 0, title, undefined, authorName, authorId)
-            }
-          />
+            />
+
+            {/* Middle: News Feed (widened & perfectly middle-aligned) */}
+            <main className="min-w-0 flex-1 max-w-[760px] xl:max-w-[800px] pb-12 pt-3">
+              {mainContent}
+            </main>
+          </div>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto px-4 min-h-[calc(100vh-65px)]">
-          <main className="min-w-0 pb-12 pt-4">
+        <div className="relative w-full min-h-[calc(100vh-65px)]">
+          <main className="min-w-0 pb-12 pt-4 px-4 max-w-4xl xl:max-w-5xl mx-auto">
             {mainContent}
           </main>
         </div>

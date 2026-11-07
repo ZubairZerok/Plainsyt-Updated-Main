@@ -43,7 +43,7 @@ export function SEOHead({
     };
 
     setMeta('description', pageDesc);
-    setMeta('keywords', 'কৃষি-প্রযুক্তি, এগ্রো-আইওটি, বাংলাদেশ কৃষি বিশ্ববিদ্যালয়, পরমাণু কৃষি, PLAiNSYT, Agritech BD, Bangladesh Agronomy');
+    setMeta('keywords', 'কৃষিপ্রযুক্তি, এগ্রো-আইওটি, বাংলাদেশ কৃষি বিশ্ববিদ্যালয়, পরমাণু কৃষি, PLAiNSYT, Agritech BD, Bangladesh Agronomy');
     setMeta('og:title', pageTitle, true);
     setMeta('og:description', pageDesc, true);
     setMeta('og:image', pageImage, true);

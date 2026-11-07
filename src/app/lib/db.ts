@@ -274,13 +274,17 @@ export function readSnapshot(): DatabaseSnapshot {
         return a;
       });
       // Purge removed seed items and dummy posts from browser cache
+      const savedIds = new Set(parsed.savedPostIds ?? []);
       const cleanPosts = (parsed.posts ?? []).filter(
         (p) =>
           p.id !== 'post-zubair-1' &&
           !p.id.toLowerCase().includes('dummy') &&
           !p.id.toLowerCase().includes('seed') &&
           !p.content.toLowerCase().includes('dummy'),
-      );
+      ).map((p) => ({
+        ...p,
+        userSaved: savedIds.has(p.id) || Boolean(p.userSaved),
+      }));
       const cleanEvents = (parsed.events ?? []).filter(
         (e) => e.id !== 'ev-summit-2026' && e.id !== 'ev-workshop-iot',
       );
@@ -473,7 +477,13 @@ const toPostRow = (p: CommunityPost) => ({
   created_at: p.createdAt ?? new Date().toISOString(),
 });
 
-const fromPostRow = (r: Record<string, unknown>, comments: Comment[], reactions: ReactionRecord[], currentUserId: string): CommunityPost => {
+const fromPostRow = (
+  r: Record<string, unknown>,
+  comments: Comment[],
+  reactions: ReactionRecord[],
+  currentUserId: string,
+  savedPostIds: string[] = [],
+): CommunityPost => {
   const id = String(r.id);
   const postComments = comments.filter((c) => c.targetType === 'post' && c.targetId === id);
   const postReacts = reactions.filter((rx) => rx.targetType === 'post' && rx.targetId === id);
@@ -485,6 +495,7 @@ const fromPostRow = (r: Record<string, unknown>, comments: Comment[], reactions:
   const rawStats = (r.stats as CommunityPost['stats']) ?? { likes: 0, commentsCount: 0, shares: 0 };
   const totalRx = Object.values(counts).reduce((s, v) => s + (v || 0), 0);
   const authorObj = (r.author_json as CommunityPost['author']) ?? { name: 'Author', avatar: 'AU', role: '' };
+  const isSaved = savedPostIds.includes(id);
   return {
     id,
     authorId: String(r.author_id ?? authorObj.id ?? ''),
@@ -503,6 +514,7 @@ const fromPostRow = (r: Record<string, unknown>, comments: Comment[], reactions:
     reactionCounts: counts,
     userReaction: userRx,
     userLiked: !!userRx,
+    userSaved: isSaved,
     comments: postComments,
     textTheme: r.text_theme ? String(r.text_theme) : undefined,
     aiLabel: Boolean(r.ai_label),
@@ -753,6 +765,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       ideasRes,
       notifsRes,
       followsRes,
+      bookmarksRes,
     ] = await Promise.all([
       supabase.from('articles').select('*').order('created_at', { ascending: false }).range(0, limit - 1),
       supabase.from('posts').select('*').order('created_at', { ascending: false }).range(0, limit - 1),
@@ -769,6 +782,9 @@ export async function fetchFromSupabase(limit = 60): Promise<{
         ? supabase.from('notifications').select('*').eq('recipient_id', currentUserId).order('created_at', { ascending: false }).range(0, 30)
         : Promise.resolve({ data: [] } as any),
       supabase.from('follows').select('follower_id, following_id'),
+      currentUserId
+        ? supabase.from('bookmarks').select('*').eq('user_id', currentUserId)
+        : Promise.resolve({ data: [] } as any),
     ]);
 
     const profiles = (probe.data ?? []).map((r) => fromProfileRow(r as Record<string, unknown>));
@@ -847,11 +863,21 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       };
     });
 
+    // Resilient bookmarks merge: keep saved posts and articles across browser refresh & database
+    const remoteBookmarks = ((bookmarksRes?.data ?? []) as Array<Record<string, unknown>>).map((b) => ({
+      targetType: String(b.target_type ?? ''),
+      targetId: String(b.target_id ?? ''),
+    }));
+    const remoteSavedPostIds = remoteBookmarks.filter((b) => b.targetType === 'post').map((b) => b.targetId);
+    const remoteBookmarkedArticleIds = remoteBookmarks.filter((b) => b.targetType === 'article').map((b) => b.targetId);
+    const finalSavedPostIds = Array.from(new Set([...(local.savedPostIds ?? []), ...remoteSavedPostIds]));
+    const finalBookmarkedArticleIds = Array.from(new Set([...(local.bookmarkedArticleIds ?? []), ...remoteBookmarkedArticleIds]));
+
     const articles = (articlesRes.data ?? []).map((r) =>
       fromArticleRow(r as Record<string, unknown>, finalComments, finalReactions, currentUserId),
     );
     const posts = (postsRes.data ?? []).map((r) =>
-      fromPostRow(r as Record<string, unknown>, finalComments, finalReactions, currentUserId),
+      fromPostRow(r as Record<string, unknown>, finalComments, finalReactions, currentUserId, finalSavedPostIds),
     );
     const reels: StoryReel[] = (reelsRes.data ?? []).map((r: Record<string, unknown>) => ({
       id: String(r.id),
@@ -1014,10 +1040,28 @@ export async function fetchFromSupabase(limit = 60): Promise<{
 
     const dummyViews = [1420, 1840, 1240, 980, 820, 760];
     const sanitizedArticles = finalArticles.map((a) => {
-      if (a.stats && dummyViews.includes(a.stats.views)) {
-        return { ...a, stats: { ...a.stats, views: 0 } };
+      const artComments = finalComments.filter((c) => c.targetType === 'article' && c.targetId === a.id);
+      const artReacts = finalReactions.filter((rx) => rx.targetType === 'article' && rx.targetId === a.id);
+      const counts = { ...(a.reactionCounts ?? a.stats?.reactionCounts ?? {}) };
+      for (const rx of artReacts) {
+        counts[rx.type] = Math.max(counts[rx.type] || 0, artReacts.filter((x) => x.type === rx.type).length);
       }
-      return a;
+      const userRx = currentUserId ? (artReacts.find((rx) => rx.userId === currentUserId)?.type ?? a.userReaction) : a.userReaction;
+      const totalComments = artComments.length > 0 ? artComments : (a.comments || []);
+      const totalLikes = Object.values(counts).reduce((sum, val) => sum + (val || 0), 0);
+      return {
+        ...a,
+        comments: totalComments,
+        userReaction: userRx ?? null,
+        userLiked: Boolean(userRx),
+        stats: {
+          ...a.stats,
+          likes: Math.max(a.stats?.likes || 0, totalLikes),
+          commentsCount: totalComments.length,
+          reactionCounts: counts,
+          views: a.stats && dummyViews.includes(a.stats.views) ? 0 : (a.stats?.views || 0),
+        },
+      };
     });
     const rawPosts = posts.length > 0 ? posts : local.posts;
     const finalPosts = rawPosts
@@ -1037,6 +1081,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
         }
         const userRx = currentUserId ? (postReacts.find((rx) => rx.userId === currentUserId)?.type ?? p.userReaction) : p.userReaction;
         const totalComments = postComments.length > 0 ? postComments : (p.comments || []);
+        const isPostSaved = finalSavedPostIds.includes(p.id) || Boolean(p.userSaved);
         return {
           ...p,
           comments: totalComments,
@@ -1047,6 +1092,7 @@ export async function fetchFromSupabase(limit = 60): Promise<{
           reactionCounts: counts,
           userReaction: userRx,
           userLiked: Boolean(userRx),
+          userSaved: isPostSaved,
         };
       });
 
@@ -1178,6 +1224,8 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       })(),
       stories: mergedStories,
       events: cleanEvents,
+      savedPostIds: finalSavedPostIds,
+      bookmarkedArticleIds: finalBookmarkedArticleIds,
       researchPapers: researchPapers.length > 0 ? researchPapers : local.researchPapers,
       storeProducts: storeProducts.length > 0 ? storeProducts : local.storeProducts,
       orders: orders.length > 0 ? orders : local.orders,
@@ -1706,6 +1754,30 @@ export async function dbToggleFollow(followerId: string, followingId: string, is
   }
 }
 
+export async function dbToggleBookmark(
+  userId: string,
+  targetType: 'article' | 'post' | 'reel',
+  targetId: string,
+  isBookmarked: boolean,
+): Promise<void> {
+  if (!userId || !targetId) return;
+  try {
+    if (isBookmarked) {
+      await supabase.from('bookmarks').upsert(
+        { user_id: userId, target_type: targetType, target_id: targetId, created_at: new Date().toISOString() },
+        { onConflict: 'user_id,target_type,target_id' },
+      );
+    } else {
+      await supabase
+        .from('bookmarks')
+        .delete()
+        .match({ user_id: userId, target_type: targetType, target_id: targetId });
+    }
+  } catch (err) {
+    console.warn('Failed to sync bookmark state to Supabase:', err);
+  }
+}
+
 const NEWSLETTER_STORAGE_KEY = 'plainsyt_newsletter_subscribers_v1';
 
 export async function dbSubscribeNewsletter(
@@ -1746,7 +1818,7 @@ export async function dbSubscribeNewsletter(
 
   return {
     success: true,
-    message: 'অভিনন্দন! আপনি সফলভাবে আমাদের সাপ্তাহিক কৃষি-প্রযুক্তি নিউজলেটারে যুক্ত হয়েছেন।',
+    message: 'অভিনন্দন! আপনি সফলভাবে আমাদের সাপ্তাহিক কৃষিপ্রযুক্তি নিউজলেটারে যুক্ত হয়েছেন।',
   };
 }
 

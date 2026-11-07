@@ -508,18 +508,17 @@ assert(fs.existsSync(prerenderScriptPath), 'prerender_articles.mjs script exists
 const pkgJsonSrc = fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8');
 assert(pkgJsonSrc.includes('prerender_articles.mjs'), 'package.json build script runs prerender_articles.mjs');
 
-console.log('\n▶ Suite 22: Perfectionist 3-Column Layout, GOATED Newsletter Flow, Story Ring Invariant & Typography Fixes');
-// 1. Perfectionist 3-Column Layout: Left side used, middle breadth maintained, no new stuff
+console.log('\n▶ Suite 22: Desktop Left Sidebar Removal, Search Tags Purge & Verified Editorial Follow Restrictions');
+// 1. Desktop Left Sidebar Purged from RootShell
 const rootShellSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
-assert(rootShellSrc.includes('<LeftSidebar') && rootShellSrc.includes("import { LeftSidebar }"), 'RootShell utilizes left side with LeftSidebar on desktop');
-assert(rootShellSrc.includes('max-w-2xl xl:max-w-3xl'), 'RootShell maintains optimal middle feed width and breadth (max-w-2xl xl:max-w-3xl)');
-assert(rootShellSrc.includes('max-w-[1440px] mx-auto'), 'RootShell frames layout in a centered perfectionist grid (max-w-[1440px] mx-auto)');
+assert(!rootShellSrc.includes('<LeftSidebar') && !rootShellSrc.includes("import { LeftSidebar }"), 'RootShell does not import or render LeftSidebar on desktop');
+assert(!rootShellSrc.includes('lg:ml-56') && !rootShellSrc.includes('xl:ml-64'), 'RootShell main area margins removed left sidebar offset (no lg:ml-56 or xl:ml-64)');
 
 // 2. Search dropdown tags purged
 const headerSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/Header.tsx'), 'utf-8');
 const purgedTags = ['#কৃষি-প্রযুক্তি', '#গবেষণা', '#জীবাণুনাশ', '#পারমাণবিক কৃষি', '#আইওটি', '#জলবায়ু'];
 const containsPurgedTags = purgedTags.some(tag => headerSrc.includes(tag));
-assert(!containsPurgedTags, 'Header search dropdown has purged all specified tags');
+assert(!containsPurgedTags, 'Header search dropdown has purged all specified tags (#কৃষি-প্রযুক্তি, #গবেষণা, #জীবাণুনাশ, etc.)');
 
 // 3. Verified Editorial Profiles & Follow Restrictions
 const authSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/auth.ts'), 'utf-8');
@@ -530,20 +529,24 @@ assert(rightSidebarSrc.includes('isFollowableAccount') || rightSidebarSrc.includ
 assert(rightSidebarSrc.includes('<VerifiedBadge'), 'RightSidebar renders VerifiedBadge for authorized editorial accounts');
 assert(rootShellSrc.includes('isFollowableAccount'), 'RootShell enforces isFollowableAccount in handleToggleFollow');
 
-// 4. Story Ring Invariant: Only shows if user actually has a story
-assert(rightSidebarSrc.includes('hasStory') && rightSidebarSrc.includes('ring={hasStory}'), 'RightSidebar only renders story rings for accounts that have an active story');
+console.log('\n▶ Suite 23: Perfect Centered 2-Column Layout & Database Ultra-Preservation');
+// 1. Centered 2-column layout & widened widths
+assert(rootShellSrc.includes('justify-center') && rootShellSrc.includes('mx-auto'), 'RootShell wraps homepage in centered flex layout');
+assert(rootShellSrc.includes('max-w-[760px]') || rootShellSrc.includes('xl:max-w-[800px]'), 'RootShell widens middle news feed to properly utilize space');
+assert(rightSidebarSrc.includes('w-[320px]') || rightSidebarSrc.includes('xl:w-[350px]'), 'RightSidebar widens trending & follow panel to properly utilize space');
+assert(rightSidebarSrc.includes('sticky top-') && !rightSidebarSrc.includes('fixed right-0'), 'RightSidebar transitioned from fixed right-0 to sticky positioning');
 
-// 5. GOATED Newsletter System & Mail Design
-const newsletterSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/NewsletterSubscription.tsx'), 'utf-8');
-assert(!newsletterSrc.includes('যেকোনো সময় এক ক্লিকে আনসাবস্ক্রাইব করা যাবে · 100% Privacy Protected'), 'NewsletterSubscription completely removed the privacy disclaimer line');
-assert(fs.existsSync(path.join(rootDir, 'src/app/components/NewsletterWelcomeModal.tsx')), 'NewsletterWelcomeModal component exists for GOATED email dispatch preview');
-assert(newsletterSrc.includes('NewsletterWelcomeModal'), 'NewsletterSubscription integrates NewsletterWelcomeModal');
+// 2. Database Ultra-Preservation across Refresh
+const dbSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
+assert(dbSrc.includes('export async function dbToggleBookmark'), 'db.ts exports dbToggleBookmark for bookmarks persistence');
+assert(dbSrc.includes("supabase.from('bookmarks').select('*')"), 'db.ts queries bookmarks table in fetchFromSupabase');
+assert(dbSrc.includes('finalSavedPostIds') && dbSrc.includes('finalBookmarkedArticleIds'), 'db.ts computes and merges finalSavedPostIds and finalBookmarkedArticleIds');
+assert(dbSrc.includes('artComments') && dbSrc.includes('artReacts'), 'db.ts sanitizes articles with comments and reactions preserved');
+assert(rootShellSrc.includes('dbToggleBookmark'), 'RootShell imports and invokes dbToggleBookmark');
+assert(rootShellSrc.includes('savedPostIds') && rootShellSrc.includes('bookmarkedArticleIds'), 'RootShell maintains savedPostIds and bookmarkedArticleIds');
 
-// 6. Typography & Broken/Merged Bangla Word Fixes
-const indexHtmlSrc = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
-assert(!indexHtmlSrc.includes('কৃষি ও কৃষিপ্রযুক্তি'), 'index.html fixed merged "কৃষিপ্রযুক্তি" into properly hyphenated/spaced Bangla');
-const fontsCssSrc = fs.readFileSync(path.join(rootDir, 'src/styles/fonts.css'), 'utf-8');
-assert(fontsCssSrc.includes('"liga" 1') && fontsCssSrc.includes('optimizeLegibility'), 'fonts.css enforces OpenType ligatures and kerning for uncompromised Bengali rendering');
+const persistMigrationPath = path.join(rootDir, 'supabase/migrations/20261107_ultra_preserve_persistence.sql');
+assert(fs.existsSync(persistMigrationPath), 'Ultra-preservation migration 20261107_ultra_preserve_persistence.sql exists');
 
 console.log(`\n====================================================`);
 

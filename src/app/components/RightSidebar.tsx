@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 import { MapPin, Users, Check, MessageCircle, Eye, ExternalLink, Calendar } from 'lucide-react';
-import type { Article, UpcomingEvent, UserProfile, TopicStory } from '../types';
+import type { Article, UpcomingEvent, UserProfile } from '../types';
 import { Avatar, CARD, FollowIconButton, Num, SectionLabel, VerifiedBadge, cn } from './Primitives';
 import { SeeAllLink } from './Header';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
-import { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_BAU_PROFILE, isEditorialAuthorized, isZubairIdentifier } from '../lib/auth';
+import { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_BAU_PROFILE, isEditorialAuthorized } from '../lib/auth';
 
 interface Props {
   articles: Article[];
   events: UpcomingEvent[];
   profiles: UserProfile[];
-  stories?: TopicStory[];
   currentUserId: string;
   followingIds: string[];
+  className?: string;
   onToggleEvent: (id: string) => void;
   onOpenRegister?: (event: UpcomingEvent) => void;
   onToggleFollow: (id: string) => void;
@@ -20,7 +20,6 @@ interface Props {
   onNavigateProfile: (userId: string) => void;
   onNavigate: (path: string) => void;
   onOpenPhoto?: (src: string, title?: string, authorName?: string, authorId?: string) => void;
-  onOpenStory?: (storyId: string) => void;
 }
 
 export function TrendingList({
@@ -195,8 +194,10 @@ export function RightSidebar(p: Props) {
 
   return (
     <aside
-      className="hidden lg:block fixed right-0 top-[60px] md:top-[65px] bottom-0 w-68 xl:w-76 z-20 overflow-y-auto no-scrollbar pr-4 pl-3 pt-3.5 pb-6 border-l border-slate-200/70 dark:border-white/5 bg-background transition-colors"
-      style={{ right: 0, marginRight: 0 }}
+      className={cn(
+        'hidden lg:block w-[320px] xl:w-[350px] 2xl:w-[370px] shrink-0 sticky top-[70px] h-[calc(100vh-76px)] overflow-y-auto no-scrollbar pb-8 pt-3 transition-colors',
+        p.className,
+      )}
     >
       <div className="flex flex-col gap-3.5">
         <section className={cn(CARD, 'p-3')}>
@@ -285,32 +286,14 @@ export function RightSidebar(p: Props) {
               <ul className="divide-y divide-slate-100 dark:divide-white/5">
                 {editorialProfiles.map((s) => {
                   const isFollowing = (p.followingIds ?? []).includes(s.id);
-                  const userStory = (p.stories || []).find(
-                    (st) => st.authorId === s.id || (isZubairIdentifier(st.authorId) && isZubairIdentifier(s.id))
-                  );
-                  const hasStory = Boolean(userStory);
-
                   return (
                     <li key={s.id} className="flex items-center gap-2 py-2">
                       <button
                         type="button"
-                        onClick={() => {
-                          if (hasStory && p.onOpenStory && userStory) {
-                            p.onOpenStory(userStory.id);
-                          } else {
-                            p.onNavigateProfile(s.id);
-                          }
-                        }}
+                        onClick={() => p.onNavigateProfile(s.id)}
                         className="shrink-0"
-                        title={hasStory ? `${s.name}-এর স্টোরি দেখুন` : s.name}
                       >
-                        <Avatar
-                          src={s.avatar || 'PS'}
-                          name={s.name}
-                          size="size-7"
-                          ring={hasStory}
-                          className={hasStory ? "ring-2 ring-[#03EF62] ring-offset-1 ring-offset-background cursor-pointer hover:scale-105 transition-transform" : undefined}
-                        />
+                        <Avatar src={s.avatar || 'PS'} name={s.name} size="size-7" ring className="ring-[#03EF62]/50" />
                       </button>
                       <span className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
