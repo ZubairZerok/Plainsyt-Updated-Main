@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, ADMIN_PROFILE, ZUBAIR_PROFILE } from '../lib/auth';
+import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, isZubairIdentifier, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE } from '../lib/auth';
 import {
   readSnapshot, writeSnapshot, fetchFromSupabase, syncLocalToSupabase, mutateSnapshotReaction,
   DEFAULT_SEED_SNAPSHOT,
@@ -152,8 +152,17 @@ export function RootShell() {
           avatar: existingAdmin?.avatar || ADMIN_PROFILE.avatar,
           email: userEmail || ADMIN_PROFILE.email,
         };
-      } else if (alias.canonicalUserId === 'usr-zubair') {
-        const existingZubair = currentProfiles.find((pr) => pr.id === 'usr-zubair') || getStoredAuthUser();
+      } else if (alias.canonicalUserId === 'usr-zubair' || isZubairIdentifier(u.id) || isZubairIdentifier(userEmail)) {
+        const storedAuth = getStoredAuthUser();
+        const existingZubair =
+          currentProfiles.find((pr) => isZubairIdentifier(pr.id) || isZubairIdentifier(pr.email)) ||
+          (storedAuth && isZubairIdentifier(storedAuth.id) ? storedAuth : null);
+        const resolvedAvatar =
+          dbProfile?.avatar && !dbProfile.avatar.includes('unsplash.com') && !dbProfile.avatar.includes('hasan_zubair.png')
+            ? dbProfile.avatar
+            : existingZubair?.avatar && !existingZubair.avatar.includes('unsplash.com') && !existingZubair.avatar.includes('hasan_zubair.png')
+              ? existingZubair.avatar
+              : ZUBAIR_PROFILE.avatar;
         profile = {
           ...ZUBAIR_PROFILE,
           ...existingZubair,
@@ -161,14 +170,19 @@ export function RootShell() {
             ? {
                 name: dbProfile.name || 'Hasan Zubair',
                 nameBn: dbProfile.name_bn || 'হাসান জুবায়ের',
-                avatar: dbProfile.avatar || 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
+                avatar: resolvedAvatar,
                 bio: dbProfile.bio || ZUBAIR_PROFILE.bio,
               }
             : {}),
-          name: existingZubair?.name || 'Hasan Zubair',
-          nameBn: existingZubair?.nameBn || 'হাসান জুবায়ের',
-          avatar: dbProfile?.avatar || existingZubair?.avatar || 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
-          email: userEmail || ZUBAIR_PROFILE.email,
+          id: u.id, // Strictly retain user's live auth UUID (e.g. 55dba730-185d-4c61-bee8-6b9ab22e3703)!
+          name: dbProfile?.name || existingZubair?.name || 'Hasan Zubair',
+          nameBn: dbProfile?.name_bn || existingZubair?.nameBn || 'হাসান জুবায়ের',
+          handle: 'hasanzubair',
+          role: dbProfile?.role || existingZubair?.role || ZUBAIR_PROFILE.role,
+          organization: dbProfile?.organization || existingZubair?.organization || ZUBAIR_PROFILE.organization,
+          avatar: resolvedAvatar,
+          bio: dbProfile?.bio || existingZubair?.bio || ZUBAIR_PROFILE.bio,
+          email: userEmail || existingZubair?.email || ZUBAIR_PROFILE.email,
         };
       } else {
         const existing =
@@ -653,7 +667,6 @@ export function RootShell() {
     if (p.startsWith('/ideas')) return 'ideas';
     if (p.startsWith('/notifications')) return 'notifications';
     if (p.startsWith('/profile')) return 'profile';
-    if (p.startsWith('/me/publications')) return 'publications';
     if (p.startsWith('/me/security')) return 'security';
     return 'home';
   }, [location.pathname]);
@@ -698,9 +711,8 @@ export function RootShell() {
     const handleCopy = () => {
       const selection = window.getSelection()?.toString().trim();
       if (selection) {
-        toast.success('লেখা কপি করা হয়েছে', {
-          description: selection.length > 35 ? `${selection.slice(0, 32)}...` : selection,
-          duration: 1600,
+        toast.success('Copied', {
+          duration: 1500,
         });
       }
     };
@@ -902,6 +914,31 @@ export function RootShell() {
       const clean = newText.trim();
       if (!clean) return;
 
+      // Ownership verification
+      let existingComment: Comment | undefined = snap.comments.find((c) => c.id === commentId);
+      if (!existingComment) {
+        for (const a of snap.articles) {
+          existingComment = a.comments?.find((c) => c.id === commentId);
+          if (existingComment) break;
+        }
+      }
+      if (!existingComment) {
+        for (const p of snap.posts) {
+          existingComment = p.comments?.find((c) => c.id === commentId);
+          if (existingComment) break;
+        }
+      }
+
+      if (existingComment) {
+        const isOwner =
+          existingComment.authorId === currentUser.id ||
+          (isZubairIdentifier(existingComment.authorId) && isZubairIdentifier(currentUser.id));
+        if (!isOwner) {
+          toast.error('আপনি শুধুমাত্র নিজের মন্তব্য সম্পাদনা করতে পারেন');
+          return;
+        }
+      }
+
       commit((prev) => {
         const updateList = (list: Comment[]) =>
           list.map((c) => (c.id === commentId ? { ...c, text: clean, isEdited: true } : c));
@@ -929,12 +966,37 @@ export function RootShell() {
       dbUpdateComment(commentId, clean);
       toast.success('মন্তব্য সফলভাবে আপডেট করা হয়েছে');
     },
-    [commit, currentUser],
+    [commit, currentUser, snap.comments, snap.articles, snap.posts],
   );
 
   const handleDeleteComment = useCallback(
     (commentId: string) => {
       if (!currentUser) return;
+
+      // Ownership verification
+      let existingComment: Comment | undefined = snap.comments.find((c) => c.id === commentId);
+      if (!existingComment) {
+        for (const a of snap.articles) {
+          existingComment = a.comments?.find((c) => c.id === commentId);
+          if (existingComment) break;
+        }
+      }
+      if (!existingComment) {
+        for (const p of snap.posts) {
+          existingComment = p.comments?.find((c) => c.id === commentId);
+          if (existingComment) break;
+        }
+      }
+
+      if (existingComment) {
+        const isOwner =
+          existingComment.authorId === currentUser.id ||
+          (isZubairIdentifier(existingComment.authorId) && isZubairIdentifier(currentUser.id));
+        if (!isOwner) {
+          toast.error('আপনি শুধুমাত্র নিজের মন্তব্য মুছে ফেলতে পারেন');
+          return;
+        }
+      }
 
       commit((prev) => {
         const removeMatching = (list: Comment[]) =>
@@ -970,7 +1032,7 @@ export function RootShell() {
       dbDeleteComment(commentId);
       toast.success('মন্তব্য মুছে ফেলা হয়েছে');
     },
-    [commit, currentUser],
+    [commit, currentUser, snap.comments, snap.articles, snap.posts],
   );
 
   const handleSavePost = useCallback(
@@ -1440,11 +1502,21 @@ export function RootShell() {
     [snap.articles, readerId],
   );
 
-  // Comprehensive directory of all platform profiles (seed + author articles + posts)
+  // Comprehensive directory of all platform profiles (seed + author articles + posts + currentUser)
   const allKnownProfiles = useMemo(() => {
     const map = new Map<string, UserProfile>();
     for (const p of snap.profiles) {
       if (p && p.id) map.set(p.id, p);
+    }
+    if (currentUser && currentUser.id) {
+      map.set(currentUser.id, currentUser);
+    }
+    if (!map.has('usr-zubair')) map.set('usr-zubair', ZUBAIR_PROFILE);
+    if (!map.has('55dba730-185d-4c61-bee8-6b9ab22e3703')) {
+      map.set(
+        '55dba730-185d-4c61-bee8-6b9ab22e3703',
+        currentUser && isZubairIdentifier(currentUser.id) ? currentUser : ZUBAIR_PROD_PROFILE,
+      );
     }
     for (const a of snap.articles) {
       const aid = a.authorId || a.author.id;
@@ -1486,7 +1558,7 @@ export function RootShell() {
       }
     }
     return Array.from(map.values());
-  }, [snap.profiles, snap.articles, snap.posts]);
+  }, [snap.profiles, snap.articles, snap.posts, currentUser]);
 
   // Determine profile target for /profile or /profile/:userId (supports userId, handle, or slug)
   const viewedProfile = useMemo(() => {
@@ -1494,19 +1566,40 @@ export function RootShell() {
     if (!rawTarget) return null;
     const cleanSlug = rawTarget.toLowerCase().replace(/^@/, '');
 
-    // 1. Exact ID or handle match in snap.profiles
+    // 0. If current user is logged in and target matches currentUser (by id, handle, me, or blank):
+    if (
+      currentUser &&
+      (params.userId === 'me' ||
+        !params.userId ||
+        rawTarget === currentUser.id ||
+        rawTarget.toLowerCase() === currentUser.id.toLowerCase() ||
+        (currentUser.handle && cleanSlug === currentUser.handle.toLowerCase()) ||
+        (isZubairIdentifier(rawTarget) && isZubairIdentifier(currentUser.id)))
+    ) {
+      return currentUser;
+    }
+
+    // 1. Direct Zubair identity guarantee (NEVER fall through to raw UUID fallback!)
+    if (isZubairIdentifier(rawTarget) || isZubairIdentifier(cleanSlug)) {
+      const snapZubair = snap.profiles.find((p) => isZubairIdentifier(p.id) || isZubairIdentifier(p.handle));
+      if (snapZubair) return { ...snapZubair, id: rawTarget };
+      if (currentUser && isZubairIdentifier(currentUser.id)) return { ...currentUser, id: rawTarget };
+      return { ...ZUBAIR_PROD_PROFILE, id: rawTarget };
+    }
+
+    // 2. Exact ID or handle match in snap.profiles
     const foundInProfiles = snap.profiles.find(
       (p) => p.id === rawTarget || p.id.toLowerCase() === rawTarget.toLowerCase() || p.handle?.toLowerCase() === cleanSlug
     );
     if (foundInProfiles) return foundInProfiles;
 
-    // 2. Match in allKnownProfiles
+    // 3. Match in allKnownProfiles
     const foundInKnown = allKnownProfiles.find(
       (p) => p.id === rawTarget || p.id.toLowerCase() === rawTarget.toLowerCase() || p.handle?.toLowerCase() === cleanSlug
     );
     if (foundInKnown) return foundInKnown;
 
-    // 3. Synthesize profile from authored articles
+    // 4. Synthesize profile from authored articles
     const fromArt = snap.articles.find(
       (a) => a.authorId === rawTarget || a.author.id === rawTarget || a.author.name?.toLowerCase() === cleanSlug
     );
@@ -1531,7 +1624,7 @@ export function RootShell() {
       };
     }
 
-    // 4. Synthesize profile from authored posts
+    // 5. Synthesize profile from authored posts
     const fromPost = snap.posts.find(
       (p) => p.authorId === rawTarget || p.author.name?.toLowerCase() === cleanSlug || p.author.handle?.toLowerCase() === cleanSlug
     );
@@ -1554,7 +1647,7 @@ export function RootShell() {
       };
     }
 
-    // 5. Fallback user profile so route /profile/:slug never crashes
+    // 6. Fallback user profile so route /profile/:slug never crashes
     return {
       id: rawTarget,
       name: cleanSlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
@@ -1563,7 +1656,7 @@ export function RootShell() {
       role: 'সদস্য',
       organization: 'PLAiNSYT Platform',
       location: 'বাংলাদেশ',
-      bio: 'সদস্য প্রোফাইল',
+      bio: 'PLAiNSYT কমিউনিটি সদস্য।',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
       coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
       isVerified: false,
@@ -1926,22 +2019,7 @@ export function RootShell() {
         );
       }
       case 'publications':
-        return (
-          <PublicationsStudioView
-            currentUser={currentUser}
-            articles={snap.articles ?? []}
-            onOpenWriteArticle={() => {
-              if (!currentUser) {
-                requestAuth('গবেষণা নিবন্ধ লিখতে দয়া করে অ্যাকাউন্টে লগইন করুন।', () => setWriteOpen(true));
-              } else {
-                setWriteOpen(true);
-              }
-            }}
-            onOpenArticlePopup={handleOpenArticlePopup}
-            onNavigate={goNavigate}
-            onNavigateProfile={navigateToProfile}
-          />
-        );
+        return <PublicationsStudioView onNavigate={goNavigate} />;
       case 'security':
         return (
           <AccountSecurityView

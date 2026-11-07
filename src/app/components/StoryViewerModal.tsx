@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import {
   X,
   Heart,
@@ -957,9 +958,10 @@ export function StoryViewerModal({
               itemComments.map((c) => {
                 const canManage = Boolean(
                   currentUser &&
+                    currentUser.id &&
+                    c.authorId &&
                     (currentUser.id === c.authorId ||
-                      currentUser.name === c.author ||
-                      currentUser.role === 'Admin'),
+                      (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
                 );
                 return (
                   <div key={c.id} className="flex items-start gap-2.5">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import { Globe2, MoreHorizontal, MessageCircle, Share2, Send, Bookmark, Bot, ExternalLink } from 'lucide-react';
 import type { CommunityPost, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
@@ -58,9 +59,10 @@ export function CommunityPostCard({
   const canManageComment = (comment: Comment) =>
     Boolean(
       currentUser &&
+        currentUser.id &&
+        comment.authorId &&
         (currentUser.id === comment.authorId ||
-          currentUser.name === comment.author ||
-          currentUser.role === 'Admin'),
+          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(comment.authorId))),
     );
   const long = post.content.length > 260;
   const shown = long && !expanded ? post.content.slice(0, 240).trimEnd() + '…' : post.content;

@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import {
-  ArrowBigUp, ShoppingBag, Lightbulb, Plus, Bell, Settings, ExternalLink, MapPin, Globe2,
+  ArrowBigUp, ShoppingBag, Lightbulb, Plus, Bell, Settings, Edit3, ExternalLink, MapPin, Globe2,
   UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard,
   CheckCheck, Clock, ArrowRight, ArrowUpRight, MessageSquare, AlertTriangle, Filter, LogIn, LogOut,
   ChevronDown, X,
@@ -515,6 +515,8 @@ export function StoreView({
   onNavigateProfile,
   onOpenPhoto,
   onOpenStory,
+  onEditComment,
+  onDeleteComment,
   isLoading,
 }: {
   products: StoreProduct[];
@@ -975,6 +977,8 @@ export function ProfileView({
   onNavigateProfile,
   onOpenPhoto,
   onOpenStory,
+  onEditComment,
+  onDeleteComment,
   isLoading,
   allProfiles = [],
   followingIds = [],
@@ -1163,9 +1167,9 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={onOpenProfileSettings}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition"
                   >
-                    <Settings className="size-3.5" /> সেটিংস
+                    <Edit3 className="size-3.5" /> এডিট
                   </button>
                   {onLogout && (
                     <button

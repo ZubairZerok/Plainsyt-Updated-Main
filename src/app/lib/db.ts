@@ -1,10 +1,13 @@
 import { supabase, BKASH_RECEIVER_NUMBER } from './supabase';
+import { isZubairIdentifier, ZUBAIR_PROD_ID, ZUBAIR_PROD_PROFILE, ADMIN_PROFILE, ZUBAIR_PROFILE } from './auth';
 import type {
   Article, BkashOrder, CartItem, Comment, CommunityIdea, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionRecord, ReactionTargetType, ResearchPaper, StoryReel,
   StoreProduct, TopicStory, UpcomingEvent, UserProfile,
 } from '../types';
 import { applyReactionChange } from '../utils/pureLogic';
+
+export { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, isZubairIdentifier };
 
 export type SupabaseConnectionStatus = 'checking' | 'connected' | 'schema_missing' | 'offline';
 
@@ -42,48 +45,6 @@ export const PURGED_STORY_IDS = new Set([
   'story-zubair-drone-spray-2026',
   'story-bau-summit-2026',
 ]);
-
-export const ADMIN_PROFILE: UserProfile = {
-  id: 'usr-plainsyt-admin',
-  name: 'PLAiNSYT',
-  nameBn: 'প্লেইনসাইট',
-  handle: 'plainsyt',
-  role: 'Admin',
-  organization: 'PLAiNSYT Editorial & Agro-Tech Publishing',
-  location: 'ঢাকা, বাংলাদেশ',
-  bio: 'কৃষি, প্রযুক্তি, গবেষণা ও জ্ঞানভিত্তিক বাংলাদেশের উন্মুক্ত প্রকাশনা প্ল্যাটফর্ম।',
-  avatar: '/logos/icon.png',
-  coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #03EF62 100%)',
-  isVerified: true,
-  focusArea: 'Agro-Tech Editorial & Publishing',
-  website: 'https://plainsyt.org',
-  email: 'plaiinsyt@gmail.com',
-  publicationsCount: 2,
-  followersCount: 0,
-  followingCount: 0,
-  createdAt: '2026-01-01T00:00:00Z',
-};
-
-export const ZUBAIR_PROFILE: UserProfile = {
-  id: 'usr-zubair',
-  name: 'Hasan Zubair',
-  nameBn: 'হাসান জুবায়ের',
-  handle: 'hasanzubair',
-  role: 'Research Fellow',
-  organization: 'Bangladesh Agricultural University (BAU)',
-  location: 'ময়মনসিংহ, বাংলাদেশ',
-  bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
-  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2b3e 55%, #03EF62 100%)',
-  isVerified: true,
-  focusArea: 'Precision Ag & IoT',
-  website: '',
-  email: 'z65gt9@gmail.com',
-  publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
-  createdAt: '2026-02-15T00:00:00Z',
-};
 
 export const BINA_ARTICLE: Article = {
   id: 'art-bina-gamma-2026',
@@ -203,7 +164,7 @@ export const JAPAN_ROBOT_ARTICLE: Article = {
 };
 
 export const DEFAULT_SEED_SNAPSHOT: DatabaseSnapshot = {
-  profiles: [ADMIN_PROFILE, ZUBAIR_PROFILE],
+  profiles: [ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE],
   currentUserId: '',
   articles: [
     JAPAN_ROBOT_ARTICLE,
@@ -329,7 +290,7 @@ export function readSnapshot(): DatabaseSnapshot {
       const mergedStories = userCreatedStories;
 
       const sanitizedProfiles = (parsed.profiles ?? DEFAULT_SEED_SNAPSHOT.profiles).map((p) => {
-        if (p.id === 'usr-zubair' || p.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba' || p.email === 'z65gt9@gmail.com') {
+        if (isZubairIdentifier(p.id) || isZubairIdentifier(p.email) || isZubairIdentifier(p.handle)) {
           const userAvatar =
             p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
               ? p.avatar
@@ -765,6 +726,18 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       return { status: 'offline', snapshot: local, errorMessage: probe.error.message };
     }
 
+    let storedAuthUserId = '';
+    if (typeof window !== 'undefined') {
+      try {
+        const rawAuth = localStorage.getItem('plainsyt_auth_session') || localStorage.getItem('plainsyt_auth_session_v1');
+        if (rawAuth) {
+          const parsed = JSON.parse(rawAuth);
+          if (parsed?.user?.id) storedAuthUserId = parsed.user.id;
+        }
+      } catch {}
+    }
+    const currentUserId = storedAuthUserId || local.currentUserId || '';
+
     // Parallel indexed queries across all tables
     const [
       articlesRes,
@@ -792,22 +765,13 @@ export async function fetchFromSupabase(limit = 60): Promise<{
       supabase.from('store_products').select('*').order('created_at', { ascending: false }).range(0, 60),
       supabase.from('orders').select('*').order('created_at', { ascending: false }).range(0, 50),
       supabase.from('ideas').select('*').order('votes', { ascending: false }).range(0, 50),
-      supabase.from('notifications').select('*').order('created_at', { ascending: false }).range(0, 30),
+      currentUserId
+        ? supabase.from('notifications').select('*').eq('recipient_id', currentUserId).order('created_at', { ascending: false }).range(0, 30)
+        : Promise.resolve({ data: [] } as any),
       supabase.from('follows').select('follower_id, following_id'),
     ]);
 
     const profiles = (probe.data ?? []).map((r) => fromProfileRow(r as Record<string, unknown>));
-    let storedAuthUserId = '';
-    if (typeof window !== 'undefined') {
-      try {
-        const rawAuth = localStorage.getItem('plainsyt_auth_session');
-        if (rawAuth) {
-          const parsed = JSON.parse(rawAuth);
-          if (parsed?.user?.id) storedAuthUserId = parsed.user.id;
-        }
-      } catch {}
-    }
-    const currentUserId = storedAuthUserId || local.currentUserId || '';
 
     const comments: Comment[] = (commentsRes.data ?? []).map((r: Record<string, unknown>) => ({
       id: String(r.id),
@@ -1104,43 +1068,61 @@ export async function fetchFromSupabase(limit = 60): Promise<{
 
     const merged: DatabaseSnapshot = {
       ...local,
-      profiles: (profiles.length > 0 ? profiles : local.profiles).map((p) => {
-        const realFollowers = followersCountMap.has(p.id) ? (followersCountMap.get(p.id) || 0) : Number(p.followersCount ?? 0);
-        const realFollowing = followingCountMap.has(p.id) ? (followingCountMap.get(p.id) || 0) : Number(p.followingCount ?? 0);
+      profiles: (() => {
+        const pMap = new Map<string, UserProfile>();
+        for (const p of DEFAULT_SEED_SNAPSHOT.profiles) {
+          if (p && p.id) pMap.set(p.id, p);
+        }
+        for (const p of profiles) {
+          if (p && p.id) pMap.set(p.id, p);
+        }
+        for (const p of (local.profiles || [])) {
+          if (p && p.id) {
+            const existing = pMap.get(p.id);
+            pMap.set(p.id, existing ? { ...existing, ...p } : p);
+          }
+        }
+        return Array.from(pMap.values()).map((p) => {
+          const realFollowers = followersCountMap.has(p.id) ? (followersCountMap.get(p.id) || 0) : Number(p.followersCount ?? 0);
+          const realFollowing = followingCountMap.has(p.id) ? (followingCountMap.get(p.id) || 0) : Number(p.followingCount ?? 0);
 
-        if (p.id === 'usr-zubair' || p.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba' || p.email === 'z65gt9@gmail.com') {
-          const localZubair = local.profiles.find((lp) => lp.id === 'usr-zubair' || lp.id === '688ac4e8-af95-4458-8623-13b5e1ae41ba');
-          const chosenAvatar =
-            p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
-              ? p.avatar
-              : localZubair?.avatar && !localZubair.avatar.includes('unsplash.com') && !localZubair.avatar.includes('hasan_zubair.png')
-                ? localZubair.avatar
-                : 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c';
+          if (isZubairIdentifier(p.id) || isZubairIdentifier(p.email) || isZubairIdentifier(p.handle)) {
+            const localZubair = (local.profiles || []).find((lp) => isZubairIdentifier(lp.id));
+            const chosenAvatar =
+              p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
+                ? p.avatar
+                : localZubair?.avatar && !localZubair.avatar.includes('unsplash.com') && !localZubair.avatar.includes('hasan_zubair.png')
+                  ? localZubair.avatar
+                  : ZUBAIR_PROFILE.avatar;
+            return {
+              ...p,
+              name: p.name && p.name !== '55dba730 185d 4c61 Bee8 6b9ab22e3703' ? p.name : 'Hasan Zubair',
+              nameBn: p.nameBn && !p.nameBn.includes('55dba730') ? p.nameBn : 'হাসান জুবায়ের',
+              handle: 'hasanzubair',
+              role: p.role && p.role !== 'সদস্য' ? p.role : ZUBAIR_PROFILE.role,
+              organization: p.organization && p.organization !== 'PLAiNSYT Platform' ? p.organization : ZUBAIR_PROFILE.organization,
+              bio: p.bio && !p.bio.includes('সদস্য প্রোফাইল') ? p.bio : ZUBAIR_PROFILE.bio,
+              avatar: chosenAvatar,
+              followersCount: realFollowers,
+              followingCount: realFollowing,
+              publicationsCount: p.publicationsCount || 0,
+            };
+          }
+          if (p.id === 'usr-plainsyt-admin') {
+            return {
+              ...p,
+              followersCount: realFollowers,
+              followingCount: realFollowing,
+              publicationsCount: p.publicationsCount || 2,
+            };
+          }
           return {
             ...p,
-            name: 'Hasan Zubair',
-            nameBn: 'হাসান জুবায়ের',
-            handle: 'hasanzubair',
-            avatar: chosenAvatar,
             followersCount: realFollowers,
             followingCount: realFollowing,
-            publicationsCount: p.publicationsCount || 0,
           };
-        }
-        if (p.id === 'usr-plainsyt-admin') {
-          return {
-            ...p,
-            followersCount: realFollowers,
-            followingCount: realFollowing,
-            publicationsCount: p.publicationsCount || 2,
-          };
-        }
-        return {
-          ...p,
-          followersCount: realFollowers,
-          followingCount: realFollowing,
-        };
-      }),
+        });
+      })(),
       currentUserId: currentUserId || local.currentUserId,
       followingIds: userFollows,
       follows: remoteFollowsList,
@@ -1188,7 +1170,15 @@ export async function dbUpsertProfile(profile: UserProfile) {
     if (!profile.id) return;
     const { data: { session } } = await supabase.auth.getSession();
     const targetId = session?.user?.id || profile.id;
-    await supabase.from('profiles').upsert(toProfileRow({ ...profile, id: targetId }));
+    const row = toProfileRow({ ...profile, id: targetId });
+    const { error: upsertErr } = await supabase.from('profiles').upsert(row);
+    if (upsertErr) {
+      const { error: updateErr } = await supabase.from('profiles').update(row).eq('id', targetId);
+      if (updateErr && (upsertErr.code === '23505' || upsertErr.message?.includes('duplicate key'))) {
+        const fallbackHandle = `${row.handle}_${targetId.slice(0, 4)}`;
+        await supabase.from('profiles').upsert({ ...row, handle: fallbackHandle });
+      }
+    }
   } catch {
     // local-first fallback
   }
@@ -1196,7 +1186,16 @@ export async function dbUpsertProfile(profile: UserProfile) {
 
 export async function dbUpsertArticle(article: Article) {
   try {
-    await supabase.from('articles').upsert(toArticleRow(article));
+    const { data: { session } } = await supabase.auth.getSession();
+    const currentUid = session?.user?.id;
+    const row = toArticleRow(article);
+    if (currentUid && isZubairIdentifier(article.authorId) && isZubairIdentifier(currentUid)) {
+      row.author_id = currentUid;
+    }
+    const { error: insertErr } = await supabase.from('articles').insert(row);
+    if (insertErr && (insertErr.code === '23505' || insertErr.message?.includes('duplicate key'))) {
+      await supabase.from('articles').update(row).eq('id', article.id);
+    }
   } catch {
     // local-first fallback
   }
@@ -1212,7 +1211,8 @@ export async function dbUpsertPost(post: CommunityPost) {
 
 export async function dbInsertComment(comment: Comment) {
   try {
-    await supabase.from('comments').upsert({
+    // Safe insert matching remote database columns
+    const row: Record<string, any> = {
       id: comment.id,
       target_type: comment.targetType ?? 'article',
       target_id: comment.targetId ?? '',
@@ -1221,11 +1221,21 @@ export async function dbInsertComment(comment: Comment) {
       avatar: comment.avatar,
       role: comment.role,
       text: comment.text,
-      timestamp_label: comment.timestamp,
-      likes: comment.likes,
+      timestamp_label: comment.timestamp || 'এখন',
+      likes: comment.likes ?? 0,
       reaction_counts: comment.reactionCounts ?? {},
-      parent_id: comment.parentId ?? null,
-    });
+    };
+    const { error } = await supabase.from('comments').upsert(row);
+    if (error && error.code === '42703') {
+      await supabase.from('comments').upsert({
+        id: comment.id,
+        target_type: comment.targetType ?? 'article',
+        target_id: comment.targetId ?? '',
+        author_id: comment.authorId,
+        author: comment.author,
+        text: comment.text,
+      });
+    }
   } catch {
     // local-first fallback
   }
@@ -1242,7 +1252,6 @@ export async function dbUpdateComment(commentId: string, newText: string) {
 export async function dbDeleteComment(commentId: string) {
   try {
     await supabase.from('comments').delete().eq('id', commentId);
-    await supabase.from('comments').delete().eq('parent_id', commentId);
   } catch {
     // local-first fallback
   }

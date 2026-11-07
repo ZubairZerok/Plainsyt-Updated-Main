@@ -110,9 +110,6 @@ export function AskAIModal({
                 AI কৃষি সহকারী
               </h2>
             </div>
-            <p className="font-mono text-[10px] tracking-wider text-emerald-300/80">
-              BRRI · BARI · SRDI সূত্রভিত্তিক · 24/7
-            </p>
           </div>
           <div className="flex items-center gap-1.5">
             <button
@@ -159,9 +156,6 @@ export function AskAIModal({
                 সংরক্ষণ
               </button>
             </div>
-            <p className="mt-1 text-[10px] text-white/60 font-bangla">
-              কী না থাকলেও ইন-বিল্ট বৈজ্ঞানিক ডাটাবেজ স্বয়ংক্রিয়ভাবে উত্তর দেবে।
-            </p>
           </div>
         )}
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">

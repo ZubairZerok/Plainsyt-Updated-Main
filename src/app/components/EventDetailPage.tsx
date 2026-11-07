@@ -66,7 +66,8 @@ export function EventDetailPage({
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      toast.success('Copied', { duration: 1500 });
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 

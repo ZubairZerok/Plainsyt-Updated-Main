@@ -216,9 +216,9 @@ export function RightSidebar(p: Props) {
                 title="PLAiNSYT Facebook Page"
               >
                 <img
-                  src="https://scontent.fdac181-1.fna.fbcdn.net/v/t39.30808-6/868869490_122115169682436931_6504382327291511656_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeGyFWAf6sNLe-0gQyPSceASMNxdebSY-u4w3F15tJj67lo6571TJcvvKbUYKo02FW6fr-aTcub2GPDiS2H_GU1n&_nc_ohc=NHKvXJuoNL8Q7kNvwEo6mYW&_nc_oc=AdpUqiVQ1_ksWUoIL1PsToHbR6vvmCkW6dInyT0jnGuPJ7tD5S9as2xr81h48Jq_2cU&_nc_zt=23&_nc_ht=scontent.fdac181-1.fna&_nc_gid=YzL8dL2FWkyI6zcoEygoGg&_nc_ss=7b2a8&oh=00_AQRL-c7zWElbtAHUl8yM6pbw-NdAenccSqpRb0PNo2R14w&oe=6AEE126F"
+                  src="/logos/icon.png"
                   alt="PLAiNSYT"
-                  className="size-9 rounded-full object-cover ring-2 ring-[#1877F2]/40 group-hover:ring-[#1877F2] transition"
+                  className="size-9 rounded-full object-cover ring-2 ring-[#1877F2]/40 group-hover:ring-[#1877F2] transition bg-white dark:bg-canvas-card p-0.5"
                 />
                 <span className="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-[#1877F2] text-white ring-1 ring-white dark:ring-[#061621]">
                   <svg className="size-2.5 fill-current" viewBox="0 0 24 24">

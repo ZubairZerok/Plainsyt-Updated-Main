@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import { MessageCircle, Bookmark, Share2, Clock, Send, Eye, ArrowRight, ExternalLink, Calendar } from 'lucide-react';
 import type { Article, LinkedInReactionType, UserProfile } from '../types';
 import { ImageGraphic } from './ImageGraphic';
@@ -54,9 +55,10 @@ export function ArticleCard({
   const canManageComment = (c: Comment) =>
     Boolean(
       currentUser &&
+        currentUser.id &&
+        c.authorId &&
         (currentUser.id === c.authorId ||
-          currentUser.name === c.author ||
-          currentUser.role === 'Admin'),
+          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
     );
   const [showComments, setShowComments] = useState(Boolean(lead));
 

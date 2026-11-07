@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import type { Comment, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar } from './Primitives';
 import { LinkedInReactionPickerButton } from './LinkedInReactionBar';
@@ -29,9 +30,10 @@ export function CommentItem({
 
   const canManage = Boolean(
     currentUser &&
+      currentUser.id &&
+      comment.authorId &&
       (currentUser.id === comment.authorId ||
-        currentUser.name === comment.author ||
-        currentUser.role === 'Admin'),
+        (isZubairIdentifier(currentUser.id) && isZubairIdentifier(comment.authorId))),
   );
 
   const handleSaveEdit = (e: React.FormEvent) => {

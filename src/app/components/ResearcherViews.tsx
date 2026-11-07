@@ -12,7 +12,7 @@ import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, cn } from './Prim
 import { toBengaliNumerals } from '../utils/pureLogic';
 
 /* -------------------------------------------------------------------------- */
-/* 1. PUBLICATIONS & DRAFTS STUDIO VIEW (/me/publications)                    */
+/* RESEARCHER VIEWS                                                           */
 /* -------------------------------------------------------------------------- */
 
 interface PublicationsStudioProps {
@@ -24,13 +24,14 @@ interface PublicationsStudioProps {
   onNavigateProfile?: (userId: string) => void;
 }
 
-export function PublicationsStudioView({
-  currentUser,
-  articles,
-  onOpenWriteArticle,
-  onOpenArticlePopup,
-  onNavigate,
-}: PublicationsStudioProps) {
+export function PublicationsStudioView({ onNavigate }: { onNavigate?: (p: string) => void; [k: string]: any }) {
+  if (typeof window !== 'undefined' && onNavigate) {
+    onNavigate('/feed');
+  }
+  return null;
+}
+
+function _deletedPublicationsView() {
   const [filter, setFilter] = useState<'all' | 'published' | 'review' | 'draft'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -580,8 +581,8 @@ export function ReadingHistoryView({
   const handleCopyCitation = (title: string, author: string, id: string) => {
     const citation = `${author} (2026). "${title}". Plainsyt Scholarly Index. https://plainsyt.com/article/${id}`;
     navigator.clipboard.writeText(citation);
-    toast.success('রেফারেন্স উদ্ধৃতি কপি হয়েছে', {
-      duration: 1600,
+    toast.success('Copied', {
+      duration: 1500,
     });
   };
 

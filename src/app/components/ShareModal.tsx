@@ -47,11 +47,10 @@ export function ShareModal({
         document.body.removeChild(input);
       }
       setCopied(true);
-      toast.success('লিংক কপি করা হয়েছে', {
-        description: payload.title,
-        duration: 2000,
+      toast.success('Copied', {
+        duration: 1500,
       });
-      setTimeout(() => setCopied(false), 2400);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('লিংক কপি করা যায়নি');
     }

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationCap, ShieldCheck, CornerDownRight, ArrowLeft } from 'lucide-react';
 import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
@@ -6,6 +7,7 @@ import { ImageGraphic } from './ImageGraphic';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 import { ArticleReaderSkeleton } from './Skeletons';
+import { RichArticleParagraph } from '../utils/richText';
 
 interface Props {
   article: Article | null;
@@ -50,9 +52,10 @@ export function ArticleReaderContent({
   const canManageComment = (c: Comment) =>
     Boolean(
       currentUser &&
+        currentUser.id &&
+        c.authorId &&
         (currentUser.id === c.authorId ||
-          currentUser.name === c.author ||
-          currentUser.role === 'Admin'),
+          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
     );
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const touchStartY = useRef<number | null>(null);
@@ -246,17 +249,9 @@ export function ArticleReaderContent({
           </aside>
         )}
 
-        <div className="mt-6 space-y-4 font-bangla text-[17px] leading-[1.85] text-slate-800 dark:text-slate-100">
+        <div className="mt-6 space-y-4">
           {a.content.map((para, i) => (
-            <p
-              key={i}
-              className={cn(
-                i === 0 &&
-                  'first-letter:float-left first-letter:mr-2.5 first-letter:font-display first-letter:text-[50px] first-letter:font-bold first-letter:leading-[0.88] first-letter:text-emerald-700 dark:first-letter:text-emerald-400',
-              )}
-            >
-              {para}
-            </p>
+            <RichArticleParagraph key={i} text={para} isFirst={i === 0} />
           ))}
         </div>
 

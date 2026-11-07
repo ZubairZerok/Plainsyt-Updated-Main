@@ -4,8 +4,40 @@ import type { UserProfile } from '../types';
 export const ADMIN_CANONICAL_ID = 'usr-plainsyt-admin';
 export const ADMIN_ALIASES = ['plaiinsyt@gmail.com', 'pl@insyt.bd'] as const;
 export const ZUBAIR_ID = 'usr-zubair';
+export const ZUBAIR_PROD_ID = '55dba730-185d-4c61-bee8-6b9ab22e3703';
 export const ZUBAIR_EMAIL = 'Zubair2001!';
-export const ZUBAIR_ALIASES = ['zubair2001!', 'zubair2001', 'z65gt9@gmail.com', 'zubair2001@gmail.com', 'hasanzubair'] as const;
+export const ZUBAIR_ALIASES = [
+  'zubair2001!',
+  'zubair2001',
+  'z65gt9@gmail.com',
+  'zubair2001@gmail.com',
+  'hasanzubair',
+  '55dba730-185d-4c61-bee8-6b9ab22e3703',
+  '688ac4e8-af95-4458-8623-13b5e1ae41ba',
+  '70e85603-ca08-476a-a73d-98ef214c7dab',
+  '6d8fd586-0225-4754-8013-c4fb2c07de18',
+  'zubair.bau.01@gmail.com',
+  'h.xubaiir@gmail.com',
+] as const;
+
+export function isZubairIdentifier(idOrEmailOrHandle?: string | null): boolean {
+  if (!idOrEmailOrHandle) return false;
+  const val = String(idOrEmailOrHandle).toLowerCase().trim().replace(/^@/, '');
+  return (
+    val === 'usr-zubair' ||
+    val === '55dba730-185d-4c61-bee8-6b9ab22e3703' ||
+    val === '688ac4e8-af95-4458-8623-13b5e1ae41ba' ||
+    val === '70e85603-ca08-476a-a73d-98ef214c7dab' ||
+    val === '6d8fd586-0225-4754-8013-c4fb2c07de18' ||
+    val === 'hasanzubair' ||
+    val === 'zubair2001' ||
+    val === 'zubair2001!' ||
+    val === 'z65gt9@gmail.com' ||
+    val === 'zubair2001@gmail.com' ||
+    val === 'zubair.bau.01@gmail.com' ||
+    val === 'h.xubaiir@gmail.com'
+  );
+}
 
 export const ADMIN_PROFILE: UserProfile = {
   id: ADMIN_CANONICAL_ID,
@@ -43,8 +75,14 @@ export const ZUBAIR_PROFILE: UserProfile = {
   publicationsCount: 0,
   followersCount: 0,
   followingCount: 0,
-  email: 'Zubair2001!',
+  email: 'z65gt9@gmail.com',
   createdAt: '2026-02-01T00:00:00.000Z',
+};
+
+export const ZUBAIR_PROD_PROFILE: UserProfile = {
+  ...ZUBAIR_PROFILE,
+  id: ZUBAIR_PROD_ID,
+  handle: 'hasanzubair',
 };
 
 const AUTH_STORAGE_KEY = 'plainsyt_auth_session_v1';
@@ -55,7 +93,7 @@ export function resolveEmailAlias(rawEmail: string): {
   canonicalUserId: string | null;
   isAdmin: boolean;
 } {
-  const normalized = rawEmail.trim().toLowerCase();
+  const normalized = (rawEmail || '').trim().toLowerCase();
   if (normalized === 'plaiinsyt@gmail.com' || normalized === 'pl@insyt.bd') {
     return {
       normalizedEmail: normalized,
@@ -64,13 +102,7 @@ export function resolveEmailAlias(rawEmail: string): {
       isAdmin: true,
     };
   }
-  if (
-    normalized === 'zubair2001!' ||
-    normalized === 'zubair2001' ||
-    normalized === 'z65gt9@gmail.com' ||
-    normalized === 'zubair2001@gmail.com' ||
-    normalized === 'hasanzubair'
-  ) {
+  if (isZubairIdentifier(normalized)) {
     return {
       normalizedEmail: normalized,
       canonicalEmail: normalized.includes('@') ? normalized : 'z65gt9@gmail.com',

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { isZubairIdentifier } from '../lib/auth';
 import {
   X,
   Heart,
@@ -501,9 +502,10 @@ export function ReelPlayerModal({
                   const likes = (c.likes ?? 0) + (commentLikes[c.id] ?? 0);
                   const canManage = Boolean(
                     currentUser &&
+                      currentUser.id &&
+                      c.authorId &&
                       (currentUser.id === c.authorId ||
-                        currentUser.name === c.author ||
-                        currentUser.role === 'Admin'),
+                        (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
                   );
                   return (
                     <div key={c.id} className="pt-3 first:pt-0 flex items-start gap-2.5">
