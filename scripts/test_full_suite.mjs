@@ -355,9 +355,10 @@ const currentDbSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'u
 assert(!currentDbSrc.includes('followersCount: 386') && !currentDbSrc.includes('followersCount: 1420'), 'db.ts has zero hardcoded fake follower counts');
 assert(currentDbSrc.includes("from('follows').select('follower_id, following_id')"), 'db.ts queries exact relational follows table for genuine dynamic counts');
 
-console.log('\n▶ Suite 14: Procedural Canvas/SVG Splash Screen 1.75x Lime-to-White & reaction-buttons.html Physics');
+console.log('\n▶ Suite 14: Procedural Canvas/SVG Splash Screen 1.00x Lime-to-White & reaction-buttons.html Physics');
 const siteLoaderSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/SiteLoader.tsx'), 'utf-8');
-assert(siteLoaderSrc.includes('speed = 1.75'), 'SiteLoader configures animation speed at 1.75x');
+assert(siteLoaderSrc.includes('speed = 1.00') || siteLoaderSrc.includes('speed = 1.0'), 'SiteLoader configures animation speed at 1.00x (normal speed)');
+assert(siteLoaderSrc.includes('sessionStorage') && siteLoaderSrc.includes('SPLASH_STORAGE_KEY'), 'SiteLoader checks session storage so splash screen appears only on first load and not on refresh');
 assert(siteLoaderSrc.includes("startBgCenter = '#a6f232'") && siteLoaderSrc.includes("endBgCenter = '#ffffff'"), 'SiteLoader configures dynamic Lime-to-White gradient palette');
 assert(siteLoaderSrc.includes('insight hidden in plain sight') && siteLoaderSrc.includes('WORDMARK_PATHS'), 'SiteLoader renders horizontal English.png wordmark lockup');
 

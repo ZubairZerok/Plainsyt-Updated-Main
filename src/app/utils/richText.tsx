@@ -95,3 +95,4 @@ export function RichArticleParagraph({ text, isFirst }: { text: string; isFirst?
     </p>
   );
 }
+

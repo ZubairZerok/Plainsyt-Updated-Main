@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 /**
  * PLAINSYT — Ultra Precision Procedural Splash Screen
  * Exact port of splashscreen.html in 'english-only' mode (Horizontal English.png lockup)
- * Speed: 1.75x
+ * Speed: 1.00x (normal speed)
  * Palette: Lime to White
  */
 
@@ -80,11 +80,26 @@ const AMBIENT_DOTS = [
   { x: 265, y: 125, r: 4.0, t0: 0.0, greenTail: { dx: 65, dy: -18 } },
 ];
 
+const SPLASH_STORAGE_KEY = 'plainsyt_splash_shown';
+
+function shouldShowSplash(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('splash')) return true; // Allows forced preview via ?splash=1
+    // Won't appear every time you refresh; only the first time
+    return !sessionStorage.getItem(SPLASH_STORAGE_KEY);
+  } catch {
+    return false;
+  }
+}
+
 export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [visible, setVisible] = useState(true);
-  const dismissedRef = useRef(false);
+  const [shouldShow] = useState(() => shouldShowSplash());
+  const [visible, setVisible] = useState(() => shouldShow);
+  const dismissedRef = useRef(!shouldShow);
 
   // SVG Elements Refs
   const cameraRigRef = useRef<SVGGElement>(null);
@@ -124,6 +139,17 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
   }, [onComplete]);
 
   useEffect(() => {
+    if (!shouldShow) {
+      onComplete?.();
+      return;
+    }
+
+    try {
+      sessionStorage.setItem(SPLASH_STORAGE_KEY, 'true');
+    } catch {
+      // ignore
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -150,8 +176,8 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
     if (pTraceMainRef.current) pTraceMainRef.current.style.strokeDasharray = `${traceMainLength}`;
     if (pTraceEarlyRef.current) pTraceEarlyRef.current.style.strokeDasharray = `${traceEarlyLength}`;
 
-    // Animation state: speed is 1.75x, duration 4.8s
-    const speed = 1.75;
+    // Animation state: speed is 1.00x (normal speed), duration 4.8s
+    const speed = 1.00;
     const duration = 4.8;
     let time = 0;
     let lastTime = performance.now();
@@ -515,17 +541,17 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
 
     animId = requestAnimationFrame(tick);
 
-    // Safety fallback: auto-dismiss after 3.2s
+    // Safety fallback: auto-dismiss after 5.5s (duration is 4.8s at 1.00x normal speed)
     const safetyTimer = setTimeout(() => {
       dismiss();
-    }, 3200);
+    }, 5500);
 
     return () => {
       cancelAnimationFrame(animId);
       clearTimeout(safetyTimer);
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [dismiss]);
+  }, [dismiss, onComplete, shouldShow]);
 
   if (!visible) return null;
 
