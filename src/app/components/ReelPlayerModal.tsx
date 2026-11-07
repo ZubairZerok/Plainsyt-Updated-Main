@@ -614,11 +614,7 @@ export function ReelPlayerModal({
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
-                                      onDeleteComment?.(c.id);
-                                    }
-                                  }}
+                                  onClick={() => onDeleteComment?.(c.id)}
                                   className="font-bangla text-[11px] font-medium text-rose-400 hover:text-rose-300 transition cursor-pointer"
                                 >
                                   মুছুন
@@ -672,12 +668,8 @@ export function ReelPlayerModal({
                                         {canManageReply && (
                                           <button
                                             type="button"
-                                            onClick={() => {
-                                              if (typeof window !== 'undefined' && window.confirm('রিপ্লাইটি মুছে ফেলবেন?')) {
-                                                onDeleteComment?.(r.id);
-                                              }
-                                            }}
-                                            className="font-bangla text-[10px] text-rose-400 hover:text-rose-300"
+                                            onClick={() => onDeleteComment?.(r.id)}
+                                            className="font-bangla text-[10px] text-rose-400 hover:text-rose-300 transition cursor-pointer"
                                           >
                                             মুছুন
                                           </button>

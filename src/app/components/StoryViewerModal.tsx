@@ -1032,11 +1032,7 @@ export function StoryViewerModal({
                           <span className="text-white/20">·</span>
                           <button
                             type="button"
-                            onClick={() => {
-                              if (typeof window !== 'undefined' && window.confirm('মন্তব্যটি মুছে ফেলবেন?')) {
-                                onDeleteComment?.(c.id);
-                              }
-                            }}
+                            onClick={() => onDeleteComment?.(c.id)}
                             className="text-rose-400 hover:text-rose-300 transition cursor-pointer"
                           >
                             মুছুন

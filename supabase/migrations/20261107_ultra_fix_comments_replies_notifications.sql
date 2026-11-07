@@ -81,3 +81,4 @@ create policy "reactions_modify_all" on public.reactions
 drop policy if exists "reactions_delete_all" on public.reactions;
 create policy "reactions_delete_all" on public.reactions
   for delete using (true);
+

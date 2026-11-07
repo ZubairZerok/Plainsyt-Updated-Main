@@ -396,7 +396,7 @@ export function Header(p: Props) {
         <div className="relative mx-auto flex h-13 max-w-[1440px] items-center justify-between gap-3 px-3 md:h-16 md:px-6">
           {/* Left: Brand Logo (Desktop: Bangla logo NO background; Mobile: Green BD icon) */}
           <div className="flex items-center gap-3">
-            <PlainsytLogo onNavigateHome={() => p.onNavigate('/')} />
+            <PlainsytLogo onNavigateHome={() => p.onNavigate('/')} className="plainsyt-nav-logo" />
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
@@ -460,31 +460,33 @@ export function Header(p: Props) {
                 >
                   <Sparkles className="size-[18px]" />
                 </button>
-                <button
-                  type="button"
-                  onClick={p.onOpenCart}
-                  aria-label="Cart Drawer"
-                  title="Shopping Cart & Checkout"
-                  className={iconBtn}
-                >
-                  <ShoppingBag className="size-[18px]" />
-                  {p.cartCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
-                      {p.cartCount}
-                    </span>
-                  )}
-                </button>
+                {/* Saved Posts Button: Visible in mobile view top nav (replaces cart) and desktop */}
                 <button
                   type="button"
                   onClick={p.onOpenSaved}
-                  aria-label="Saved articles"
-                  title="সংরক্ষিত তালিকা"
-                  className={cn(iconBtn, 'hidden sm:flex')}
+                  aria-label="Saved posts"
+                  title="সংরক্ষিত পোস্ট"
+                  className={iconBtn}
                 >
                   <Bookmark className="size-[18px]" />
                   {p.savedCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.savedCount}
+                    </span>
+                  )}
+                </button>
+                {/* Cart Drawer: Desktop view only (hidden on mobile top nav) */}
+                <button
+                  type="button"
+                  onClick={p.onOpenCart}
+                  aria-label="Cart Drawer"
+                  title="Shopping Cart & Checkout"
+                  className={cn(iconBtn, 'hidden sm:flex')}
+                >
+                  <ShoppingBag className="size-[18px]" />
+                  {p.cartCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
+                      {p.cartCount}
                     </span>
                   )}
                 </button>
@@ -575,7 +577,7 @@ export function Header(p: Props) {
           />
           <div
             className={cn(
-              'z-50 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#071f2d]/95 backdrop-blur-xl p-3 shadow-2xl font-bangla transition-all duration-150',
+              'user-pfp-dropdown z-50 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#071f2d]/95 backdrop-blur-xl p-3 shadow-2xl font-bangla transition-all duration-150',
               // Mobile: anchored right above bottom nav bar
               'fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom)+8px)] left-2.5 right-2.5 sm:left-auto sm:right-3 sm:w-82 max-h-[calc(100vh-5rem)] overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-2',
               // Desktop: positioned right below top avatar
@@ -590,10 +592,10 @@ export function Header(p: Props) {
                 <p className="font-sans text-sm font-bold text-slate-900 dark:text-white truncate">
                   {p.currentUser.name}
                 </p>
-                <p className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 truncate">
+                <p className="font-mono text-[11px] text-emerald-600 dark:text-[#03EF62] truncate">
                   @{p.currentUser.handle || 'user'}
                 </p>
-                <span className="inline-block mt-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 font-sans text-[10px] font-semibold text-emerald-800 dark:text-emerald-300">
+                <span className="inline-block mt-0.5 rounded-full bg-emerald-100 dark:bg-[#03EF62]/20 px-2 py-0.5 font-sans text-[10px] font-semibold text-emerald-800 dark:text-[#03EF62]">
                   {p.currentUser.role || 'গবেষক'}
                 </span>
               </div>
@@ -610,12 +612,12 @@ export function Header(p: Props) {
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#03EF62]/15 text-emerald-600 dark:text-[#03EF62]">
                     <User className="size-4" />
                   </span>
                   <span className="truncate">আমার পাবলিক প্রোফাইল</span>
                 </div>
-                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
               </button>
 
               {/* 2. Account Security & Devices */}
@@ -628,12 +630,12 @@ export function Header(p: Props) {
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#03EF62]/15 text-emerald-600 dark:text-[#03EF62]">
                     <ShieldCheck className="size-4" />
                   </span>
                   <span className="truncate">সিকিউরিটি ও ডিভাইস</span>
                 </div>
-                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                <span className="rounded-md bg-emerald-100 dark:bg-[#03EF62]/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#03EF62]">
                   Verified
                 </span>
               </button>
@@ -648,12 +650,12 @@ export function Header(p: Props) {
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#03EF62]/15 text-emerald-600 dark:text-[#03EF62]">
                     <ShoppingBag className="size-4" />
                   </span>
                   <span className="truncate">কৃষি বাজার ও স্টোর</span>
                 </div>
-                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
               </button>
 
               {/* 7. Innovation Ideas Board */}
@@ -666,12 +668,12 @@ export function Header(p: Props) {
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-[#03EF62]/15 text-amber-600 dark:text-[#03EF62]">
                     <Lightbulb className="size-4" />
                   </span>
                   <span className="truncate">উদ্ভাবনী আইডিয়া</span>
                 </div>
-                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition" />
+                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
               </button>
 
               {/* Divider */}
@@ -691,7 +693,7 @@ export function Header(p: Props) {
                 className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#03EF62]/15 text-slate-700 dark:text-[#03EF62]">
                     <Settings className="size-4" />
                   </span>
                   <span className="truncate">প্রোফাইল সেটিংস ও এডিট</span>
@@ -710,7 +712,7 @@ export function Header(p: Props) {
                   }}
                   className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
                 >
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-rose-50 dark:bg-[#03EF62]/15 text-rose-600 dark:text-[#03EF62]">
                     <LogOut className="size-4" />
                   </span>
                   <span>সাইন আউট (Log Out)</span>

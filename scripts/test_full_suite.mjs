@@ -474,6 +474,29 @@ assert(!wranglerContent.includes('pages_build_output_dir'), 'wrangler.jsonc purg
 assert(fs.existsSync(path.join(rootDir, '.nvmrc')), 'Cloudflare .nvmrc specifies Node 22 LTS');
 assert(fs.existsSync(path.join(rootDir, '.node-version')), 'Cloudflare .node-version specifies Node 22.11 LTS');
 
+console.log('\n▶ Suite 20: Dark Mode Navbar Logo, Black Selection, Mobile Saved Post, PFP Lime Dropdown & Delete Comment Alert Modal');
+const themeCss = fs.readFileSync(path.join(rootDir, 'src/styles/theme.css'), 'utf-8');
+assert(themeCss.includes('color: #000000 !important') && themeCss.includes('::selection'), 'Selected text font color is strictly #000000');
+assert(themeCss.includes('filter: brightness(0)') && themeCss.includes('html.dark header'), 'Dark mode navbar logo color is black via brightness(0)');
+assert(themeCss.includes('.user-pfp-dropdown svg') && themeCss.includes('#03EF62'), 'Profile picture dropdown icons in dark mode are lime #03EF62');
+
+const headerCode = fs.readFileSync(path.join(rootDir, 'src/app/components/Header.tsx'), 'utf-8');
+assert(headerCode.includes('aria-label="Saved posts"') && headerCode.includes('className={iconBtn}'), 'Header mobile view top nav renders Saved Post button');
+assert(headerCode.includes('user-pfp-dropdown'), 'Header profile menu contains user-pfp-dropdown class');
+
+const deleteModalPath = path.join(rootDir, 'src/app/components/DeleteCommentAlertModal.tsx');
+assert(fs.existsSync(deleteModalPath), 'DeleteCommentAlertModal component exists');
+const deleteModalCode = fs.readFileSync(deleteModalPath, 'utf-8');
+assert(deleteModalCode.includes('DeleteCommentAlertModal') && deleteModalCode.includes('মুছে ফেলুন'), 'DeleteCommentAlertModal renders Bengali confirmation modal');
+
+const rootShellCode = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
+assert(rootShellCode.includes('DeleteCommentAlertModal') && rootShellCode.includes('pendingDeleteCommentId'), 'RootShell integrates DeleteCommentAlertModal with pendingDeleteCommentId state');
+
+const commCardCode = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
+const artCardCode = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
+const reelModalCode = fs.readFileSync(path.join(rootDir, 'src/app/components/ReelPlayerModal.tsx'), 'utf-8');
+assert(!commCardCode.includes('window.confirm') && !artCardCode.includes('window.confirm') && !reelModalCode.includes('window.confirm'), 'window.confirm completely eliminated from comment deletion flows');
+
 
 
 

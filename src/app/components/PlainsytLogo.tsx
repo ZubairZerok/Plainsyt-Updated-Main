@@ -65,17 +65,17 @@ export function PlainsytLogo({
     <a
       href="/"
       onClick={handleClick}
-      className={cn('inline-flex items-center focus:outline-none transition-transform hover:opacity-95 active:scale-95', className)}
+      className={cn('inline-flex items-center focus:outline-none transition-transform hover:opacity-95 active:scale-95 plainsyt-nav-logo dark:brightness-0 [html.dark_&]:brightness-0 transition-[filter]', className)}
       aria-label="Plainsyt Home"
     >
       {/* Mobile view: full Plainsyt text english logo */}
       <div className="flex items-center md:hidden">
-        <PlainsytWordmark lang="en" className="h-7 w-auto select-none" />
+        <PlainsytWordmark lang="en" className="h-7 w-auto select-none dark:brightness-0 [html.dark_&]:brightness-0 transition-[filter]" />
       </div>
 
       {/* Desktop view: Plainsyt English Logo */}
       <div className="hidden md:flex items-center">
-        <PlainsytWordmark lang="en" className="h-8 lg:h-9 select-none" />
+        <PlainsytWordmark lang="en" className="h-8 lg:h-9 select-none dark:brightness-0 [html.dark_&]:brightness-0 transition-[filter]" />
       </div>
     </a>
   );

@@ -1,13 +1,40 @@
 @custom-variant dark (&:is(.dark *));
 
-::selection {
+::selection,
+*::selection {
   background-color: #03EF62 !important;
-  color: #ffffff !important;
+  color: #000000 !important;
 }
 
-::-moz-selection {
+::-moz-selection,
+*::-moz-selection {
   background-color: #03EF62 !important;
-  color: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.dark ::selection,
+html.dark *::selection {
+  background-color: #03EF62 !important;
+  color: #000000 !important;
+}
+
+html.dark ::-moz-selection,
+html.dark *::-moz-selection {
+  background-color: #03EF62 !important;
+  color: #000000 !important;
+}
+
+/* Navbar logo color in Dark Mode: black */
+html.dark header [aria-label="Plainsyt Home"] img,
+html.dark header .plainsyt-nav-logo img,
+html.dark header .plainsyt-nav-logo {
+  filter: brightness(0) !important;
+}
+
+/* In dark mode, all profile picture dropdown icons rendered in lime color */
+html.dark .user-pfp-dropdown svg,
+html.dark .user-pfp-dropdown span svg {
+  color: #03EF62 !important;
 }
 
 :root {
@@ -311,11 +338,6 @@ button.text-white svg.lucide,
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-  }
-
-  ::selection {
-    background: var(--pine-200);
-    color: var(--pine-950);
   }
 
   * {

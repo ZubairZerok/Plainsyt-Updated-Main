@@ -52,9 +52,7 @@ export function CommentItem({
   };
 
   const handleDelete = () => {
-    if (typeof window !== 'undefined' && window.confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')) {
-      onDeleteComment?.(comment.id);
-    }
+    onDeleteComment?.(comment.id);
   };
 
   return (

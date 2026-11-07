@@ -513,11 +513,7 @@ export function ArticleReaderContent({
                             <span className="text-slate-300 dark:text-white/20 select-none">·</span>
                             <button
                               type="button"
-                              onClick={() => {
-                                if (typeof window !== 'undefined' && window.confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')) {
-                                  onDeleteComment?.(c.id);
-                                }
-                              }}
+                              onClick={() => onDeleteComment?.(c.id)}
                               className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
                               title="মন্তব্য মুছে ফেলুন"
                             >
@@ -671,11 +667,7 @@ export function ArticleReaderContent({
                                       <span className="text-slate-300 dark:text-white/20 select-none">·</span>
                                       <button
                                         type="button"
-                                        onClick={() => {
-                                          if (typeof window !== 'undefined' && window.confirm('আপনি কি এই মন্তব্যটি মুছে ফেলতে চান?')) {
-                                            onDeleteComment?.(r.id);
-                                          }
-                                        }}
+                                        onClick={() => onDeleteComment?.(r.id)}
                                         className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
                                         title="মন্তব্য মুছে ফেলুন"
                                       >

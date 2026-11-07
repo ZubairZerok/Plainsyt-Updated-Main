@@ -38,6 +38,7 @@ import {
 } from './ResearcherViews';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
 import { ShareModal, type SharePayload } from './ShareModal';
+import { DeleteCommentAlertModal } from './DeleteCommentAlertModal';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
 import { BkashCheckoutModal, CreateProductModal } from './BkashCheckoutModal';
 import { ReactionBreakdownModal } from './LinkedInReactionBar';
@@ -1059,6 +1060,8 @@ export function RootShell() {
     [commit, currentUser, snap.comments, snap.articles, snap.posts],
   );
 
+  const [pendingDeleteCommentId, setPendingDeleteCommentId] = useState<string | null>(null);
+
   const handleDeleteComment = useCallback(
     (commentId: string) => {
       if (!currentUser) return;
@@ -1088,42 +1091,66 @@ export function RootShell() {
         }
       }
 
-      commit((prev) => {
-        const removeMatching = (list: Comment[]) =>
-          list.filter((c) => c.id !== commentId && c.parentId !== commentId);
+      // Trigger custom delete comment alert modal
+      setPendingDeleteCommentId(commentId);
+    },
+    [currentUser, snap.comments, snap.articles, snap.posts],
+  );
 
-        const articles = prev.articles.map((a) => {
-          const filtered = removeMatching(a.comments);
-          return {
-            ...a,
-            comments: filtered,
-            stats: { ...a.stats, commentsCount: filtered.length },
-          };
-        });
+  const handleConfirmDeleteComment = useCallback(() => {
+    if (!pendingDeleteCommentId || !currentUser) return;
+    const commentId = pendingDeleteCommentId;
+    setPendingDeleteCommentId(null);
 
-        const posts = prev.posts.map((p) => {
-          const filtered = removeMatching(p.comments);
-          return {
-            ...p,
-            comments: filtered,
-          };
-        });
+    commit((prev) => {
+      const removeMatching = (list: Comment[]) =>
+        list.filter((c) => c.id !== commentId && c.parentId !== commentId);
 
-        const comments = removeMatching(prev.comments);
-
+      const articles = prev.articles.map((a) => {
+        const filtered = removeMatching(a.comments);
         return {
-          ...prev,
-          comments,
-          articles,
-          posts,
+          ...a,
+          comments: filtered,
+          stats: { ...a.stats, commentsCount: filtered.length },
         };
       });
 
-      dbDeleteComment(commentId);
-      toast.success('মন্তব্য মুছে ফেলা হয়েছে');
-    },
-    [commit, currentUser, snap.comments, snap.articles, snap.posts],
-  );
+      const posts = prev.posts.map((p) => {
+        const filtered = removeMatching(p.comments);
+        return {
+          ...p,
+          comments: filtered,
+        };
+      });
+
+      const comments = removeMatching(prev.comments);
+
+      return {
+        ...prev,
+        comments,
+        articles,
+        posts,
+      };
+    });
+
+    dbDeleteComment(commentId);
+    toast.success('মন্তব্য মুছে ফেলা হয়েছে');
+  }, [commit, currentUser, pendingDeleteCommentId]);
+
+  const isPendingCommentReply = useMemo(() => {
+    if (!pendingDeleteCommentId) return false;
+    const found = snap.comments.find((c) => c.id === pendingDeleteCommentId);
+    if (found?.parent_id || found?.parentId) return true;
+    for (const a of snap.articles) {
+      const fc = a.comments?.find((c) => c.id === pendingDeleteCommentId);
+      if (fc?.parent_id || fc?.parentId) return true;
+    }
+    for (const p of snap.posts) {
+      const fc = p.comments?.find((c) => c.id === pendingDeleteCommentId);
+      if (fc?.parent_id || fc?.parentId) return true;
+    }
+    return false;
+  }, [pendingDeleteCommentId, snap.comments, snap.articles, snap.posts]);
 
   const handleSavePost = useCallback(
     (postId: string) => {
@@ -2568,6 +2595,13 @@ export function RootShell() {
           })
         }
         onSuccess={handleAuthSuccess}
+      />
+
+      <DeleteCommentAlertModal
+        isOpen={Boolean(pendingDeleteCommentId)}
+        isReply={isPendingCommentReply}
+        onClose={() => setPendingDeleteCommentId(null)}
+        onConfirm={handleConfirmDeleteComment}
       />
 
       <Toaster
