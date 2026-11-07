@@ -1,5 +1,5 @@
 import { supabase, BKASH_RECEIVER_NUMBER } from './supabase';
-import { isZubairIdentifier, ZUBAIR_PROD_ID, ZUBAIR_PROD_PROFILE, ADMIN_PROFILE, ZUBAIR_PROFILE } from './auth';
+import { isZubairIdentifier, ZUBAIR_PROD_ID, ZUBAIR_PROD_PROFILE, ADMIN_PROFILE, ZUBAIR_PROFILE, HASAN_ZUBAIR_AVATAR } from './auth';
 import type {
   Article, BkashOrder, CartItem, Comment, CommunityIdea, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionRecord, ReactionTargetType, ResearchPaper, StoryReel,
@@ -294,7 +294,7 @@ export function readSnapshot(): DatabaseSnapshot {
           const userAvatar =
             p.avatar && !p.avatar.includes('unsplash.com') && !p.avatar.includes('hasan_zubair.png')
               ? p.avatar
-              : 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c';
+              : HASAN_ZUBAIR_AVATAR;
           return {
             ...p,
             name: 'Hasan Zubair',
@@ -1694,4 +1694,80 @@ export async function dbToggleFollow(followerId: string, followingId: string, is
   } catch (err) {
     console.warn('Failed to sync follow state to Supabase:', err);
   }
+}
+
+const NEWSLETTER_STORAGE_KEY = 'plainsyt_newsletter_subscribers_v1';
+
+export async function dbSubscribeNewsletter(
+  email: string,
+): Promise<{ success: boolean; message: string }> {
+  const clean = email.trim().toLowerCase();
+  if (!clean || !clean.includes('@')) {
+    return { success: false, message: 'সঠিক ইমেইল ঠিকানা দিন' };
+  }
+
+  // Local storage cache
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(NEWSLETTER_STORAGE_KEY) : null;
+    const list: string[] = raw ? JSON.parse(raw) : [];
+    if (list.includes(clean)) {
+      return { success: true, message: 'আপনি ইতিমধ্যে আমাদের সাপ্তাহিক নিউজলেটারে যুক্ত আছেন!' };
+    }
+    list.unshift(clean);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(NEWSLETTER_STORAGE_KEY, JSON.stringify(list));
+    }
+  } catch (e) {
+    console.warn('Newsletter local cache write error:', e);
+  }
+
+  // Supabase persist
+  try {
+    const { error } = await supabase.from('newsletter_subscribers').upsert(
+      { email: clean, created_at: new Date().toISOString() },
+      { onConflict: 'email' },
+    );
+    if (error && error.code !== '23505') {
+      console.warn('Supabase newsletter insert note:', error.message);
+    }
+  } catch (err) {
+    console.warn('Supabase newsletter connection note:', err);
+  }
+
+  return {
+    success: true,
+    message: 'অভিনন্দন! আপনি সফলভাবে আমাদের সাপ্তাহিক কৃষিপ্রযুক্তি নিউজলেটারে যুক্ত হয়েছেন।',
+  };
+}
+
+export async function dbGetNewsletterSubscribers(): Promise<Array<{ email: string; createdAt: string }>> {
+  try {
+    const { data, error } = await supabase
+      .from('newsletter_subscribers')
+      .select('email, created_at')
+      .order('created_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      return data.map((r) => ({
+        email: r.email,
+        createdAt: r.created_at || new Date().toISOString(),
+      }));
+    }
+  } catch {
+    // fallback
+  }
+
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(NEWSLETTER_STORAGE_KEY) : null;
+    if (raw) {
+      const list: string[] = JSON.parse(raw);
+      return list.map((email) => ({
+        email,
+        createdAt: new Date().toISOString(),
+      }));
+    }
+  } catch {
+    // ignore
+  }
+
+  return [];
 }

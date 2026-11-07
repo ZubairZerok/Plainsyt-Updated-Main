@@ -25,6 +25,7 @@ import {
   ProfilePageSkeleton,
 } from './Skeletons';
 import { toBengaliNumerals } from '../utils/pureLogic';
+import { canCreateStory } from '../lib/auth';
 
 function ViewHeader({
   kicker,
@@ -505,249 +506,12 @@ export function EventsView({
   );
 }
 
-export function StoreView({
-  products,
-  cart,
-  ordersCount,
-  onAddToCart,
-  onOpenCheckout,
-  onOpenCreateProduct,
-  onNavigateProfile,
-  onOpenPhoto,
-  onOpenStory,
-  onEditComment,
-  onDeleteComment,
-  isLoading,
-}: {
-  products: StoreProduct[];
-  cart: CartItem[];
-  ordersCount: number;
-  onAddToCart: (product: StoreProduct) => void;
-  onOpenCheckout: () => void;
-  onOpenCreateProduct: () => void;
-  onNavigateProfile: (userId: string) => void;
-  onOpenPhoto: (src: string, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
-  onOpenStory?: (id: string) => void;
-  isLoading?: boolean;
-}) {
-  const totalCartQty = cart.reduce((s, c) => s + c.quantity, 0);
-
-  if (isLoading) {
-    return <StorePageSkeleton />;
-  }
-
-  return (
-    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-      <ViewHeader
-        kicker="বই ও প্রকাশনা"
-        title="প্লেইনসাইট প্রকাশনী ও স্টোর"
-        sub="বিশেষ মুদ্রিত বই, জার্নাল, গবেষণাপত্র ও সংকলন — সহজ অর্ডারে ঘরে বসেই সংগ্রহ করুন।"
-        action={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onOpenCheckout}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955] shadow-xs transition"
-            >
-              <ShoppingBag className="size-4" />
-              কার্ট ({toBengaliNumerals(totalCartQty)})
-            </button>
-          </div>
-        }
-      />
-
-      {products.length === 0 ? (
-        <section className={cn(FEED_CARD, 'p-8 text-center')}>
-          <ShoppingBag className="mx-auto size-10 text-slate-300" />
-          <h2 className="mt-3 font-sans text-lg font-bold text-slate-900">
-            স্টোরে বর্তমানে কোনো পণ্য তালিকাভুক্ত নেই
-          </h2>
-          <p className="mx-auto mt-1 max-w-md font-sans text-xs text-slate-500">
-            নতুন বই ও প্রকাশনা শীঘ্রই স্টোরে যুক্ত করা হবে।
-          </p>
-          {ordersCount > 0 && (
-            <div className="mt-4 flex justify-center">
-              <button
-                type="button"
-                onClick={onOpenCheckout}
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                পূর্ববর্তী অর্ডার রশিদ ({ordersCount})
-              </button>
-            </div>
-          )}
-        </section>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 px-3 sm:gap-4 sm:px-0 md:grid-cols-3">
-          {products.map((s) => {
-            const inCartQty = cart.find((c) => c.productId === s.id)?.quantity ?? 0;
-            return (
-              <div key={s.id} className={cn(CARD, 'flex flex-col overflow-hidden border border-slate-200')}>
-                <div className="relative bg-slate-100">
-                  {s.image ? (
-                    <button
-                      type="button"
-                      onClick={() => onOpenPhoto(s.image, s.name, s.description, s.seller, s.sellerId)}
-                      className="block w-full cursor-zoom-in"
-                    >
-                      <img src={s.image} alt={s.name} className="aspect-[4/3] w-full object-cover" />
-                    </button>
-                  ) : (
-                    <div className="flex aspect-[4/3] w-full items-center justify-center bg-gradient-to-br from-[#061621] to-slate-800 font-display text-lg font-bold text-white">
-                      {s.name.slice(0, 10)}
-                    </div>
-                  )}
-                  <span className="absolute left-2 top-2 rounded bg-white/90 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wide text-slate-800">
-                    {s.tag}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col p-3">
-                  <p className="font-sans text-sm font-semibold leading-snug text-slate-900">{s.name}</p>
-                  {s.description && (
-                    <p className="mt-1 line-clamp-2 font-sans text-xs text-slate-500">
-                      {s.description}
-                    </p>
-                  )}
-                  <div className="mt-auto flex items-end justify-between pt-3">
-                    <p className="font-sans text-base font-bold text-slate-900">
-                      ৳{toBengaliNumerals(s.price.toLocaleString('en-IN'))}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => onAddToCart(s)}
-                      className={cn(
-                        'inline-flex h-7 items-center gap-1 rounded-md px-2.5 text-xs font-semibold transition shadow-xs',
-                        inCartQty > 0
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d955]',
-                      )}
-                    >
-                      <Plus className="size-3" />
-                      {inCartQty > 0 ? `কার্টে (${inCartQty})` : 'যোগ করুন'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
+export function StoreView(_props: any) {
+  return null;
 }
 
-export function IdeasView({
-  ideas,
-  onSubmitIdea,
-  onToggleVote,
-  onNavigateProfile,
-  isLoading,
-}: {
-  ideas: CommunityIdea[];
-  onSubmitIdea: (title: string, body: string, tag: string) => void;
-  onToggleVote: (id: string) => void;
-  onNavigateProfile: (userId: string) => void;
-  isLoading?: boolean;
-}) {
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [tag, setTag] = useState('সাধারণ');
-  const sorted = [...ideas].sort((a, b) => b.votes - a.votes);
-
-  if (isLoading) {
-    return <IdeasPageSkeleton />;
-  }
-
-  return (
-    <div className="flex flex-col gap-5 animate-in fade-in duration-300">
-      <ViewHeader
-        kicker="কমিউনিটি আইডিয়া বোর্ড"
-        title="ভাবনার খাতা"
-        sub="নতুন আইডিয়া, গবেষণার প্রস্তাবনা বা বিষয়ের পরামর্শ দিন এবং সবার মতামত জানুন।"
-      />
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!title.trim()) return;
-          onSubmitIdea(title.trim(), body.trim() || title.trim(), tag.trim() || 'সাধারণ');
-          setTitle('');
-          setBody('');
-        }}
-        className={cn(FEED_CARD, 'space-y-2.5 p-4')}
-      >
-        <div className="flex items-center gap-2">
-          <Lightbulb className="ml-1 size-5 shrink-0 text-amber-500" />
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="আপনার আইডিয়ার শিরোনাম…"
-            className="h-9 flex-1 bg-transparent font-sans text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400"
-          />
-          <input
-            value={tag}
-            onChange={(e) => setTag(e.target.value)}
-            placeholder="ট্যাগ"
-            className="w-24 rounded-md border border-slate-200 bg-white px-2 py-1 font-sans text-xs text-slate-700"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="সংক্ষেপে বিস্তারিত পরিকল্পনা লিখুন…"
-            className="h-9 flex-1 rounded-lg bg-slate-50 px-3 font-sans text-xs text-slate-800 outline-none placeholder:text-slate-400 border border-slate-200"
-          />
-          <button
-            type="submit"
-            disabled={!title.trim()}
-            className="h-9 rounded-md bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955] disabled:opacity-40 transition"
-          >
-            আইডিয়া প্রকাশ করুন
-          </button>
-        </div>
-      </form>
-
-      {sorted.length === 0 ? (
-        <section className={cn(FEED_CARD, 'p-8 text-center font-sans text-sm text-slate-500')}>
-          এখনো কোনো আইডিয়া জমা পড়েনি — আপনার আইডিয়াটি উপরে লিখে প্রথম জমা দিন।
-        </section>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {sorted.map((i) => (
-            <li key={i.id} className={cn(FEED_CARD, 'flex gap-3.5 p-4')}>
-              <button
-                type="button"
-                onClick={() => onToggleVote(i.id)}
-                aria-pressed={i.voted}
-                className={cn(
-                  'flex w-12 shrink-0 flex-col items-center rounded-lg border py-1.5 shadow-xs transition',
-                  i.voted
-                    ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300',
-                )}
-              >
-                <ArrowBigUp className={cn('size-5', i.voted && 'fill-current text-emerald-600')} />
-                <span className="font-bangla text-xs font-bold">{i.votes}</span>
-              </button>
-              <div className="min-w-0">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-slate-400">{i.tag}</span>
-                <p className="font-sans text-base font-semibold leading-snug text-slate-900">{i.title}</p>
-                <p className="mt-0.5 font-sans text-xs text-slate-600">{i.body}</p>
-                <button
-                  type="button"
-                  onClick={() => onNavigateProfile(i.authorId)}
-                  className="mt-1.5 text-[11px] font-semibold text-slate-500 hover:underline"
-                >
-                  লেখক: {i.author}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+export function IdeasView(_props: any) {
+  return null;
 }
 
 export function NotificationsView({
@@ -1029,51 +793,13 @@ export function ProfileView({
   allFollows?: Array<{ followerId: string; followingId: string }>;
   onToggleFollowUser?: (userId: string) => void;
 }) {
-  const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'following' | 'followers' | 'saved' | 'orders'>('articles');
+  const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'saved'>('articles');
   const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile?.id);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     type: 'post' | 'story' | 'article';
     id: string;
     title: string;
   } | null>(null);
-
-  // Real followers list (database-backed, zero hardcoded/fake numbers)
-  const displayedFollowers = useMemo(() => {
-    if (!profile) return [];
-    const directFollowerIds = new Set<string>();
-    for (const f of allFollows) {
-      if (f.followingId === profile.id) {
-        directFollowerIds.add(f.followerId);
-      }
-    }
-    if (!isSelf && currentUser && isFollowing) {
-      directFollowerIds.add(currentUser.id);
-    } else if (!isSelf && currentUser && !isFollowing) {
-      directFollowerIds.delete(currentUser.id);
-    }
-    return (allProfiles || []).filter((p) => p.id !== profile.id && directFollowerIds.has(p.id));
-  }, [allProfiles, profile, allFollows, isSelf, currentUser, isFollowing]);
-
-  // Real following list (database-backed)
-  const displayedFollowing = useMemo(() => {
-    if (!profile) return [];
-    if (isSelf) {
-      return (allProfiles || []).filter((p) => p.id !== profile.id && (followingIds || []).includes(p.id));
-    }
-    const directFollowingIds = new Set<string>();
-    for (const f of allFollows) {
-      if (f.followerId === profile.id) {
-        directFollowingIds.add(f.followingId);
-      }
-    }
-    return (allProfiles || []).filter((p) => p.id !== profile.id && directFollowingIds.has(p.id));
-  }, [allProfiles, profile, isSelf, followingIds, allFollows]);
-
-  const effectiveFollowersCount = displayedFollowers.length;
-
-  const effectiveFollowingCount = isSelf
-    ? (followingIds || []).length
-    : displayedFollowing.length;
 
   if (isLoading || (!profile && !isOwnProfile)) {
     return <ProfilePageSkeleton />;
@@ -1231,11 +957,9 @@ export function ProfileView({
             )}
           </div>
 
-          {/* Compact Modern Single-line Stats: clickable buttons to view followers/following/articles/posts */}
+          {/* Compact Modern Single-line Stats: clickable buttons to view articles/posts/stories */}
           <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
             {[
-              ['অনুসারী', effectiveFollowersCount, 'followers'],
-              ['অনুসরণ', isSelf ? displayedFollowing.length : effectiveFollowingCount, 'following'],
               ['প্রতিবেদন', authorArticles.length, 'articles'],
               ['পোস্ট', authorPosts.length, 'posts'],
               ['স্টোরি', authorStories.length, 'stories'],
@@ -1270,12 +994,9 @@ export function ProfileView({
               { key: 'articles', label: `প্রতিবেদন (${toBengaliNumerals(authorArticles.length)})` },
               { key: 'posts', label: `পোস্ট (${toBengaliNumerals(authorPosts.length)})` },
               { key: 'stories', label: `স্টোরি (${toBengaliNumerals(authorStories.length)})` },
-              { key: 'following', label: `অনুসরণ (${toBengaliNumerals(isSelf ? displayedFollowing.length : effectiveFollowingCount)})` },
-              { key: 'followers', label: `অনুসারী (${toBengaliNumerals(effectiveFollowersCount)})` },
               ...(isSelf
                 ? [
                     { key: 'saved', label: `সংরক্ষিত (${toBengaliNumerals(savedArticles.length + savedPosts.length)})` },
-                    { key: 'orders', label: `অর্ডারসমূহ (${toBengaliNumerals(orders.length)})` },
                   ]
                 : []),
             ] as const
@@ -1334,23 +1055,25 @@ export function ProfileView({
               </div>
             </button>
 
-            <button
-              type="button"
-              onClick={onOpenCreateStory}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
-                <Clapperboard className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
-              </span>
-              <div>
-                <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
-                  স্টোরি তৈরি করুন
-                </p>
-                <p className="font-sans text-[11px] text-slate-500">
-                  ২৪ ঘণ্টার ভিজ্যুয়াল স্টোরি
-                </p>
-              </div>
-            </button>
+            {canCreateStory(currentUser) && (
+              <button
+                type="button"
+                onClick={onOpenCreateStory}
+                className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
+                  <Clapperboard className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
+                </span>
+                <div>
+                  <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
+                    স্টোরি তৈরি করুন
+                  </p>
+                  <p className="font-sans text-[11px] text-slate-500">
+                    ভিজ্যুয়াল শর্ট স্টোরি
+                  </p>
+                </div>
+              </button>
+            )}
 
             <button
               type="button"
@@ -1460,7 +1183,7 @@ export function ProfileView({
           {authorStories.length === 0 ? (
             <section className={cn(FEED_CARD, 'p-8 text-center font-sans text-sm text-slate-500')}>
               এখনো কোনো সক্রিয় স্টোরি প্রকাশিত হয়নি।
-              {isOwnProfile && (
+              {isOwnProfile && canCreateStory(currentUser) && (
                 <div className="mt-3">
                   <button
                     type="button"
@@ -1483,9 +1206,6 @@ export function ProfileView({
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 rounded-full bg-emerald-600/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
-                      <Clock className="size-2.5" /> ২৪ ঘণ্টা সক্রিয়
-                    </div>
                     {isOwnProfile && onDeleteStory && (
                       <button
                         type="button"
@@ -1511,171 +1231,6 @@ export function ProfileView({
         </div>
       )}
 
-      {tab === 'following' && (
-        <section className={cn(FEED_CARD, 'p-4 sm:p-5 space-y-4 animate-in fade-in duration-200')}>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-white/10 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <Users className="size-4 text-[#03EF62]" />
-                <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white">
-                  অনুসরণ করা অ্যাকাউন্টসমূহ (<Num>{toBengaliNumerals(displayedFollowing.length)}</Num>)
-                </h3>
-              </div>
-              <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {isSelf
-                  ? 'আপনি যাদের অনুসরণ করছেন — তাদের সাম্প্রতিক গবেষণা, স্টোরি ও প্রকাশনা ফিডে দেখতে পাবেন।'
-                  : `${profile.name} যাদের অনুসরণ করছেন।`}
-              </p>
-            </div>
-            <span className="rounded-full bg-[#03EF62]/10 text-[#006f30] dark:text-[#03EF62] px-3 py-0.5 font-bangla text-xs font-bold border border-[#03EF62]/30">
-              মোট <Num>{toBengaliNumerals(displayedFollowing.length)}</Num> টি
-            </span>
-          </div>
-
-          {displayedFollowing.length === 0 ? (
-            <div className="p-8 text-center space-y-3">
-              <Users className="mx-auto size-10 text-slate-300 dark:text-slate-600" />
-              <p className="font-bangla text-sm text-slate-500 dark:text-slate-400">
-                {isSelf
-                  ? 'আপনি এখনো কোনো অ্যাকাউন্ট বা গবেষককে অনুসরণ করছেন না।'
-                  : 'এই সদস্য এখনো কাউকে অনুসরণ করছেন না।'}
-              </p>
-              {isSelf && (
-                <p className="font-bangla text-xs text-slate-400">
-                  হোম ফিড ও এক্সপ্লোর থেকে নতুন লেখক ও গবেষকদের ফলো করুন!
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {displayedFollowing.map((u) => {
-                const isUserFollowed = (followingIds || []).includes(u.id);
-                return (
-                  <div
-                    key={u.id}
-                    className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 hover:border-[#03EF62]/50 hover:bg-slate-100/60 dark:hover:bg-white/10 transition group"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => onNavigateProfile(u.id)}
-                      className="flex items-center gap-3 min-w-0 flex-1 text-left"
-                    >
-                      <Avatar src={u.avatar} name={u.name} size="size-11" online ring={u.isVerified} className="shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <span className="font-bangla font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
-                            {u.name}
-                          </span>
-                          {u.isVerified && <VerifiedBadge />}
-                        </div>
-                        <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {u.role} {u.organization ? `· ${u.organization}` : ''}
-                        </p>
-                        <span className="font-mono text-[10.5px] text-slate-400">
-                          @{u.handle}
-                        </span>
-                      </div>
-                    </button>
-
-                    {onToggleFollowUser && u.id !== currentUser?.id && (
-                      <FollowIconButton
-                        isFollowing={isUserFollowed}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleFollowUser(u.id);
-                        }}
-                        showLabel
-                        className="shrink-0"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      )}
-
-      {tab === 'followers' && (
-        <section className={cn(FEED_CARD, 'p-4 sm:p-5 space-y-4 animate-in fade-in duration-200')}>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-white/10 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <Users className="size-4 text-[#03EF62]" />
-                <h3 className="font-bangla text-base font-bold text-slate-900 dark:text-white">
-                  অনুসারী তালিকা (<Num>{toBengaliNumerals(effectiveFollowersCount)}</Num>)
-                </h3>
-              </div>
-              <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {isSelf
-                  ? `আপনাকে মোট ${toBengaliNumerals(effectiveFollowersCount)} জন সদস্য ও গবেষক অনুসরণ করছেন।`
-                  : `${profile.name}-কে মোট ${toBengaliNumerals(effectiveFollowersCount)} জন অনুসরণ করছেন।`}
-              </p>
-            </div>
-            <span className="rounded-full bg-[#03EF62]/10 text-[#006f30] dark:text-[#03EF62] px-3 py-0.5 font-bangla text-xs font-bold border border-[#03EF62]/30">
-              <Num>{toBengaliNumerals(effectiveFollowersCount)}</Num> জন
-            </span>
-          </div>
-
-          {displayedFollowers.length === 0 && effectiveFollowersCount === 0 ? (
-            <div className="p-8 text-center space-y-2">
-              <Users className="mx-auto size-10 text-slate-300 dark:text-slate-600" />
-              <p className="font-bangla text-sm text-slate-500 dark:text-slate-400">
-                {isSelf
-                  ? 'আপনার এখনো কোনো অনুসারী নেই। আপনার প্রতিবেদন ও মতামত শেয়ার করে পাঠকদের যুক্ত করুন।'
-                  : 'এই সদস্যের এখনো কোনো অনুসারী নেই। আপনিই প্রথম ফলো করতে পারেন!'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {displayedFollowers.map((u) => {
-                const isUserFollowed = (followingIds || []).includes(u.id);
-                return (
-                  <div
-                    key={u.id}
-                    className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 hover:border-[#03EF62]/50 hover:bg-slate-100/60 dark:hover:bg-white/10 transition group"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => onNavigateProfile(u.id)}
-                      className="flex items-center gap-3 min-w-0 flex-1 text-left"
-                    >
-                      <Avatar src={u.avatar} name={u.name} size="size-11" online ring={u.isVerified} className="shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <span className="font-bangla font-bold text-sm text-slate-900 dark:text-white truncate group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">
-                            {u.name}
-                          </span>
-                          {u.isVerified && <VerifiedBadge />}
-                        </div>
-                        <p className="font-bangla text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {u.role} {u.organization ? `· ${u.organization}` : ''}
-                        </p>
-                        <span className="font-mono text-[10.5px] text-slate-400">
-                          @{u.handle}
-                        </span>
-                      </div>
-                    </button>
-
-                    {onToggleFollowUser && u.id !== currentUser?.id && (
-                      <FollowIconButton
-                        isFollowing={isUserFollowed}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleFollowUser(u.id);
-                        }}
-                        showLabel
-                        className="shrink-0"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      )}
-
       {tab === 'saved' && isOwnProfile && (
         <section className={cn(FEED_CARD, 'p-4')}>
           <SavedList
@@ -1685,31 +1240,6 @@ export function ProfileView({
             onRemoveArticle={onRemoveSavedArticle}
             onRemovePost={onRemoveSavedPost}
           />
-        </section>
-      )}
-
-      {tab === 'orders' && isOwnProfile && (
-        <section className={cn(FEED_CARD, 'space-y-3 p-4')}>
-          <SectionLabel>আপনার পূর্ববর্তী বিকাশ অর্ডারসমূহ</SectionLabel>
-          {orders.length === 0 ? (
-            <p className="py-6 text-center font-sans text-sm text-slate-500">
-              আপনার এখনো কোনো বিকাশ অর্ডার নেই।
-            </p>
-          ) : (
-            orders.map((o) => (
-              <div key={o.id} className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-bangla text-xs font-bold text-slate-900">#{o.orderNumber}</span>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[11px] font-bold text-emerald-700">
-                    TrxID: {o.trxId}
-                  </span>
-                </div>
-                <p className="mt-1 font-sans text-xs text-slate-700">
-                  {o.deliveryAddress}, {o.district} · ৳<strong className="font-bangla font-bold">{toBengaliNumerals(o.totalBdt)}</strong>
-                </p>
-              </div>
-            ))
-          )}
         </section>
       )}
 

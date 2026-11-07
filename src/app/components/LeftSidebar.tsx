@@ -1,5 +1,5 @@
 import React from 'react';
-import { Newspaper, Bot, Settings, Compass, Sparkles, Plane, Wheat, BookOpenText, CloudSun, Snowflake, Rocket } from 'lucide-react';
+import { Newspaper, Settings, Compass, CalendarDays, Plane, Wheat, BookOpenText, CloudSun, Snowflake, Rocket } from 'lucide-react';
 import type { Article, StoryReel, UserProfile } from '../types';
 import { Avatar, SectionLabel, cn } from './Primitives';
 import { toBengaliNumerals } from '../utils/pureLogic';
@@ -20,7 +20,7 @@ interface Props {
   savedCount: number;
   onOpenSaved: () => void;
   onOpenReels: () => void;
-  onOpenAI: () => void;
+  onOpenAI?: () => void;
   onOpenProfileSettings: () => void;
   onOpenAuth?: () => void;
   onNavigate: (path: string) => void;
@@ -45,11 +45,11 @@ export function LeftSidebar(p: Props) {
       tone: 'bg-blue-50 text-blue-700',
     },
     {
-      label: 'AI সহকারী',
-      icon: Bot,
-      onClick: p.onOpenAI,
+      label: 'ইভেন্টস',
+      icon: CalendarDays,
+      onClick: () => p.onNavigate('/events'),
       badge: null,
-      tone: 'bg-amber-50 text-amber-700',
+      tone: 'bg-emerald-50 text-emerald-700',
     },
   ];
 

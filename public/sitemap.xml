@@ -1,46 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://plainsyt.com/</loc>
-    <lastmod>2026-11-01</lastmod>
+    <loc>https://pla.insyt.bd/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://plainsyt.com/article/japan-ai-cucumber-harvesting-robot-future-of-smart-agriculture</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://plainsyt.com/article/bina-gamma-ray-irradiation-center-inauguration-2026</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://plainsyt.com/explore</loc>
-    <lastmod>2026-11-01</lastmod>
+    <loc>https://pla.insyt.bd/explore</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://plainsyt.com/store</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://plainsyt.com/events</loc>
-    <lastmod>2026-11-01</lastmod>
+    <loc>https://pla.insyt.bd/article/bina-gamma-ray-irradiation-center</loc>
+    <lastmod>2026-02-15</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://plainsyt.com/ideas</loc>
-    <lastmod>2026-11-01</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
+    <loc>https://pla.insyt.bd/article/japan-cucumber-harvesting-robot</loc>
+    <lastmod>2026-03-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>

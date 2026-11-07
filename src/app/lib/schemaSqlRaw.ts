@@ -522,7 +522,7 @@ insert into public.profiles (
   'Bangladesh Agricultural University (BAU)',
   'ময়মনসিংহ, বাংলাদেশ',
   'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
+  'https://scontent.fdac181-1.fna.fbcdn.net/v/t39.30808-6/868869490_122115169682436931_6504382327291511656_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=OPH1ic41iEcQ7kNvwHfVJ22&_nc_oc=Ado4dMV71UpAFR9znBCct-4oL-vbc2Tj2XNuEOMF69HCn9LVBresJLegwGmkFlHIoao&_nc_zt=23&_nc_ht=scontent.fdac181-1.fna&_nc_gid=Y728jMG_bc65Ll0ceAYQAg&_nc_ss=7b289&oh=00_AQTWBy-QOn2nh1S1pqRbyKcEOazefMscU9_rRdxE7UTIPQ&oe=6AF4A9EF',
   true,
   'z65gt9@gmail.com',
   0

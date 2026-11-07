@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu, UserRound } from 'lucide-react';
 import type { TopicStory, UserProfile } from '../types';
+import { canCreateStory } from '../lib/auth';
 import { Avatar, Num } from './Primitives';
 import { YouTubeMark } from './YouTubeMark';
 import { toBengaliNumerals } from '../utils/pureLogic';
@@ -71,8 +72,8 @@ export function TopicStoriesCarousel({
         ref={ref}
         className="no-scrollbar flex snap-x gap-2 overflow-x-auto px-3 py-1 sm:px-0.5 md:gap-3 md:pb-2"
       >
-        {/* Create Story Card (Only available for logged-in users) */}
-        {onCreate && currentUser && (
+        {/* Create Story Card (Only available for authorized editorial creators) */}
+        {onCreate && canCreateStory(currentUser) && (
           <button
             type="button"
             onClick={onCreate}

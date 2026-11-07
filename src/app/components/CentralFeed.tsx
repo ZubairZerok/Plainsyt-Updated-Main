@@ -4,6 +4,7 @@ import type {
   Article, CommunityPost, LinkedInReactionType, ReactionTargetType, StoryReel, TopicStory, UserProfile,
 } from '../types';
 import { PostCreatorBar } from './PostCreatorBar';
+import { NewsletterSubscription } from './NewsletterSubscription';
 import { TopicStoriesCarousel } from './TopicStoriesCarousel';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
@@ -23,7 +24,7 @@ export interface FeedApi {
   isLoading?: boolean;
   onWriteArticle: () => void;
   onUploadVideo: () => void;
-  onAskAI: () => void;
+  onAskAI?: () => void;
   onOpenProfileSettings: () => void;
   onOpenStory: (storyIdOrIndex: string | number) => void;
   onCreateStory: () => void;
@@ -238,9 +239,12 @@ export function CentralFeed(f: FeedApi) {
       )}
 
       {!isEmpty && (
-        <div className="flex flex-col items-center gap-1 py-8 text-center text-slate-400">
-          <span className="font-sans text-xs italic tracking-wider">— সব আপডেট দেখা শেষ —</span>
-        </div>
+        <>
+          <NewsletterSubscription className="my-4" />
+          <div className="flex flex-col items-center gap-1 py-8 text-center text-slate-400">
+            <span className="font-sans text-xs italic tracking-wider">— সব আপডেট দেখা শেষ —</span>
+          </div>
+        </>
       )}
     </div>
   );

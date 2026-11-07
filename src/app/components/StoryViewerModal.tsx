@@ -48,12 +48,6 @@ export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl
 
 
 
-interface FloatingReaction {
-  id: string;
-  emoji: string;
-  x: number; // percentage 10% - 90%
-}
-
 interface Props {
   open: boolean;
   stories: TopicStory[];
@@ -64,12 +58,7 @@ interface Props {
   savedStoryIds?: string[];
   onClose: () => void;
   onToggleFollow: (authorId: string) => void;
-  onReact: (targetType: ReactionTargetType, targetId: string, type: LinkedInReactionType) => void;
-  onComment: (targetId: string, text: string) => void;
-  onEditComment?: (id: string, newText: string) => void;
-  onDeleteComment?: (id: string) => void;
-  onShare: (title: string) => void;
-  onSave: (storyId: string) => void;
+  onSave?: (storyId: string) => void;
   onOpenAuth: () => void;
   onNavigateProfile?: (userId: string) => void;
 }
@@ -84,11 +73,6 @@ export function StoryViewerModal({
   savedStoryIds = [],
   onClose,
   onToggleFollow,
-  onReact,
-  onComment,
-  onEditComment,
-  onDeleteComment,
-  onShare,
   onSave,
   onOpenAuth,
   onNavigateProfile,
@@ -123,13 +107,6 @@ export function StoryViewerModal({
   const [cubeAngle, setCubeAngle] = useState(0); // 3D rotation angle: 0, -90, 90
   const [isRotating, setIsRotating] = useState(false);
   const [showCenterIcon, setShowCenterIcon] = useState(false);
-  const [showComments, setShowComments] = useState(false);
-  const [showReactionPicker, setShowReactionPicker] = useState(false);
-  const [commentText, setCommentText] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingText, setEditingText] = useState('');
-  const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
-  const [userReactions, setUserReactions] = useState<Record<string, LinkedInReactionType>>({});
   const [isCaptionExpanded, setIsCaptionExpanded] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -256,7 +233,7 @@ export function StoryViewerModal({
 
   // Timer loop for story progression
   useEffect(() => {
-    if (!open || paused || isHolding || showComments || isCaptionExpanded || isRotating || !currentStory) {
+    if (!open || paused || isHolding || isCaptionExpanded || isRotating || !currentStory) {
       if (progressTimer.current) clearInterval(progressTimer.current);
       return;
     }
@@ -277,19 +254,19 @@ export function StoryViewerModal({
     return () => {
       if (progressTimer.current) clearInterval(progressTimer.current);
     };
-  }, [open, paused, isHolding, showComments, isCaptionExpanded, isRotating, currentStory, storyDurationSec, advanceToNext]);
+  }, [open, paused, isHolding, isCaptionExpanded, isRotating, currentStory, storyDurationSec, advanceToNext]);
 
   // YouTube / Video Playback Sync
   useEffect(() => {
     if (!open) return;
-    if (paused || isHolding || showComments) {
+    if (paused || isHolding) {
       ytPostCommand(iframeRef.current, 'pauseVideo');
       videoRef.current?.pause();
     } else {
       ytPostCommand(iframeRef.current, 'playVideo');
       void videoRef.current?.play().catch(() => undefined);
     }
-  }, [open, paused, isHolding, showComments, storyIdx, accountIdx]);
+  }, [open, paused, isHolding, storyIdx, accountIdx]);
 
   useEffect(() => {
     ytPostCommand(iframeRef.current, isMuted ? 'mute' : 'unMute');
@@ -302,8 +279,7 @@ export function StoryViewerModal({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
       if (e.key === 'Escape') {
-        if (showComments) setShowComments(false);
-        else onClose();
+        onClose();
       } else if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         advanceToNext();
@@ -316,11 +292,10 @@ export function StoryViewerModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, showComments, onClose, advanceToNext, advanceToPrev]);
+  }, [open, onClose, advanceToNext, advanceToPrev]);
 
   // --- Touch & Pointer Gestures for 3D Cube Rotation and Tap Zones ---
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (showComments) return;
     const target = e.target as HTMLElement | null;
     if (target && target.closest('button, input, textarea, a, form, [role="button"]')) {
       return;
@@ -339,7 +314,7 @@ export function StoryViewerModal({
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!pointerStart.current || showComments || isRotating) return;
+    if (!pointerStart.current || isRotating) return;
     const deltaX = e.clientX - pointerStart.current.x;
     const deltaY = e.clientY - pointerStart.current.y;
 
@@ -452,57 +427,10 @@ export function StoryViewerModal({
     }
   };
 
-  // --- Interactive Reactions with Floating Bursts ---
-  const triggerReaction = (type: LinkedInReactionType, emoji: string) => {
-    if (!currentStory) return;
-    if (!currentUser) {
-      onOpenAuth();
-      return;
-    }
-    setUserReactions((prev) => ({ ...prev, [currentStory.id]: type }));
-    onReact('story', currentStory.id, type);
-    setShowReactionPicker(false);
-
-    // Spawn 5 burst particles
-    const burstCount = 6;
-    const newItems: FloatingReaction[] = [];
-    for (let i = 0; i < burstCount; i++) {
-      newItems.push({
-        id: `react-${Date.now()}-${i}-${Math.random()}`,
-        emoji,
-        x: Math.floor(25 + Math.random() * 50),
-      });
-    }
-    setFloatingReactions((prev) => [...prev, ...newItems]);
-    setTimeout(() => {
-      setFloatingReactions((prev) => prev.filter((item) => !newItems.some((n) => n.id === item.id)));
-    }, 1800);
-  };
-
-  const handleSendComment = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!currentUser) {
-      onOpenAuth();
-      return;
-    }
-    const val = commentText.trim();
-    if (!val || !currentStory) return;
-    const targetId = currentStory.articleId || currentStory.id;
-    onComment(targetId, val);
-    setCommentText('');
-  };
-
   if (!open || !currentGroup || !currentStory) return null;
 
   const isFollowing = followingIds.includes(currentGroup.authorId);
   const isSaved = savedStoryIds.includes(currentStory.id);
-  const activeReaction = userReactions[currentStory.id];
-  const itemComments = comments.filter(
-    (c) =>
-      c.targetId === currentStory.id ||
-      c.targetId === `story-${currentStory.id}` ||
-      (currentStory.articleId && (c.targetId === currentStory.articleId || c.targetId === `art-${currentStory.articleId}`)),
-  );
 
   return (
     <div
@@ -531,19 +459,6 @@ export function StoryViewerModal({
         aria-hidden
         className="absolute inset-0 size-full object-cover opacity-20 blur-3xl pointer-events-none scale-110"
       />
-
-      {/* Floating Reaction Bursts Layer */}
-      <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
-        {floatingReactions.map((f) => (
-          <span
-            key={f.id}
-            style={{ left: `${f.x}%` }}
-            className="absolute bottom-24 text-3xl select-none animate-in fade-in slide-out-to-top duration-1000 [animation:storyBurst_1.6s_ease-out_forwards]"
-          >
-            {f.emoji}
-          </span>
-        ))}
-      </div>
 
       {/* 3D Perspective Scene Container */}
       <div
@@ -797,292 +712,8 @@ export function StoryViewerModal({
               )}
             </div>
           </div>
-
-          {/* --- BOTTOM INTERACTIVE ACTIONS (Quick Reply, React, Comment, Share, Save) --- */}
-          <div
-            className={cn(
-              'absolute inset-x-0 bottom-0 z-30 p-3 flex flex-col gap-2 transition-opacity duration-200 bg-gradient-to-t from-black via-black/80 to-transparent',
-              isHolding ? 'opacity-0' : 'opacity-100',
-            )}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Floating LinkedIn / Facebook Reaction Picker (Pops down when unpressed) */}
-            {showReactionPicker && (
-              <>
-                <div
-                  className="fixed inset-0 z-20"
-                  onClick={() => setShowReactionPicker(false)}
-                />
-                <div className="relative z-30 flex items-center gap-2 bg-[#061621]/95 border border-white/20 p-2 rounded-full shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-2 duration-150 self-start">
-                  {LINKEDIN_REACTIONS.map((r) => (
-                    <button
-                      key={r.type}
-                      type="button"
-                      onClick={() => triggerReaction(r.type as LinkedInReactionType, r.emoji)}
-                      title={r.labelBn}
-                      className="p-1 hover:scale-125 transition-transform active:scale-95 flex items-center justify-center rounded-full"
-                    >
-                      <LinkedInReactionBadge type={r.type as LinkedInReactionType} size="size-7" />
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Quick Reply Form + Action Buttons */}
-            <div className="flex items-center gap-2">
-              <form onSubmit={handleSendComment} className="flex-1 relative flex items-center">
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="একটি বার্তা বা উত্তর লিখুন..."
-                  className="w-full rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 font-bangla text-xs text-white placeholder-white/60 backdrop-blur-md focus:border-[#03EF62] focus:bg-black/50 focus:outline-none transition"
-                />
-                {commentText.trim() && (
-                  <button
-                    type="submit"
-                    className="absolute right-1.5 flex size-6 items-center justify-center rounded-full bg-[#03EF62] text-[#061621] transition active:scale-95 shadow-sm"
-                  >
-                    <Send className="size-3" />
-                  </button>
-                )}
-              </form>
-
-              {/* React Trigger Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowReactionPicker((prev) => !prev);
-                }}
-                className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90 relative"
-                title="প্রতিক্রিয়া জানান"
-              >
-                {activeReaction ? (
-                  <LinkedInReactionBadge type={activeReaction} size="size-5" />
-                ) : (
-                  <Heart className="size-5 hover:text-[#ff3b5c] transition-colors" />
-                )}
-              </button>
-
-              {/* Comments drawer button (Pops down when unpressed) */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowComments((prev) => {
-                    const next = !prev;
-                    setPaused(next);
-                    return next;
-                  });
-                }}
-                className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90 relative"
-                title="মন্তব্য দেখুন"
-              >
-                <MessageCircle className="size-5" />
-                {itemComments.length > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#03EF62] px-1 font-bangla text-[9px] font-bold text-[#061621]">
-                    <Num>{toBengaliNumerals(itemComments.length)}</Num>
-                  </span>
-                )}
-              </button>
-
-              {/* Share Story (Facebook & Copy Link) */}
-              <button
-                type="button"
-                onClick={() => {
-                  setPaused(true);
-                  onShare(currentStory.title);
-                }}
-                className="flex size-9 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition active:scale-90"
-                title="ফেসবুক বা লিংক শেয়ার করুন"
-              >
-                <Share2 className="size-4.5" />
-              </button>
-
-              {/* Save Story */}
-              <button
-                type="button"
-                onClick={() => onSave(currentStory.id)}
-                className={cn(
-                  'flex size-9 items-center justify-center rounded-full transition active:scale-90',
-                  isSaved ? 'bg-[#03EF62] text-[#061621]' : 'bg-white/15 text-white hover:bg-white/25',
-                )}
-                title="স্টোরি সংরক্ষণ করুন"
-              >
-                <Bookmark className={cn('size-4.5', isSaved && 'fill-current')} />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* --- Comments Slide-Up / Drawer (Pops down when unpressed) --- */}
-      {showComments && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs"
-            onClick={() => {
-              setShowComments(false);
-              setPaused(false);
-            }}
-          />
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="fixed inset-x-0 bottom-0 sm:inset-y-0 sm:right-0 sm:left-auto sm:w-[380px] z-50 flex flex-col bg-[#07161f] text-white border-t sm:border-t-0 sm:border-l border-white/15 shadow-2xl rounded-t-3xl sm:rounded-none max-h-[82vh] sm:max-h-full animate-in slide-in-from-bottom sm:slide-in-from-right duration-200"
-          >
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3.5 bg-[#0a1f2b]/80">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="size-4 text-[#03EF62]" />
-              <h3 className="font-bangla text-sm font-bold text-white">
-                মন্তব্যসমূহ (<Num>{toBengaliNumerals(itemComments.length)}</Num>)
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setShowComments(false);
-                setPaused(false);
-              }}
-              className="flex size-7 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 transition"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 custom-scrollbar">
-            {itemComments.length === 0 ? (
-              <div className="py-16 text-center text-white/50 font-bangla text-xs">
-                এখনো কোনো মন্তব্য নেই। প্রথম মন্তব্যটি আপনিই করুন!
-              </div>
-            ) : (
-              itemComments.map((c) => {
-                const canManage = Boolean(
-                  currentUser &&
-                    currentUser.id &&
-                    c.authorId &&
-                    (currentUser.id === c.authorId ||
-                      (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
-                );
-                return (
-                  <div key={c.id} className="flex items-start gap-2.5">
-                    <Avatar src={c.avatar} name={c.author} size="size-7" />
-                    <div className="flex-1 min-w-0 bg-white/5 rounded-2xl p-2.5 border border-white/5">
-                      <div className="flex items-baseline justify-between gap-1">
-                        <span className="font-bangla text-xs font-bold text-white truncate">{c.author}</span>
-                        <span className="font-bangla text-[10px] text-emerald-400 shrink-0">
-                          {c.timestampLabel || 'এখন'}
-                        </span>
-                      </div>
-                      {editingCommentId === c.id ? (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            const clean = editingText.trim();
-                            if (clean && clean !== c.text) {
-                              onEditComment?.(c.id, clean);
-                            }
-                            setEditingCommentId(null);
-                          }}
-                          className="mt-1 space-y-1.5"
-                        >
-                          <input
-                            type="text"
-                            value={editingText}
-                            onChange={(e) => setEditingText(e.target.value)}
-                            autoFocus
-                            className="w-full rounded-lg border border-white/20 bg-black/40 px-2 py-1 font-bangla text-xs text-white outline-none focus:border-[#03EF62]"
-                          />
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="submit"
-                              disabled={!editingText.trim()}
-                              className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
-                            >
-                              সংরক্ষণ
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingCommentId(null)}
-                              className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
-                            >
-                              বাতিল
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <p className="mt-1 font-bangla text-xs text-white/85 leading-relaxed break-words">
-                          {c.text}
-                          {c.isEdited && (
-                            <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
-                          )}
-                        </p>
-                      )}
-                      {canManage && editingCommentId !== c.id && (
-                        <div className="mt-1 flex items-center gap-2 font-bangla text-[10.5px]">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingCommentId(c.id);
-                              setEditingText(c.text);
-                            }}
-                            className="text-white/60 hover:text-[#03EF62] transition cursor-pointer"
-                          >
-                            এডিট
-                          </button>
-                          <span className="text-white/20">·</span>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteComment?.(c.id)}
-                            className="text-rose-400 hover:text-rose-300 transition cursor-pointer"
-                          >
-                            মুছুন
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          <form onSubmit={handleSendComment} className="p-3 border-t border-white/10 flex items-center gap-2">
-            <input
-              type="text"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="মন্তব্য লিখুন..."
-              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-3 py-2 font-bangla text-xs text-white placeholder-white/50 focus:border-[#03EF62] focus:outline-none"
-            />
-            <button
-              type="submit"
-              disabled={!commentText.trim()}
-              className="flex size-8 items-center justify-center rounded-xl bg-[#03EF62] text-[#061621] disabled:opacity-40 transition"
-            >
-              <Send className="size-3.5" />
-            </button>
-          </form>
-        </div>
-      </>
-      )}
-
-      {/* Floating 3D CSS Keyframe in head */}
-      <style>{`
-        @keyframes storyBurst {
-          0% {
-            opacity: 1;
-            transform: translateY(0) scale(0.8) rotate(0deg);
-          }
-          50% {
-            opacity: 0.9;
-            transform: translateY(-140px) scale(1.3) rotate(-15deg);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-280px) scale(1.6) rotate(20deg);
-          }
-        }
-      `}</style>
     </div>
   );
 }

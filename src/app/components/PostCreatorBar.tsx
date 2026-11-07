@@ -1,4 +1,4 @@
-import { Image as ImageIcon, PenLine, Video, Sparkles } from 'lucide-react';
+import { Image as ImageIcon, PenLine, Video } from 'lucide-react';
 import type { UserProfile } from '../types';
 import { Avatar, CARD, cn } from './Primitives';
 
@@ -6,17 +6,15 @@ interface Props {
   currentUser: UserProfile | null;
   onWriteArticle: () => void;
   onUploadVideo: () => void;
-  onAskAI: () => void;
+  onAskAI?: () => void;
   onNavigateProfile: () => void;
 }
 
 export function PostCreatorBar(p: Props) {
   const firstName = p.currentUser ? p.currentUser.name.split(' ')[0] : 'Researcher';
-  // "Create Post" option removed per specification
   const actions = [
     { label: 'Write Article', icon: PenLine, onClick: p.onWriteArticle, tone: 'text-pine-600' },
     { label: 'Upload Video', icon: Video, onClick: p.onUploadVideo, tone: 'text-[#e41e3f]' },
-    { label: 'Ask AI', icon: Sparkles, onClick: p.onAskAI, tone: 'text-[#b7791f]' },
   ];
   return (
     <section className={cn(CARD, 'rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden')}>
@@ -45,7 +43,7 @@ export function PostCreatorBar(p: Props) {
           <ImageIcon className="size-5" />
         </button>
       </div>
-      <div className="grid grid-cols-3 border-t border-slate-100 dark:border-white/10 px-1.5 py-1">
+      <div className="grid grid-cols-2 border-t border-slate-100 dark:border-white/10 px-1.5 py-1">
         {actions.map((a) => (
           <button
             key={a.label}

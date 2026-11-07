@@ -24,12 +24,7 @@ export const router = createBrowserRouter([
     ErrorBoundary: RouteErrorBoundary,
   },
   {
-    path: '/store',
-    Component: RootShell,
-    ErrorBoundary: RouteErrorBoundary,
-  },
-  {
-    path: '/ideas',
+    path: '/editorial',
     Component: RootShell,
     ErrorBoundary: RouteErrorBoundary,
   },

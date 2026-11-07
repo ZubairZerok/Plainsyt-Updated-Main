@@ -4,6 +4,9 @@ import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationC
 import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
 import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
+import { SharePopoverButton } from './ShareModal';
+import { SEOHead } from './SEOHead';
+import { NewsletterSubscription } from './NewsletterSubscription';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 import { ArticleReaderSkeleton } from './Skeletons';
@@ -90,6 +93,7 @@ export function ArticleReaderContent({
       }}
       className="rounded-t-3xl border border-slate-200/80 dark:border-[#03EF62]/60 bg-canvas-card shadow-2xl sm:rounded-3xl overflow-hidden animate-in slide-in-from-bottom-6 duration-300 ease-out"
     >
+      <SEOHead article={a} />
       {/* Sticky top header with mobile drag-down handle */}
       <div
         onTouchStart={(e) => handleDragStart(e.touches[0].clientY)}
@@ -356,15 +360,18 @@ export function ArticleReaderContent({
               countLabel={rxTotal > 0 ? formatBengaliNumberCompact(rxTotal) : undefined}
             />
           </div>
-          <button
-            type="button"
-            onClick={onShare}
-            className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition"
-          >
-            <Share2 className="size-[18px] text-[#03EF62]" />
-            Share
-          </button>
+          <SharePopoverButton title={a.title} url={`/article/${a.slug || a.id}`}>
+            <button
+              type="button"
+              className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition cursor-pointer"
+            >
+              <Share2 className="size-[18px] text-[#03EF62]" />
+              <span className="font-bangla">শেয়ার</span>
+            </button>
+          </SharePopoverButton>
         </div>
+
+        <NewsletterSubscription className="mt-8 mb-4" />
 
         <section className="mt-8 border-t border-slate-100 dark:border-white/10 pt-5">
           <h2 className="font-display text-[22px] font-semibold text-slate-900 dark:text-white">

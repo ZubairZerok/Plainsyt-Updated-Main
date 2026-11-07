@@ -184,11 +184,8 @@ function getCurrentPageContext(): { label: string; pageName: string } {
   if (path.startsWith('/events')) {
     return { label: 'ইভেন্টসে পুনরায় চেষ্টা করুন', pageName: 'ইভেন্টস' };
   }
-  if (path.startsWith('/store')) {
-    return { label: 'স্টোরে পুনরায় চেষ্টা করুন', pageName: 'স্টোর' };
-  }
-  if (path.startsWith('/ideas')) {
-    return { label: 'আইডিয়ায় পুনরায় চেষ্টা করুন', pageName: 'আইডিয়া' };
+  if (path.startsWith('/editorial')) {
+    return { label: 'ড্যাশবোর্ডে পুনরায় চেষ্টা করুন', pageName: 'সম্পাদকীয় ড্যাশবোর্ড' };
   }
   if (path.startsWith('/notifications')) {
     return { label: 'বিজ্ঞপ্তিতে পুনরায় চেষ্টা করুন', pageName: 'বিজ্ঞপ্তি' };

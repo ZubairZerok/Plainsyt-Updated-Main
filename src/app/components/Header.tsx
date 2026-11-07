@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, Store, Lightbulb,
-  Clapperboard, Sparkles, FileText, ArrowUpRight, ShoppingBag, Trash2, LogIn, User, LogOut,
-  Settings, Check, ShieldCheck, CheckCircle2,
+  Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays,
+  Clapperboard, FileText, ArrowUpRight, Trash2, LogIn, User, LogOut,
+  Settings, Check, ShieldCheck, CheckCircle2, BarChart3,
 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, TopicStory, UserProfile } from '../types';
+import { isEditorialAuthorized } from '../lib/auth';
 import { PlainsytLogo } from './PlainsytLogo';
 import { Avatar, cn } from './Primitives';
 
@@ -12,8 +13,7 @@ export type View =
   | 'home'
   | 'explore'
   | 'events'
-  | 'store'
-  | 'ideas'
+  | 'editorial'
   | 'notifications'
   | 'profile'
   | 'publications'
@@ -26,8 +26,6 @@ const DESKTOP_TABS: { key: View; path: string; label: string; icon: typeof Home 
   { key: 'home', path: '/', label: 'হোম ফিড · Home', icon: Home },
   { key: 'explore', path: '/explore', label: 'এক্সপ্লোর · Explore', icon: Compass },
   { key: 'events', path: '/events', label: 'ইভেন্টস · Events', icon: CalendarDays },
-  { key: 'store', path: '/store', label: 'কৃষি বাজার · Store', icon: Store },
-  { key: 'ideas', path: '/ideas', label: 'আইডিয়া বোর্ড · Ideas', icon: Lightbulb },
 ];
 
 interface Props {
@@ -37,12 +35,12 @@ interface Props {
   dark: boolean;
   onToggleDark: () => void;
   savedCount: number;
-  cartCount: number;
+  cartCount?: number;
   reelsCount: number;
-  onOpenCart: () => void;
+  onOpenCart?: () => void;
   onOpenSaved: () => void;
   onOpenReels: () => void;
-  onOpenAI: () => void;
+  onOpenAI?: () => void;
   onOpenAuth?: () => void;
   onLogout?: () => void;
   onOpenProfileSettings?: () => void;
@@ -448,19 +446,10 @@ export function Header(p: Props) {
 
           {/* Right Action Cluster */}
           <div className="flex items-center justify-end gap-1.5 sm:gap-2">
-            {/* AI, Cart, Saved, and Notification icons: ONLY shown when logged in */}
+            {/* Saved and Notification icons: shown when logged in */}
             {p.currentUser && (
               <>
-                <button
-                  type="button"
-                  onClick={p.onOpenAI}
-                  aria-label="Ask AI Assistant"
-                  title="Plainsyt AI সহকারী"
-                  className={cn(iconBtn, 'hidden sm:flex')}
-                >
-                  <Sparkles className="size-[18px]" />
-                </button>
-                {/* Saved Posts Button: Visible in mobile view top nav (replaces cart) and desktop */}
+                {/* Saved Posts Button: Visible in mobile view top nav and desktop */}
                 <button
                   type="button"
                   onClick={p.onOpenSaved}
@@ -472,21 +461,6 @@ export function Header(p: Props) {
                   {p.savedCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.savedCount}
-                    </span>
-                  )}
-                </button>
-                {/* Cart Drawer: Desktop view only (hidden on mobile top nav) */}
-                <button
-                  type="button"
-                  onClick={p.onOpenCart}
-                  aria-label="Cart Drawer"
-                  title="Shopping Cart & Checkout"
-                  className={cn(iconBtn, 'hidden sm:flex')}
-                >
-                  <ShoppingBag className="size-[18px]" />
-                  {p.cartCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
-                      {p.cartCount}
                     </span>
                   )}
                 </button>
@@ -640,41 +614,25 @@ export function Header(p: Props) {
                 </span>
               </button>
 
-              {/* 6. Marketplace / Store */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onNavigate('/store');
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#03EF62]/15 text-emerald-600 dark:text-[#03EF62]">
-                    <ShoppingBag className="size-4" />
-                  </span>
-                  <span className="truncate">কৃষি বাজার ও স্টোর</span>
-                </div>
-                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
-              </button>
-
-              {/* 7. Innovation Ideas Board */}
-              <button
-                type="button"
-                onClick={() => {
-                  setUserMenuOpen(false);
-                  p.onNavigate('/ideas');
-                }}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 dark:bg-[#03EF62]/15 text-amber-600 dark:text-[#03EF62]">
-                    <Lightbulb className="size-4" />
-                  </span>
-                  <span className="truncate">উদ্ভাবনী আইডিয়া</span>
-                </div>
-                <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
-              </button>
+              {/* Editorial Dashboard (Available ONLY to authorized editorial emails) */}
+              {isEditorialAuthorized(p.currentUser) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    p.onNavigate('/editorial');
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-[#03EF62]/15 text-emerald-600 dark:text-[#03EF62]">
+                      <BarChart3 className="size-4" />
+                    </span>
+                    <span className="truncate">সম্পাদকীয় ড্যাশবোর্ড</span>
+                  </div>
+                  <ArrowUpRight className="size-3.5 text-slate-400 group-hover:text-slate-700 dark:text-[#03EF62]/80 dark:group-hover:text-[#03EF62] transition" />
+                </button>
+              )}
 
               {/* Divider */}
               <div className="my-1 border-t border-slate-100 dark:border-white/10" />

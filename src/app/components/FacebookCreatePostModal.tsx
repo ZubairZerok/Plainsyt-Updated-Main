@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { X, Globe2, MapPin, Upload, Video, Clapperboard, Link as LinkIcon } from 'lucide-react';
 import type { ArticleCategory, CommunityPost, StoryReel, TopicStory, UserProfile } from '../types';
 import { Avatar, Modal, SectionLabel, cn } from './Primitives';
+import { canCreateStory } from '../lib/auth';
 
 interface Props {
   open: boolean;
@@ -72,7 +73,8 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
       createdAt: nowIso,
     };
 
-    const story: TopicStory | undefined = alsoShareToStories
+    const allowedStory = canCreateStory(currentUser);
+    const story: TopicStory | undefined = (allowedStory && alsoShareToStories)
       ? {
           id: `st-${Date.now().toString(36)}`,
           title: title.trim(),
@@ -258,15 +260,17 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
           </div>
 
           <div className="flex flex-wrap gap-4 rounded-xl border border-canvas-border bg-canvas-subtle p-3 text-[13px] font-semibold text-pine-900">
-            <label className="inline-flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                checked={alsoShareToStories}
-                onChange={(e) => setAlsoShareToStories(e.target.checked)}
-                className="size-4 accent-pine-900"
-              />
-              Include in Topic Stories Carousel
-            </label>
+            {canCreateStory(currentUser) && (
+              <label className="inline-flex cursor-pointer items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={alsoShareToStories}
+                  onChange={(e) => setAlsoShareToStories(e.target.checked)}
+                  className="size-4 accent-pine-900"
+                />
+                Include in Topic Stories Carousel
+              </label>
+            )}
             <label className="inline-flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"

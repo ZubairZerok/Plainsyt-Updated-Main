@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, isZubairIdentifier, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE } from '../lib/auth';
+import { getStoredAuthUser, logoutUser, setStoredAuth, resolveEmailAlias, isZubairIdentifier, ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_PROD_PROFILE, canCreateStory } from '../lib/auth';
 import {
   readSnapshot, writeSnapshot, fetchFromSupabase, syncLocalToSupabase, mutateSnapshotReaction,
   DEFAULT_SEED_SNAPSHOT,
@@ -25,22 +25,20 @@ import { LeftSidebar } from './LeftSidebar';
 import { RightSidebar } from './RightSidebar';
 import { CentralFeed } from './CentralFeed';
 import { FacebookCreatePostModal } from './FacebookCreatePostModal';
-import { AskAIModal } from './AskAIModal';
 import { ArticleReaderModal, ArticleReaderContent } from './ArticleReaderModal';
 import { ReelPlayerModal, type PlayerItem } from './ReelPlayerModal';
 import { StoryViewerModal } from './StoryViewerModal';
 import { SavedArticlesModal } from './SavedArticlesModal';
 import { CreatePostModal } from './CreatePostModal';
-import { ExploreView, EventsView, StoreView, IdeasView, NotificationsView, ProfileView } from './Views';
+import { ExploreView, EventsView, NotificationsView, ProfileView } from './Views';
+import { EditorialDashboard } from './EditorialDashboard';
 import {
   PublicationsStudioView,
   AccountSecurityView,
 } from './ResearcherViews';
 import { PhotoLightboxModal } from './PhotoLightboxModal';
-import { ShareModal, type SharePayload } from './ShareModal';
 import { DeleteCommentAlertModal } from './DeleteCommentAlertModal';
 import { ProfileSettingsModal } from './ProfileSettingsModal';
-import { BkashCheckoutModal, CreateProductModal } from './BkashCheckoutModal';
 import { ReactionBreakdownModal } from './LinkedInReactionBar';
 import { SiteLoader } from './SiteLoader';
 import { EventRegistrationModal } from './EventRegistrationModal';
@@ -50,8 +48,6 @@ import {
   FeedPageSkeleton,
   ExplorePageSkeleton,
   EventsPageSkeleton,
-  StorePageSkeleton,
-  IdeasPageSkeleton,
   NotificationsPageSkeleton,
   ProfilePageSkeleton,
   ResearcherStudioSkeleton,
@@ -88,11 +84,8 @@ export function RootShell() {
   // Active modals/popups
   const [writeOpen, setWriteOpen] = useState(false);
   const [reelUploadOpen, setReelUploadOpen] = useState(false);
-  const [aiOpen, setAiOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
-  const [createProductOpen, setCreateProductOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [registrationEvent, setRegistrationEvent] = useState<UpcomingEvent | null>(null);
   const [readerId, setReaderId] = useState<string | null>(null);
   const [player, setPlayer] = useState<{ items: PlayerItem[]; start: number } | null>(null);
@@ -101,7 +94,6 @@ export function RootShell() {
   const [rxBreakdown, setRxBreakdown] = useState<{ targetType: ReactionTargetType; targetId: string } | null>(null);
   const [pillar, setPillar] = useState<string | null>(null);
   const [savedReelIds, setSavedReelIds] = useState<string[]>([]);
-  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
 
   const commit = useCallback((updater: (prev: DatabaseSnapshot) => DatabaseSnapshot) => {
     setSnap((prev) => {
@@ -352,11 +344,8 @@ export function RootShell() {
     if (player) list.push('player');
     if (writeOpen) list.push('write');
     if (reelUploadOpen) list.push('reelUpload');
-    if (aiOpen) list.push('ai');
     if (savedOpen) list.push('saved');
     if (profileSettingsOpen) list.push('profileSettings');
-    if (createProductOpen) list.push('createProduct');
-    if (checkoutOpen) list.push('checkout');
     if (registrationEvent) list.push('registration');
     if (rxBreakdown) list.push('rxBreakdown');
     if (authModalOpen) list.push('auth');
@@ -368,11 +357,8 @@ export function RootShell() {
     player,
     writeOpen,
     reelUploadOpen,
-    aiOpen,
     savedOpen,
     profileSettingsOpen,
-    createProductOpen,
-    checkoutOpen,
     registrationEvent,
     rxBreakdown,
     authModalOpen,
@@ -423,24 +409,12 @@ export function RootShell() {
       setRegistrationEvent(null);
       return true;
     }
-    if (checkoutOpen) {
-      setCheckoutOpen(false);
-      return true;
-    }
-    if (createProductOpen) {
-      setCreateProductOpen(false);
-      return true;
-    }
     if (profileSettingsOpen) {
       setProfileSettingsOpen(false);
       return true;
     }
     if (savedOpen) {
       setSavedOpen(false);
-      return true;
-    }
-    if (aiOpen) {
-      setAiOpen(false);
       return true;
     }
     if (reelUploadOpen) {
@@ -469,11 +443,8 @@ export function RootShell() {
     authModalOpen,
     rxBreakdown,
     registrationEvent,
-    checkoutOpen,
-    createProductOpen,
     profileSettingsOpen,
     savedOpen,
-    aiOpen,
     reelUploadOpen,
     writeOpen,
     player,
@@ -664,8 +635,7 @@ export function RootShell() {
     const p = location.pathname;
     if (p.startsWith('/explore')) return 'explore';
     if (p.startsWith('/events')) return 'events';
-    if (p.startsWith('/store')) return 'store';
-    if (p.startsWith('/ideas')) return 'ideas';
+    if (p.startsWith('/editorial')) return 'editorial';
     if (p.startsWith('/notifications')) return 'notifications';
     if (p.startsWith('/profile')) return 'profile';
     if (p.startsWith('/me/security')) return 'security';
@@ -1348,8 +1318,9 @@ export function RootShell() {
       : typeof window !== 'undefined'
         ? `${window.location.origin}${rawUrl}`
         : `https://pla.insyt.bd${rawUrl}`;
-    navigator.clipboard?.writeText(fullUrl).catch(() => {});
-    setSharePayload({ title: label, url: fullUrl });
+    navigator.clipboard?.writeText(fullUrl).then(() => {
+      toast.success('Copied', { duration: 1500 });
+    }).catch(() => {});
   }, []);
 
   const handleOpenArticlePopup = useCallback(
@@ -1550,55 +1521,6 @@ export function RootShell() {
     [currentUser, requestAuth, snap.followingIds, snap.profiles, commit],
   );
 
-  // Store & Cart handlers
-  const handleAddToCart = useCallback(
-    (product: StoreProduct) => {
-      commit((prev) => {
-        const existing = prev.cart.find((c) => c.productId === product.id);
-        const nextCart = existing
-          ? prev.cart.map((c) => (c.productId === product.id ? { ...c, quantity: c.quantity + 1 } : c))
-          : [...prev.cart, { productId: product.id, quantity: 1 }];
-        return { ...prev, cart: nextCart };
-      });
-    },
-    [commit],
-  );
-
-  const handleUpdateCartQty = useCallback(
-    (productId: string, qty: number) => {
-      commit((prev) => ({
-        ...prev,
-        cart:
-          qty <= 0
-            ? prev.cart.filter((c) => c.productId !== productId)
-            : prev.cart.map((c) => (c.productId === productId ? { ...c, quantity: qty } : c)),
-      }));
-    },
-    [commit],
-  );
-
-  const handleCompleteOrder = useCallback(
-    (order: BkashOrder) => {
-      commit((prev) => {
-        const updatedProducts = prev.storeProducts.map((p) => {
-          const ordered = order.items.find((i) => i.productId === p.id);
-          if (!ordered) return p;
-          const nextStock = Math.max(0, p.stock - ordered.quantity);
-          dbUpsertProduct({ ...p, stock: nextStock });
-          return { ...p, stock: nextStock };
-        });
-        return {
-          ...prev,
-          orders: [order, ...prev.orders],
-          storeProducts: updatedProducts,
-          cart: [],
-        };
-      });
-      dbInsertOrder(order);
-    },
-    [commit],
-  );
-
   const reelPlayerItems: PlayerItem[] = useMemo(
     () =>
       snap.reels.map((r) => ({
@@ -1636,7 +1558,6 @@ export function RootShell() {
   );
   const savedPosts = useMemo(() => snap.posts.filter((p) => p.userSaved), [snap.posts]);
   const savedCount = savedArticles.length + savedPosts.length;
-  const cartCount = useMemo(() => snap.cart.reduce((s, c) => s + c.quantity, 0), [snap.cart]);
   const readerArticle = useMemo(
     () =>
       snap.articles.find((a) => a.id === readerId || a.slug === readerId) ??
@@ -2051,82 +1972,12 @@ export function RootShell() {
             onOpenRegister={(ev) => setRegistrationEvent(ev)}
           />
         );
-      case 'store':
+      case 'editorial':
         return (
-          <StoreView
-            products={snap.storeProducts}
-            cart={snap.cart}
-            ordersCount={snap.orders.length}
-            onAddToCart={handleAddToCart}
-            isLoading={isPageLoading}
-            onOpenCheckout={() => {
-              if (!currentUser) {
-                requestAuth('অর্ডার সম্পন্ন করতে দয়া করে আপনার অ্যাকাউন্টে লগইন করুন।', () => setCheckoutOpen(true));
-              } else {
-                setCheckoutOpen(true);
-              }
-            }}
-            onOpenCreateProduct={() => {
-              if (!currentUser) {
-                requestAuth('পণ্য যোগ করতে দয়া করে আপনার অ্যাকাউন্টে লগইন করুন।', () => setCreateProductOpen(true));
-              } else {
-                setCreateProductOpen(true);
-              }
-            }}
-            onNavigateProfile={navigateToProfile}
-            onOpenPhoto={(src, title, subtitle, authorName, authorId) =>
-              openPhotoPopup([src], 0, title, subtitle, authorName, authorId)
-            }
-          />
-        );
-      case 'ideas':
-        return (
-          <IdeasView
-            ideas={snap.ideas}
-            isLoading={isPageLoading}
-            onSubmitIdea={(title, body, tag) => {
-              if (!currentUser) {
-                requestAuth('নতুন আইডিয়া জমা দিতে দয়া করে অ্যাকাউন্টে লগইন করুন।');
-                return;
-              }
-              const actor = currentUser;
-              const idea = {
-                id: `idea-${Date.now().toString(36)}`,
-                title,
-                body,
-                authorId: actor.id,
-                author: actor.name,
-                authorAvatar: actor.avatar,
-                votes: 1,
-                tag,
-                voted: true,
-                createdAt: new Date().toISOString(),
-              };
-              commit((prev) => ({
-                ...prev,
-                ideas: [idea, ...prev.ideas],
-                votedIdeaIds: [...prev.votedIdeaIds, idea.id],
-              }));
-              dbUpsertIdea(idea);
-            }}
-            onToggleVote={(id) => {
-              if (!currentUser) {
-                requestAuth('আইডিয়ায় ভোট দিতে দয়া করে অ্যাকাউন্টে লগইন করুন।');
-                return;
-              }
-              commit((prev) => {
-                const voted = (prev.votedIdeaIds ?? []).includes(id);
-                const nextVoted = toggleBookmarkId(prev.votedIdeaIds, id);
-                const nextIdeas = (prev.ideas ?? []).map((i) => {
-                  if (i.id !== id) return i;
-                  const updated = { ...i, voted: !voted, votes: Math.max(0, i.votes + (voted ? -1 : 1)) };
-                  dbUpsertIdea(updated);
-                  return updated;
-                });
-                return { ...prev, votedIdeaIds: nextVoted, ideas: nextIdeas };
-              });
-            }}
-            onNavigateProfile={navigateToProfile}
+          <EditorialDashboard
+            articles={snap.articles}
+            currentUser={currentUser}
+            onOpenArticle={handleOpenArticlePopup}
           />
         );
       case 'notifications':
@@ -2196,11 +2047,11 @@ export function RootShell() {
               }
             }}
             onOpenCreateStory={() => {
-              if (!currentUser) {
-                requestAuth('স্টোরি তৈরি করতে দয়া করে লগইন করুন।', () => setReelUploadOpen(true));
-              } else {
-                setReelUploadOpen(true);
+              if (!canCreateStory(currentUser)) {
+                toast.error('স্টোরি তৈরির অনুমতি কেবল নির্দিষ্ট সম্পাদকীয় অ্যাকাউন্টের রয়েছে।');
+                return;
               }
+              setReelUploadOpen(true);
             }}
             onOpenWriteArticle={() => {
               if (!currentUser) {
@@ -2269,11 +2120,11 @@ export function RootShell() {
               }
             }}
             onCreateStory={() => {
-              if (!currentUser) {
-                requestAuth('স্টোরি তৈরি করতে দয়া করে অ্যাকাউন্টে লগইন করুন।', () => setReelUploadOpen(true));
-              } else {
-                setReelUploadOpen(true);
+              if (!canCreateStory(currentUser)) {
+                toast.error('স্টোরি তৈরির অনুমতি কেবল নির্দিষ্ট সম্পাদকীয় অ্যাকাউন্টের রয়েছে।');
+                return;
               }
+              setReelUploadOpen(true);
             }}
             onOpenArticlePopup={handleOpenArticlePopup}
             onReact={handleReact}
@@ -2327,9 +2178,7 @@ export function RootShell() {
         dark={dark}
         onToggleDark={toggleDark}
         savedCount={savedCount}
-        cartCount={cartCount}
         reelsCount={snap.reels.length}
-        onOpenCart={() => setCheckoutOpen(true)}
         onOpenSaved={() => setSavedOpen(true)}
         onOpenReels={() => {
           if (reelPlayerItems.length > 0) {
@@ -2338,7 +2187,6 @@ export function RootShell() {
             setReelUploadOpen(true);
           }
         }}
-        onOpenAI={() => setAiOpen(true)}
         notifications={userNotifications}
         onReadNotifications={handleReadAllNotifications}
         onToggleNotificationRead={handleToggleNotificationRead}
@@ -2365,7 +2213,6 @@ export function RootShell() {
               if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
               else setReelUploadOpen(true);
             }}
-            onOpenAI={() => setAiOpen(true)}
             onOpenProfileSettings={() => setProfileSettingsOpen(true)}
             onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
             onNavigate={goNavigate}
@@ -2417,7 +2264,6 @@ export function RootShell() {
               if (reelPlayerItems.length > 0) setPlayer({ items: reelPlayerItems, start: 0 });
               else setReelUploadOpen(true);
             }}
-            onOpenAI={() => setAiOpen(true)}
             onOpenProfileSettings={() => setProfileSettingsOpen(true)}
             onNavigate={goNavigate}
             activePillar={pillar}
@@ -2443,8 +2289,6 @@ export function RootShell() {
         currentUser={currentUser}
         onSubmitReel={handlePublishReel}
       />
-
-      <AskAIModal open={aiOpen} onClose={() => handleUiCloseModal(() => setAiOpen(false))} currentUser={currentUser} />
 
       <SavedArticlesModal
         open={savedOpen}
@@ -2487,13 +2331,8 @@ export function RootShell() {
         savedStoryIds={snap.savedPostIds ?? []}
         onClose={() => handleUiCloseModal(() => setStoryViewerId(null))}
         onToggleFollow={handleToggleFollow}
-        onReact={handleReact}
-        onComment={handleCommentStoryOrReel}
-        onEditComment={handleEditComment}
-        onDeleteComment={handleDeleteComment}
-        onShare={handleShare}
         onSave={(id) => setSavedReelIds((s) => toggleBookmarkId(s, id))}
-        onOpenAuth={() => requestAuth('স্টোরি প্রতিক্রিয়া বা মন্তব্যের জন্য অনুগ্রহ করে লগইন করুন')}
+        onOpenAuth={() => requestAuth('অনুগ্রহ করে লগইন করুন')}
         onNavigateProfile={navigateToProfile}
       />
 
@@ -2537,31 +2376,6 @@ export function RootShell() {
         }}
       />
 
-      <CreateProductModal
-        open={createProductOpen}
-        onClose={() => handleUiCloseModal(() => setCreateProductOpen(false))}
-        currentUser={currentUser}
-        onCreateProduct={(product) => {
-          commit((prev) => ({
-            ...prev,
-            storeProducts: [product, ...prev.storeProducts],
-          }));
-          dbUpsertProduct(product);
-        }}
-      />
-
-      <BkashCheckoutModal
-        open={checkoutOpen}
-        onClose={() => handleUiCloseModal(() => setCheckoutOpen(false))}
-        cart={snap.cart}
-        products={snap.storeProducts}
-        currentUser={currentUser}
-        orders={snap.orders}
-        onUpdateQty={handleUpdateCartQty}
-        onClearCart={() => commit((prev) => ({ ...prev, cart: [] }))}
-        onCompleteOrder={handleCompleteOrder}
-      />
-
       <EventRegistrationModal
         open={!!registrationEvent}
         event={registrationEvent}
@@ -2576,12 +2390,6 @@ export function RootShell() {
             ),
           }));
         }}
-      />
-
-      <ShareModal
-        open={!!sharePayload}
-        payload={sharePayload}
-        onClose={() => handleUiCloseModal(() => setSharePayload(null))}
       />
 
       <AuthModal

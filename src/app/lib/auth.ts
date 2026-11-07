@@ -59,6 +59,29 @@ export const ADMIN_PROFILE: UserProfile = {
   createdAt: '2026-01-01T00:00:00.000Z',
 };
 
+export const HASAN_ZUBAIR_AVATAR =
+  'https://scontent.fdac181-1.fna.fbcdn.net/v/t39.30808-6/868869490_122115169682436931_6504382327291511656_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=OPH1ic41iEcQ7kNvwHfVJ22&_nc_oc=Ado4dMV71UpAFR9znBCct-4oL-vbc2Tj2XNuEOMF69HCn9LVBresJLegwGmkFlHIoao&_nc_zt=23&_nc_ht=scontent.fdac181-1.fna&_nc_gid=Y728jMG_bc65Ll0ceAYQAg&_nc_ss=7b289&oh=00_AQTWBy-QOn2nh1S1pqRbyKcEOazefMscU9_rRdxE7UTIPQ&oe=6AF4A9EF';
+
+export const AUTHORIZED_EDITORIAL_EMAILS = [
+  'z65gt9@gmail.com',
+  'plaiinsyt@gmail.com',
+  'zubair.bau.01@gmail.com',
+] as const;
+
+export function isEditorialAuthorized(user?: UserProfile | null): boolean {
+  if (!user) return false;
+  const email = (user.email || '').toLowerCase().trim();
+  if (AUTHORIZED_EDITORIAL_EMAILS.some((e) => e === email)) return true;
+  if (user.id === ADMIN_CANONICAL_ID || isZubairIdentifier(user.id) || isZubairIdentifier(user.email)) {
+    return true;
+  }
+  return false;
+}
+
+export function canCreateStory(user?: UserProfile | null): boolean {
+  return isEditorialAuthorized(user);
+}
+
 export const ZUBAIR_PROFILE: UserProfile = {
   id: ZUBAIR_ID,
   name: 'Hasan Zubair',
@@ -68,7 +91,7 @@ export const ZUBAIR_PROFILE: UserProfile = {
   organization: 'Bangladesh Agricultural University (BAU)',
   location: 'ময়মনসিংহ, বাংলাদেশ',
   bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: 'https://lh3.googleusercontent.com/a/ACg8ocKKzx5J69HH-15sdpD7MZWljX6SIYD0HxFVNuix_bU5j6mpvWVx=s96-c',
+  avatar: HASAN_ZUBAIR_AVATAR,
   coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
   isVerified: true,
   focusArea: 'Agri-Tech & Agronomy',

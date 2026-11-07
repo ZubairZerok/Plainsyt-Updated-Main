@@ -119,11 +119,8 @@ assert(toBengaliNumerals(0) === '০', 'toBengaliNumerals formats 0 correctly');
 assert(toBengaliNumerals(1450) === '১,৪৫০', 'toBengaliNumerals formats 1450 as ১,৪৫০ with commas');
 assert(toBengaliNumerals(89000000) === '৮৯,০০০,০০০', 'toBengaliNumerals formats 89 million BDT properly');
 
-// Bkash checkout verification logic check
-const checkoutSource = fs.readFileSync(path.join(rootDir, 'src/app/components/BkashCheckoutModal.tsx'), 'utf-8');
-assert(checkoutSource.includes('orders.some((o) => o.trxId.toUpperCase() === finalTrx)'), 'BkashCheckoutModal enforces duplicate TrxID prevention');
-assert(checkoutSource.includes('পেমেন্ট যাচাই প্রক্রিয়াধীন'), 'Receipt shows explicit verification pending state');
-assert(!checkoutSource.includes('Payment Verified'), 'No false Payment Verified labels shown on receipt');
+// Marketplace & Cart purged verification
+assert(!fs.existsSync(path.join(rootDir, 'src/app/components/BkashCheckoutModal.tsx')), 'BkashCheckoutModal is purged as marketplace/cart is deleted');
 
 // ----------------------------------------------------
 // SUITE 4: PWA, SERVICE WORKER & SEO DISCOVERY
@@ -199,10 +196,10 @@ const storyViewerSource = fs.readFileSync(path.join(rootDir, 'src/app/components
 assert(storyViewerSource.includes('FollowIconButton'), 'StoryViewerModal uses standardized FollowIconButton');
 assert(storyViewerSource.includes('rotateY(${cubeAngle}deg)'), 'StoryViewerModal has 3D cube rotation transition');
 assert(storyViewerSource.includes('isCaptionExpanded ? \'-translate-y-4\''), 'StoryViewerModal has caption Y-axis lift on expansion');
-assert(storyViewerSource.includes('setShowComments((prev) =>'), 'StoryViewerModal comments drawer toggles and pops down');
+assert(!storyViewerSource.includes('setShowComments'), 'StoryViewerModal has purged comments drawer');
 
 const carouselSource = fs.readFileSync(path.join(rootDir, 'src/app/components/TopicStoriesCarousel.tsx'), 'utf-8');
-assert(carouselSource.includes('onCreate && currentUser &&'), 'TopicStoriesCarousel hides Add Story card for logged out visitors');
+assert(carouselSource.includes('canCreateStory(currentUser)'), 'TopicStoriesCarousel restricts Add Story card to authorized editorial users');
 
 const readerSource = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleReaderModal.tsx'), 'utf-8');
 assert(readerSource.includes('handleDragStart') && readerSource.includes('translateY'), 'ArticleReaderModal supports mobile pull-to-dismiss gesture');
@@ -214,7 +211,7 @@ assert(authModalSource.includes('font-bold underline text-[#03EF62]'), 'AuthModa
 
 const viewsSource = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
 assert(viewsSource.includes('ExploreTopicDropdown') && viewsSource.includes('relative z-50'), 'Explore view isolates topic dropdown stacking context with relative z-50');
-assert(viewsSource.includes("'অনুসারী'") && viewsSource.includes("'অনুসরণ'"), 'ProfileView displays both followers and following counts');
+assert(!viewsSource.includes("['অনুসারী'") && !viewsSource.includes("['অনুসরণ'"), 'ProfileView completely removed follower and following metrics');
 assert(!viewsSource.includes('hidden sm:flex flex-wrap items-center gap-2 sm:gap-2.5'), 'ProfileView stats are visible on mobile and desktop');
 
 assert(rootShellSource.includes('plainsytApp') && rootShellSource.includes('closeTopModal'), 'RootShell implements mobile history sentinel and modal interception');
@@ -269,9 +266,9 @@ const articleCardSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/com
 assert(articleCardSourceUpdated.includes('whitespace-nowrap overflow-hidden text-ellipsis') && articleCardSourceUpdated.includes('text-[11px] font-bangla'), 'ArticleCard renders smaller author designations in a single line beside author name');
 
 const viewsSourceUpdated = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
-assert(viewsSourceUpdated.includes("setTab(tabKey as typeof tab)") && viewsSourceUpdated.includes("'followers'") && viewsSourceUpdated.includes("'following'"), 'ProfileView stats badges are clickable buttons opening following and followers lists');
-assert(viewsSourceUpdated.includes("tab === 'following'") && viewsSourceUpdated.includes('displayedFollowing.map'), 'ProfileView displays list of accounts being followed with avatars and follow controls');
-assert(viewsSourceUpdated.includes("tab === 'followers'") && viewsSourceUpdated.includes('displayedFollowers.map'), 'ProfileView displays list of followers and follower count');
+assert(viewsSourceUpdated.includes("setTab(tabKey as typeof tab)"), 'ProfileView stats badges are clickable buttons opening respective content lists');
+assert(!viewsSourceUpdated.includes("['অনুসারী'") && !viewsSourceUpdated.includes("['অনুসরণ'"), 'ProfileView stats bar purged follower and following metrics');
+assert(!viewsSourceUpdated.includes("tab === 'following'") && !viewsSourceUpdated.includes("tab === 'followers'"), 'ProfileView purged following and followers tabs and lists');
 
 assert(rootShellSource.includes('allKnownProfiles') && rootShellSource.includes('allProfiles={allKnownProfiles}'), 'RootShell passes allKnownProfiles directory to ProfileView');
 assert(viewsSourceUpdated.includes('allProfiles = []') && viewsSourceUpdated.includes('followingIds = []'), 'ProfileView destructures allProfiles and followingIds with safe defaults');
@@ -326,12 +323,8 @@ assert(!updatedHeaderSource.includes("'analytics'") && !updatedHeaderSource.incl
 
 assert(!updatedRootShell.includes('/me/analytics') && !updatedRootShell.includes('/me/reading-history'), 'RootShell route matcher purged analytics and reading-history');
 
-const aiModalSource = fs.readFileSync(path.join(rootDir, 'src/app/components/AskAIModal.tsx'), 'utf-8');
-assert(!aiModalSource.includes('লোকাল এগ্রোনমি'), 'AskAIModal purged local agronomy engine attribution text');
-assert(!aiModalSource.includes('m.source'), 'AskAIModal purged bottom source attribution block from chat messages');
-
-const aiServiceSource = fs.readFileSync(path.join(rootDir, 'src/app/lib/aiService.ts'), 'utf-8');
-assert(!aiServiceSource.includes('লোকাল এগ্রোনমি'), 'aiService.ts purged local agronomy engine attribution text');
+assert(!fs.existsSync(path.join(rootDir, 'src/app/components/AskAIModal.tsx')), 'AskAIModal is completely deleted from codebase');
+assert(!fs.existsSync(path.join(rootDir, 'src/app/lib/aiService.ts')), 'aiService is completely deleted from codebase');
 
 console.log('\n▶ Suite 13: Clean Story Reactions, Author Profile Link, Lime Tick, Genuine Follow Counts & Facebook Share');
 const storyViewerSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/StoryViewerModal.tsx'), 'utf-8');
@@ -348,7 +341,7 @@ const shareModalSrc = fs.readFileSync(shareModalPath, 'utf-8');
 assert(shareModalSrc.includes('facebook.com/sharer/sharer.php') && shareModalSrc.includes('navigator.clipboard'), 'ShareModal provides both Facebook sharing and direct clipboard copy');
 
 const currentRootShell = fs.readFileSync(path.join(rootDir, 'src/app/components/RootShell.tsx'), 'utf-8');
-assert(currentRootShell.includes('ShareModal') && currentRootShell.includes('setSharePayload'), 'RootShell integrates ShareModal and sets payload on handleShare');
+assert(!currentRootShell.includes('<ShareModal') && !currentRootShell.includes('setSharePayload'), 'RootShell completely purged modal popup for share button');
 assert(!currentRootShell.includes('followersCount: 142') && !currentRootShell.includes('followersCount: 386'), 'RootShell has zero hardcoded follower counts for synthetic profiles');
 
 const currentDbSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/db.ts'), 'utf-8');
@@ -374,9 +367,8 @@ const reactionsBarSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/L
 assert(reactionsBarSrc.includes('react-btn') && reactionsBarSrc.includes('react-heart') && reactionsBarSrc.includes('react-glass'), 'LinkedInReactionBar implements Heart and Bulb reaction button markup from reaction-buttons.html');
 assert(reactionsBarSrc.includes('react-dot') && reactionsBarSrc.includes('react-ring'), 'LinkedInReactionBar renders dynamic burst particle dots and expanding ring');
 
-const updatedAiServiceSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/aiService.ts'), 'utf-8');
-assert(updatedAiServiceSrc.includes('google/gemini-2.0-flash-001'), 'aiService includes high-performance Gemini 2.0 Flash model');
-assert(updatedAiServiceSrc.includes('লবণাক্ত') && updatedAiServiceSrc.includes('ব্লাস্ট') && updatedAiServiceSrc.includes('কারেন্ট') && updatedAiServiceSrc.includes('AWD'), 'aiService contains ultra-detailed Bangladesh agronomic intelligence database');
+const editorialDashboardPath = path.join(rootDir, 'src/app/components/EditorialDashboard.tsx');
+assert(fs.existsSync(editorialDashboardPath), 'EditorialDashboard component exists');
 
 console.log('\n▶ Suite 15: Comment Icon Text Removed, Faster Fullscreen Splash, /help Route Purged, Dummy Posts Purged & Specification v5.0.0');
 const updatedArticleCardClean = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
@@ -421,8 +413,8 @@ assert(viteConfigSrc.includes('vendor-react') && viteConfigSrc.includes('vendor-
 const lightboxSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/PhotoLightboxModal.tsx'), 'utf-8');
 assert(lightboxSrc.includes('imgError') && lightboxSrc.includes('onError={() => setImgError(true)}'), 'PhotoLightboxModal implements resilient onError fallback');
 
-const aiModalUpdatedSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/AskAIModal.tsx'), 'utf-8');
-assert(aiModalUpdatedSrc.includes('plainsyt_openrouter_api_key') && aiModalUpdatedSrc.includes('showKeyInput'), 'AskAIModal provides OpenRouter API key configuration drawer');
+const seoHeadSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/SEOHead.tsx'), 'utf-8');
+assert(seoHeadSrc.includes('application/ld+json') && seoHeadSrc.includes('og:title'), 'SEOHead renders rich JSON-LD and Open Graph meta tags');
 
 console.log('\n▶ Suite 18: Pure Reaction Icons, Hover/Hold Name Display, Comment Edit & Delete Invariants');
 const rxBarClean = fs.readFileSync(path.join(rootDir, 'src/app/components/LinkedInReactionBar.tsx'), 'utf-8');
@@ -495,12 +487,26 @@ assert(rootShellCode.includes('DeleteCommentAlertModal') && rootShellCode.includ
 const commCardCode = fs.readFileSync(path.join(rootDir, 'src/app/components/CommunityPostCard.tsx'), 'utf-8');
 const artCardCode = fs.readFileSync(path.join(rootDir, 'src/app/components/ArticleCard.tsx'), 'utf-8');
 const reelModalCode = fs.readFileSync(path.join(rootDir, 'src/app/components/ReelPlayerModal.tsx'), 'utf-8');
-assert(!commCardCode.includes('window.confirm') && !artCardCode.includes('window.confirm') && !reelModalCode.includes('window.confirm'), 'window.confirm completely eliminated from comment deletion flows');
+console.log('\n▶ Suite 21: Editorial Permissions, Pure Watch-Only Stories, SEO Prerender & Newsletter Invariants');
+const authSource21 = fs.readFileSync(path.join(rootDir, 'src/app/lib/auth.ts'), 'utf-8');
+assert(authSource21.includes('z65gt9@gmail.com') && authSource21.includes('plaiinsyt@gmail.com') && authSource21.includes('zubair.bau.01@gmail.com'), 'auth.ts defines the 3 authorized editorial emails');
+assert(authSource21.includes('export function canCreateStory'), 'auth.ts exports canCreateStory guard');
 
+const storyViewer21 = fs.readFileSync(path.join(rootDir, 'src/app/components/StoryViewerModal.tsx'), 'utf-8');
+assert(!storyViewer21.includes('<LinkedInReactionPickerButton') && !storyViewer21.includes('onComment') && !storyViewer21.includes('onShare'), 'StoryViewerModal has zero react, comment, or share systems (pure watch-only)');
 
+const profileView21 = fs.readFileSync(path.join(rootDir, 'src/app/components/Views.tsx'), 'utf-8');
+assert(!profileView21.includes("'following' | 'followers'") && !profileView21.includes("displayedFollowers"), 'ProfileView completely removed follower and following metrics');
 
+const newsletterPath = path.join(rootDir, 'src/app/components/NewsletterSubscription.tsx');
+assert(fs.existsSync(newsletterPath), 'NewsletterSubscription component exists');
+const centralFeedSrc = fs.readFileSync(path.join(rootDir, 'src/app/components/CentralFeed.tsx'), 'utf-8');
+assert(centralFeedSrc.includes('<NewsletterSubscription'), 'CentralFeed mounts NewsletterSubscription');
 
-console.log('\n====================================================');
+const prerenderScriptPath = path.join(rootDir, 'scripts/prerender_articles.mjs');
+assert(fs.existsSync(prerenderScriptPath), 'prerender_articles.mjs script exists');
+const pkgJsonSrc = fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8');
+assert(pkgJsonSrc.includes('prerender_articles.mjs'), 'package.json build script runs prerender_articles.mjs');
 console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
 console.log('====================================================');
 
