@@ -134,7 +134,7 @@ export function Header(p: Props) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="আর্টিকেল, পোস্ট বা গবেষক খুঁজুন…"
-            className="h-10 flex-1 bg-transparent text-[14px] text-pine-900 outline-none placeholder:text-pine-900/40"
+            className="h-10 flex-1 bg-transparent text-[14px] text-pine-900 outline-none placeholder:text-pine-900/60"
           />
           {q && (
             <button

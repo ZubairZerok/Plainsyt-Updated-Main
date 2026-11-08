@@ -150,7 +150,7 @@ export function CreatePostModal({
   };
 
   const field =
-    'w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 px-3.5 py-2.5 font-bangla text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white dark:focus:bg-canvas-card transition';
+    'w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 px-3.5 py-2.5 font-bangla text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white dark:focus:bg-canvas-card transition';
 
   return (
     <Modal open={open} onClose={onClose} className="max-w-[760px]" labelledBy="write-title">

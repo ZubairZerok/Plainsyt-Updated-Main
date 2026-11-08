@@ -107,7 +107,7 @@ export function ProfileSettingsModal({
   };
 
   const inputCls =
-    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/20 transition';
+    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/20 transition';
 
   if (!currentUser) {
     return (
@@ -137,7 +137,7 @@ export function ProfileSettingsModal({
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 bg-canvas-card px-5 py-4">
           <div>
             <h2 id="profile-settings-title" className="font-display text-[21px] font-semibold text-pine-900">
-              Profile &amp; Appearance Settings
+              প্রোফাইল ও অ্যাপিয়ারেন্স সেটিংস
             </h2>
             <p className="text-[12px] text-slate-500 dark:text-slate-400">
               আপনার ব্যক্তিগত তথ্য ও প্রোফাইল কাস্টমাইজ করুন
@@ -221,7 +221,7 @@ export function ProfileSettingsModal({
               <input
                 value={avatar.startsWith('data:') ? '' : avatar}
                 onChange={(e) => setAvatar(e.target.value)}
-                placeholder={avatar.startsWith('data:') ? 'Custom uploaded photo active (paste URL to override)' : 'https://...'}
+                placeholder="https://… (অথবা উপরের বাটন দিয়ে ছবি আপলোড করুন)"
                 className={inputCls}
               />
             </div>
@@ -243,12 +243,12 @@ export function ProfileSettingsModal({
                       type="button"
                       onClick={() => setCoverGradient(g.css)}
                       className={cn(
-                        'group relative h-12 overflow-hidden rounded-lg border text-left transition',
+                        'group relative h-16 overflow-hidden rounded-lg border text-left transition',
                         selected ? 'border-pine-900 ring-2 ring-pine-600' : 'border-pine-900/20',
                       )}
                       style={{ background: g.css }}
                     >
-                      <span className="absolute inset-x-1.5 bottom-1 truncate rounded bg-black/45 px-1 py-0.5 font-mono text-[11px] text-white backdrop-blur-[1px]">
+                      <span className="absolute inset-x-1 bottom-1 rounded bg-black/60 px-1 py-0.5 text-center font-mono text-[11px] leading-tight text-white [overflow-wrap:anywhere]">
                         {g.name}
                       </span>
                     </button>

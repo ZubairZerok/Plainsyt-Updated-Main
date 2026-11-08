@@ -841,3 +841,16 @@ button.text-white svg.lucide,
     scroll-behavior: auto !important;
   }
 }
+
+/* Placeholders must stay readable (>= 4.5:1). Utility classes on a field still win over this default. */
+@layer base {
+  input::placeholder,
+  textarea::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #94a3b8;
+  }
+}

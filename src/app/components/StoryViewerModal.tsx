@@ -423,7 +423,7 @@ export function StoryViewerModal({
           onClose();
         }
       }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md select-none overflow-hidden"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/95 backdrop-blur-md select-none overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Story Viewer"

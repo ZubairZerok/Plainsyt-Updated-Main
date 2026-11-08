@@ -617,7 +617,7 @@ export function CommunityPostCard({
             onChange={(e) => setText(e.target.value)}
             onFocus={() => setShowComments(true)}
             placeholder="মন্তব্য লিখুন…"
-            className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/40"
+            className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/60"
           />
           <button
             type="submit"

@@ -528,7 +528,7 @@ export function ArticleCard({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="আপনার গঠনমূলক মতামত লিখুন…"
-                className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/40"
+                className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/60"
               />
               <button
                 type="submit"

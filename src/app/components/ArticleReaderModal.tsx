@@ -390,7 +390,7 @@ export function ArticleReaderContent({
                 onChange={(e) => setText(e.target.value)}
                 rows={2}
                 placeholder="তথ্যভিত্তিক মতামত দিন…"
-                className="w-full resize-none bg-transparent px-2 py-1 font-bangla text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400"
+                className="w-full resize-none bg-transparent px-2 py-1 font-bangla text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
               />
               <div className="flex justify-end pt-1">
                 <button
