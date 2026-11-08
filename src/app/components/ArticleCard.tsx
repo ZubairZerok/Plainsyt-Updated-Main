@@ -93,11 +93,11 @@ export function ArticleCard({
             {a.category}
           </span>
           <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
-            <Clock className="size-3 text-[#03EF62]" />
+            <Clock className="size-3 text-accent-fg" />
             <span className="font-bangla font-bold">{toBengaliNumerals(a.readTimeMinutes)}</span> মিনিট পড়া
           </span>
           {/* Post Date & Time replacing Views count */}
-          <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300"><Calendar className="size-3 text-[#03EF62]" /><span className="font-bangla font-bold">{a.publishedAt}</span></span>
+          <span className="flex items-center gap-1 font-bangla text-[12px] text-slate-600 dark:text-slate-300"><Calendar className="size-3 text-accent-fg" /><span className="font-bangla font-bold">{a.publishedAt}</span></span>
           <a
             href={`/article/${a.id}`}
             target="_blank"

@@ -2,7 +2,7 @@
 
 ## Order matters
 1. **Rotate the leaked OpenRouter key** (it was committed in `.env` in git history): OpenRouter dashboard → revoke.
-2. **Back up Supabase**, then apply `supabase/migrations/20261108000000_security_lockdown.sql` and grant your
+2. **Back up Supabase**, then apply `supabase/migrations/20261108000000_security_lockdown.sql` and then `20261109000000_notifications_v2.sql` and grant your
    admin role (see `supabase/README.md`).
 3. Merge the branch to `main`. Cloudflare builds and deploys automatically.
 

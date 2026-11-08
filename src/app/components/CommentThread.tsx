@@ -58,7 +58,7 @@ const toneCls = (tone: Tone) =>
         meta: 'text-slate-500 dark:text-slate-400',
         action: 'text-slate-600 hover:text-accent-fg dark:text-slate-300 dark:hover:text-[#03EF62]',
         line: 'border-slate-200 dark:border-white/10',
-        composer: 'bg-canvas-subtle ring-canvas-border text-slate-900 dark:text-white',
+        composer: 'bg-canvas-subtle ring-canvas-border text-slate-900 placeholder:text-slate-500 dark:text-white',
         menu: 'bg-canvas-card ring-canvas-border text-slate-800 dark:text-slate-100',
         menuItem: 'hover:bg-canvas-subtle',
         chip: 'bg-canvas-card ring-canvas-border text-slate-700 dark:text-slate-200',

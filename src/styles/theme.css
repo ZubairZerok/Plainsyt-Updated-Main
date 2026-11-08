@@ -862,7 +862,7 @@ html.dark .user-pfp-dropdown span svg {
 @layer base {
   input::placeholder,
   textarea::placeholder {
-    color: #64748b;
+    color: #55657b; /* >= 4.5:1 on white and on the #edf1f4 subtle surface */
     opacity: 1;
   }
   .dark input::placeholder,

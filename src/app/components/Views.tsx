@@ -975,8 +975,8 @@ export function ProfileView({
               onClick={onOpenWriteArticle}
               className="group flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-left hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-[#03EF62]">
-                <Plus className="size-4.5 text-[#03EF62]" strokeWidth={2.5} />
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#03EF62]/15 border border-[#03EF62]/30 text-accent-fg">
+                <Plus className="size-4.5 text-accent-fg" strokeWidth={2.5} />
               </span>
               <div>
                 <p className="font-sans text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-[#03EF62]">

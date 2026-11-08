@@ -217,11 +217,11 @@ export function ArticleReaderContent({
           </div>
           <span className="ml-auto flex items-center gap-3 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1">
-              <Calendar className="size-3 text-[#03EF62]" />
+              <Calendar className="size-3 text-accent-fg" />
               {a.publishedAt}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="size-3 text-[#03EF62]" />
+              <Clock className="size-3 text-accent-fg" />
               {toBengaliNumerals(a.readTimeMinutes)} মিনিট
             </span>
           </span>
@@ -351,7 +351,7 @@ export function ArticleReaderContent({
               type="button"
               className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition cursor-pointer"
             >
-              <Share2 className="size-[18px] text-[#03EF62]" />
+              <Share2 className="size-[18px] text-accent-fg" />
               <span className="font-bangla">শেয়ার</span>
             </button>
           </SharePopoverButton>

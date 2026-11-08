@@ -6,7 +6,8 @@ row-level-security policies; it is idempotent.
 
 ## Before deploying the matching web client
 1. Back up the database (Dashboard → Database → Backups).
-2. Apply `20261108000000_security_lockdown.sql`.
+2. Apply `20261108000000_security_lockdown.sql`, then `20261109000000_notifications_v2.sql`
+   (grouped/retractable notifications, reply + @mention + new-article alerts, realtime; idempotent).
 3. Make sure your own account has a role (the migration carries over the previous e-mail based access once):
    ```sql
    insert into public.app_admins (user_id, role)
@@ -21,7 +22,8 @@ row-level-security policies; it is idempotent.
 ## Tests
 `tests/rls_test.sql` runs ~40 security checks (anonymous attacks, impersonation, forged counters, privilege
 escalation, notification forging, cascades). **Run it only on a local/scratch database, never production.**
-CI does this automatically (see `.github/workflows/ci.yml`).
+`tests/notifications_test.sql` runs 22 notification behaviour checks (grouping, retraction, replies, mentions,
+deep links, follower fan-out, tamper-proofing). CI does both automatically (see `.github/workflows/ci.yml`).
 
 ## Notes
 * Counters (reactions, comments, followers, publications) and notifications are maintained by triggers; the
