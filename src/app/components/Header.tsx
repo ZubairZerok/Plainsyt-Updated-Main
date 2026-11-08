@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, FileText, ArrowUpRight, Trash2, LogIn, User, LogOut, Settings, ShieldCheck, BarChart3 } from 'lucide-react';
+import { Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, FileText, ArrowUpRight, LogIn, User, LogOut, Settings, ShieldCheck, BarChart3 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, TopicStory, UserProfile } from '../types';
+import { NotificationList } from './NotificationList';
+import { toBengaliNumerals } from '../utils/pureLogic';
 import { isEditorialAuthorized } from '../lib/auth';
 import { PlainsytLogo } from './PlainsytLogo';
 import { Avatar, cn } from './Primitives';
@@ -44,6 +46,7 @@ interface Props {
   onReadNotifications: () => void;
   onToggleNotificationRead?: (id: string, isRead: boolean) => void;
   onDeleteNotification?: (id: string) => void;
+  onOpenNotification: (n: NotificationItem) => void;
   articles: Article[];
   posts: CommunityPost[];
   stories?: TopicStory[];
@@ -215,132 +218,35 @@ export function Header(p: Props) {
         <div className="flex items-center justify-between border-b border-canvas-border px-4 py-3 bg-canvas-subtle/40">
           <div className="flex items-center gap-2">
             <Bell className="size-4 text-emerald-600" />
-            <p className="font-display text-[16px] font-bold text-pine-900">বিজ্ঞপ্তি (Notifications)</p>
+            <p className="font-bangla text-[17px] font-bold text-slate-900 dark:text-white">বিজ্ঞপ্তি</p>
             {unread > 0 && (
-              <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
-                {unread} নতুন
+              <span className="rounded-full bg-[#03EF62] px-2 py-0.5 font-bangla text-[11.5px] font-bold text-[#061621]">
+                {toBengaliNumerals(unread)} নতুন
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={p.onReadNotifications}
-            className="font-mono text-[11px] uppercase tracking-wider text-accent-fg hover:text-pine-900 hover:underline"
-          >
-            সব পড়া হয়েছে
-          </button>
+          {unread > 0 && (
+            <button
+              type="button"
+              onClick={p.onReadNotifications}
+              className="rounded-full px-2.5 py-1 font-bangla text-[12.5px] font-bold text-accent-fg transition hover:bg-canvas-subtle"
+            >
+              সব পড়া হয়েছে
+            </button>
+          )}
         </div>
-        {p.notifications.length === 0 ? (
-          <p className="px-4 py-8 text-center font-bangla text-[13px] text-pine-900/55">
-            কোনো নতুন নোটিফিকেশন নেই।
-          </p>
-        ) : (
-          <ul className="p-1.5 max-h-[60vh] overflow-y-auto divide-y divide-slate-100 dark:divide-white/5">
-            {p.notifications.map((n) => {
-              const isUnread = n.isRead !== undefined ? !n.isRead : n.unread;
-              return (
-                <li
-                  key={n.id}
-                  className={cn(
-                    'group flex items-start gap-2.5 rounded-xl p-2.5 transition-colors',
-                    isUnread ? 'bg-emerald-50/60 dark:bg-emerald-950/20' : 'hover:bg-pine-50/60 dark:hover:bg-white/5',
-                  )}
-                >
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (n.actorId) {
-                        p.onNavigateProfile(n.actorId);
-                        setBellOpen(false);
-                      }
-                    }}
-                    className="shrink-0 mt-0.5"
-                    title={n.actorName || n.source}
-                  >
-                    <Avatar
-                      src={n.actorAvatar || ''}
-                      name={n.actorName || n.source || 'PS'}
-                      size="size-8"
-                      hasStory={n.actorId ? storyAuthorIds.has(n.actorId) : false}
-                    />
-                  </button>
-
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => {
-                      if (p.onToggleNotificationRead && isUnread) {
-                        p.onToggleNotificationRead(n.id, true);
-                      }
-                      const dest = n.targetUrl || n.targetRoute || '/';
-                      setBellOpen(false);
-                      if (dest.startsWith('/article/')) {
-                        const artId = dest.replace('/article/', '');
-                        p.onOpenArticle(artId);
-                      } else {
-                        p.onNavigate(dest);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const dest = n.targetUrl || n.targetRoute || '/';
-                        setBellOpen(false);
-                        p.onNavigate(dest);
-                      }
-                    }}
-                    className="min-w-0 flex-1 cursor-pointer text-left"
-                  >
-                    <p className="font-bangla text-[12.5px] leading-snug text-pine-900 font-medium">
-                      {n.message || n.title}
-                    </p>
-                    <div className="mt-1 flex items-center gap-2 font-mono text-[11px] text-accent-fg">
-                      <span>{n.time}</span>
-                      <span>·</span>
-                      <span className="font-sans font-semibold text-emerald-700 dark:text-emerald-400">
-                        {n.actorName || n.source}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0 pt-0.5">
-                    {p.onToggleNotificationRead && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          p.onToggleNotificationRead?.(n.id, !isUnread);
-                        }}
-                        aria-label={isUnread ? 'Mark as read' : 'Mark as unread'}
-                        title={isUnread ? 'পড়া হয়েছে হিসেবে চিহ্নিত করুন' : 'অপঠিত হিসেবে চিহ্নিত করুন'}
-                        className="rounded-full p-1 text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10"
-                      >
-                        {isUnread ? (
-                          <span className="size-2 rounded-full bg-[#03EF62] block" />
-                        ) : (
-                          <span className="size-2 rounded-full border border-slate-300 dark:border-white/30 block" />
-                        )}
-                      </button>
-                    )}
-                    {p.onDeleteNotification && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          p.onDeleteNotification?.(n.id);
-                        }}
-                        aria-label="Delete notification"
-                        title="মুছে ফেলুন"
-                        className="opacity-0 group-hover:opacity-100 rounded-full p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-white/10 transition"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <div className="max-h-[min(70vh,560px)] overflow-y-auto overscroll-contain p-1.5">
+          <NotificationList
+            items={p.notifications.slice(0, 15)}
+            variant="panel"
+            onOpen={(n) => {
+              setBellOpen(false);
+              p.onOpenNotification(n);
+            }}
+            onToggleRead={p.onToggleNotificationRead}
+            onDelete={p.onDeleteNotification}
+          />
+        </div>
         <div className="border-t border-canvas-border p-2 bg-canvas-subtle/30 text-center">
           <button
             type="button"
@@ -444,13 +350,15 @@ export function Header(p: Props) {
                 <button
                   type="button"
                   onClick={() => setBellOpen((b) => !b)}
-                  aria-label="Notifications"
+                  aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
+                  aria-expanded={bellOpen}
+                  aria-haspopup="dialog"
                   className={cn(iconBtn, 'hidden sm:flex')}
                 >
-                  <Bell className="size-[18px]" />
+                  <Bell className={cn('size-[18px]', unread > 0 && 'origin-top animate-[bell-ring_1.2s_ease-in-out_1]')} key={unread} />
                   {unread > 0 && (
-                    <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-[#e41e3f] font-bangla text-[11px] font-bold text-white shadow-xs">
-                      {unread}
+                    <span className="absolute -right-1.5 -top-1.5 flex h-[19px] min-w-[19px] items-center justify-center rounded-full bg-[#e41e3f] px-1 font-bangla text-[11px] font-bold text-white ring-2 ring-[#03EF62]">
+                      {unread > 9 ? '৯+' : toBengaliNumerals(unread)}
                     </span>
                   )}
                 </button>
@@ -674,7 +582,7 @@ export function Header(p: Props) {
                 path: '/notifications',
                 label: 'বিজ্ঞপ্তি',
                 icon: Bell,
-                badge: unread ? String(unread) : '',
+                badge: unread ? (unread > 9 ? '৯+' : toBengaliNumerals(unread)) : '',
               },
             ] as const
           ).map((t) => {

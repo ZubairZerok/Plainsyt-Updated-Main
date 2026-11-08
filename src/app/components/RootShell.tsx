@@ -9,12 +9,15 @@ import {
   fetchReactionsFor, dbUpdateProfile, dbInsertArticle, dbInsertPost, dbInsertComment, dbUpdateComment,
   dbDeleteComment, dbSetReaction, dbInsertReel, dbInsertStory, dbDeletePost, dbDeleteArticle, dbDeleteStory,
   dbUpdateNotificationRead, dbDeleteNotification, dbMarkAllNotificationsRead, dbToggleFollow, dbToggleBookmark,
-  dbIncrementArticleView, dbRegisterForEvent,
+  dbIncrementArticleView, dbRegisterForEvent, dbFetchNotifications, NOTIF_PAGE,
   type DatabaseSnapshot, type DbResult, type EventRegistrationInput, type SupabaseConnectionStatus,
 } from '../lib/db';
 import { applyReactionToSnapshot } from '../lib/reactions';
+import { fromNotificationRow } from '../lib/mappers';
+import { contextText, isUnread, notificationSentence, parseTarget, upsertNotification } from '../lib/notifications';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import type {
-  Article, Comment, CommunityPost, LightboxPayload, LinkedInReactionType,
+  Article, Comment, CommunityPost, LightboxPayload, LinkedInReactionType, NotificationItem,
   ReactionRecord, ReactionTargetType, StoryReel, TopicStory, UpcomingEvent, UserProfile,
 } from '../types';
 import { toggleBookmarkId, appendArticleComment, appendPostComment, makeComment, toBengaliNumerals } from '../utils/pureLogic';
@@ -187,6 +190,8 @@ export function RootShell() {
     };
   }, [refresh, navigate]);
 
+  const onNotificationEventRef = useRef<(p: RealtimePostgresChangesPayload<Record<string, unknown>>) => void>(() => undefined);
+
   // Targeted realtime: new content from others + this user's notifications (debounced re-sync).
   useEffect(() => {
     let channel = supabase
@@ -195,10 +200,11 @@ export function RootShell() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => scheduleRefresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'articles' }, () => scheduleRefresh());
     if (meId) {
+      // Notifications are applied straight from the change event (no full re-sync), so the bell is instant.
       channel = channel.on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${meId}` },
-        () => scheduleRefresh(300),
+        (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => onNotificationEventRef.current(payload),
       );
     }
     channel.subscribe();
@@ -677,6 +683,83 @@ export function RootShell() {
     );
   }, [currentUser, mutate]);
 
+  /** Open what a notification points at (deep-linking to the exact comment) and mark it read. */
+  const handleOpenNotification = useCallback(
+    (n: NotificationItem) => {
+      if (isUnread(n)) handleToggleNotificationRead(n.id, true);
+      const { path, commentId, articleId } = parseTarget(n.targetUrl || n.targetRoute);
+      if (articleId && !commentId) {
+        handleOpenArticlePopup(articleId);
+        return;
+      }
+      goNavigate(commentId ? `${path}?c=${encodeURIComponent(commentId)}` : path);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleOpenArticlePopup is stable (declared below)
+    [handleToggleNotificationRead, goNavigate],
+  );
+  const openNotificationRef = useRef(handleOpenNotification);
+  openNotificationRef.current = handleOpenNotification;
+
+  // Live updates: upsert/remove the single changed row and toast genuinely new activity.
+  onNotificationEventRef.current = (payload) => {
+    if (payload.eventType === 'DELETE') {
+      const id = (payload.old as { id?: string } | null)?.id;
+      if (id) commit((s) => ({ ...s, notifications: s.notifications.filter((n) => n.id !== id) }));
+      return;
+    }
+    const row = payload.new as Record<string, unknown> | null;
+    if (!row || !row.id) return;
+    const n = fromNotificationRow(row);
+    const prev = snapRef.current.notifications.find((x) => x.id === n.id);
+    commit((s) => ({ ...s, notifications: upsertNotification(s.notifications, n) }));
+    const fresh =
+      isUnread(n) &&
+      (payload.eventType === 'INSERT' || !prev || ((n.actorCount ?? 1) > (prev.actorCount ?? 1) && (n.updatedAt ?? '') > (prev.updatedAt ?? '')));
+    if (fresh) {
+      toast(notificationSentence(n), {
+        description: contextText(n) || undefined,
+        duration: 5000,
+        action: { label: 'দেখুন', onClick: () => openNotificationRef.current(n) },
+      });
+    }
+  };
+
+  // Older pages ("আরও দেখুন").
+  const [notifLoadingMore, setNotifLoadingMore] = useState(false);
+  const [notifExhausted, setNotifExhausted] = useState(false);
+  const handleLoadMoreNotifications = useCallback(async () => {
+    if (!meId || notifLoadingMore) return;
+    const list = snapRef.current.notifications;
+    const last = list[list.length - 1];
+    setNotifLoadingMore(true);
+    const res = await dbFetchNotifications(meId, last?.updatedAt || last?.createdAt);
+    setNotifLoadingMore(false);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
+    if (res.data.length < NOTIF_PAGE) setNotifExhausted(true);
+    commit((s) => {
+      const seen = new Set(s.notifications.map((n) => n.id));
+      return { ...s, notifications: [...s.notifications, ...res.data.filter((n) => !seen.has(n.id))] };
+    });
+  }, [meId, notifLoadingMore, commit]);
+
+  // Unread count in the tab title and on the installed-app icon.
+  const unreadNotifCount = useMemo(() => snap.notifications.filter(isUnread).length, [snap.notifications]);
+  useEffect(() => {
+    const apply = () => {
+      const base = document.title.replace(/^\([^)]*\)\s*/, '');
+      document.title = unreadNotifCount > 0 ? `(${toBengaliNumerals(unreadNotifCount > 99 ? 99 : unreadNotifCount)}${unreadNotifCount > 99 ? '+' : ''}) ${base}` : base;
+    };
+    apply();
+    const t = window.setTimeout(apply, 120); // after SEOHead sets the page title
+    const nav = navigator as Navigator & { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> };
+    if (unreadNotifCount > 0) void nav.setAppBadge?.(unreadNotifCount).catch(() => undefined);
+    else void nav.clearAppBadge?.().catch(() => undefined);
+    return () => window.clearTimeout(t);
+  }, [unreadNotifCount, location.pathname]);
+
   /* ----------------------------- content deletion ----------------------------- */
   const handleDeletePost = useCallback(
     (postId: string) => {
@@ -1023,10 +1106,12 @@ export function RootShell() {
             onRead={handleReadAllNotifications}
             onToggleRead={handleToggleNotificationRead}
             onDelete={handleDeleteNotification}
-            onNavigate={goNavigate}
+            onOpen={handleOpenNotification}
+            onLoadMore={snap.notifications.length >= NOTIF_PAGE && !notifExhausted ? handleLoadMoreNotifications : undefined}
+            loadingMore={notifLoadingMore}
+            followingIds={snap.followingIds}
+            onFollowBack={handleToggleFollow}
             isLoading={loading}
-            onOpenArticle={handleOpenArticlePopup}
-            onNavigateProfile={navigateToProfile}
           />
         );
       case 'profile': {
@@ -1178,6 +1263,7 @@ export function RootShell() {
         onReadNotifications={handleReadAllNotifications}
         onToggleNotificationRead={handleToggleNotificationRead}
         onDeleteNotification={handleDeleteNotification}
+        onOpenNotification={handleOpenNotification}
         onOpenAuth={() => requestAuth('লগইন বা সাইন আপ করুন')}
         onLogout={handleLogout}
         onOpenProfileSettings={() => setProfileSettingsOpen(true)}
@@ -1271,6 +1357,8 @@ export function RootShell() {
         onComment={handleCommentStoryOrReel}
         onEditComment={handleEditComment}
         onDeleteComment={handleDeleteComment}
+        onReactComment={(cid, type) => handleReact('comment', cid, type)}
+        onNavigateProfile={(uid) => { handleUiCloseModal(() => setPlayer(null)); window.setTimeout(() => navigateToProfile(uid), 150); }}
         onReactStory={(id) => handleReact('reel', id, 'like')}
         onBookmarkStory={handleSaveReel}
       />

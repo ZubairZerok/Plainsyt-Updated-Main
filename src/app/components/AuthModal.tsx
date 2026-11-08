@@ -371,7 +371,7 @@ export function AuthModal({
             {/* Cloud Security Indicator */}
             <div className="pt-2 text-center text-[11px] text-slate-400">
               <span className="flex items-center justify-center gap-1">
-                <ShieldCheck className="size-3.5 text-[#03EF62]" /> সম্পূর্ণ সুরক্ষিত ও এনক্রিপ্টেড সংযোগ
+                <ShieldCheck className="size-3.5 text-accent-fg" /> সম্পূর্ণ সুরক্ষিত ও এনক্রিপ্টেড সংযোগ
               </span>
             </div>
           </form>

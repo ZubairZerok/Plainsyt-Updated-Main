@@ -234,7 +234,7 @@ export interface NotificationItem {
   actorId?: string;
   actorName?: string;
   actorAvatar?: string;
-  type?: 'reaction' | 'comment' | 'bookmark' | 'follow' | 'system';
+  type?: 'reaction' | 'comment' | 'reply' | 'mention' | 'bookmark' | 'follow' | 'new_article' | 'system';
   entityType?: 'article' | 'post' | 'reel' | 'profile' | 'comment';
   entityId?: string;
   title: string;
@@ -246,6 +246,13 @@ export interface NotificationItem {
   targetRoute?: string;
   targetUrl?: string;
   createdAt?: string;
+  /** Last activity (grouped rows move up when someone new joins). */
+  updatedAt?: string;
+  /** Newest first, at most 3. */
+  actors?: { id: string; name: string; avatar: string }[];
+  actorCount?: number;
+  entityLabel?: string;
+  snippet?: string;
 }
 
 export interface LightboxPayload {

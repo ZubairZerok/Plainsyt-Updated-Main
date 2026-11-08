@@ -63,7 +63,7 @@ export function TrendingList({
               </span>
               <span className="mt-1 flex items-center gap-2 font-bangla text-[11px] text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1">
-                  <Calendar className="size-2.5 text-[#03EF62]" />
+                  <Calendar className="size-2.5 text-accent-fg" />
                   {a.publishedAt}
                 </span>
                 <span className="flex items-center gap-1">

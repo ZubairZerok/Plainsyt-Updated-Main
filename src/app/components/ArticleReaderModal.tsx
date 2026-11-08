@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { Bookmark, Share2, Clock, Send, ExternalLink, Calendar, GraduationCap, ShieldCheck, ArrowLeft } from 'lucide-react';
-import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
+import type { Article, LinkedInReactionType, UserProfile } from '../types';
 import { safeUrl } from '../lib/mappers';
 import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
 import { SharePopoverButton } from './ShareModal';
+import { CommentThread } from './CommentThread';
 import { SEOHead } from './SEOHead';
 import { NewsletterSubscription } from './NewsletterSubscription';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
@@ -46,18 +47,7 @@ export function ArticleReaderContent({
   onOpenPhoto,
 }: Omit<Props, 'article'> & { article: Article; isStandalonePage?: boolean }) {
   const [text, setText] = useState('');
-  const [replyingToId, setReplyingToId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingText, setEditingText] = useState('');
 
-  const canManageComment = (c: Comment) =>
-    Boolean(
-      currentUser &&
-        currentUser.id &&
-        c.authorId &&
-        (currentUser.id === c.authorId),
-    );
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const touchStartY = useRef<number | null>(null);
   const rxTotal = totalReactions(a.reactionCounts, a.stats.likes);
@@ -227,11 +217,11 @@ export function ArticleReaderContent({
           </div>
           <span className="ml-auto flex items-center gap-3 font-bangla text-[12px] text-slate-600 dark:text-slate-300">
             <span className="flex items-center gap-1">
-              <Calendar className="size-3 text-[#03EF62]" />
+              <Calendar className="size-3 text-accent-fg" />
               {a.publishedAt}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="size-3 text-[#03EF62]" />
+              <Clock className="size-3 text-accent-fg" />
               {toBengaliNumerals(a.readTimeMinutes)} মিনিট
             </span>
           </span>
@@ -361,7 +351,7 @@ export function ArticleReaderContent({
               type="button"
               className="flex h-10 items-center gap-2 rounded-full border border-slate-200/80 dark:border-[#03EF62] bg-canvas-card px-4 text-[14px] font-semibold text-slate-700 dark:text-[#03EF62] shadow-sm hover:bg-slate-50 dark:hover:bg-[#03EF62]/10 transition cursor-pointer"
             >
-              <Share2 className="size-[18px] text-[#03EF62]" />
+              <Share2 className="size-[18px] text-accent-fg" />
               <span className="font-bangla">শেয়ার</span>
             </button>
           </SharePopoverButton>
@@ -404,292 +394,17 @@ export function ArticleReaderContent({
               </div>
             </div>
           </form>
-          <ul className="mt-4 space-y-4">
-            {a.comments.filter((c) => !c.parentId).map((c) => {
-              const replies = a.comments.filter((r) => r.parentId === c.id);
-              const isReplying = replyingToId === c.id;
-              return (
-                <li key={c.id} className="space-y-2">
-                  <div className="flex gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!isStandalonePage) onClose();
-                        onNavigateProfile(c.authorId);
-                      }}
-                    >
-                      <Avatar src={c.avatar} name={c.author} size="size-9" />
-                    </button>
-                    <div className="flex-1 min-w-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (!isStandalonePage) onClose();
-                          onNavigateProfile(c.authorId);
-                        }}
-                        className="block font-bangla text-left hover:underline"
-                      >
-                        <span className="text-[13.5px] font-semibold text-pine-900 dark:text-white">{c.author}</span>
-                      </button>
-                      {editingCommentId === c.id ? (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            const clean = editingText.trim();
-                            if (clean && clean !== c.text) {
-                              onEditComment?.(c.id, clean);
-                            }
-                            setEditingCommentId(null);
-                          }}
-                          className="mt-1 space-y-2"
-                        >
-                          <textarea
-                            value={editingText}
-                            onChange={(e) => setEditingText(e.target.value)}
-                            autoFocus
-                            rows={2}
-                            className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
-                          />
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="submit"
-                              disabled={!editingText.trim()}
-                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
-                            >
-                              সংরক্ষণ
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingCommentId(null)}
-                              className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
-                            >
-                              বাতিল
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <p className="font-bangla text-[14.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">
-                          {c.text}
-                          {c.isEdited && (
-                            <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
-                          )}
-                        </p>
-                      )}
-                      <div className="mt-1 flex flex-wrap items-center gap-2.5 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
-                        <span className="font-semibold text-slate-500 dark:text-slate-400">{c.timestamp}</span>
-                        {onReactComment && (
-                          <LinkedInReactionPickerButton
-                            compact
-                            userReaction={c.userReaction}
-                            onSelect={(type) => onReactComment(c.id, type)}
-                            countLabel={c.likes > 0 ? String(c.likes) : undefined}
-                          />
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isReplying) {
-                              setReplyingToId(null);
-                            } else {
-                              setReplyingToId(c.id);
-                              setReplyText(`@${c.author} `);
-                            }
-                          }}
-                          className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                        >
-                          উত্তর দিন
-                        </button>
-                        {canManageComment(c) && (
-                          <>
-                            <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingCommentId(c.id);
-                                setEditingText(c.text);
-                              }}
-                              className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                              title="মন্তব্য সম্পাদনা করুন"
-                            >
-                              এডিট
-                            </button>
-                            <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                            <button
-                              type="button"
-                              onClick={() => onDeleteComment?.(c.id)}
-                              className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
-                              title="মন্তব্য মুছে ফেলুন"
-                            >
-                              মুছুন
-                            </button>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Inline Reply Input */}
-                      {isReplying && (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            if (replyText.trim()) {
-                              onComment(replyText.trim(), c.id, c.author);
-                              setReplyText('');
-                              setReplyingToId(null);
-                            }
-                          }}
-                          className="mt-2.5 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/5 p-2"
-                        >
-                          <Avatar src={currentUser?.avatar || 'PS'} name={currentUser?.name || 'User'} size="size-7" />
-                          <input
-                            value={replyText}
-                            onChange={(e) => setReplyText(e.target.value)}
-                            autoFocus
-                            placeholder={`${c.author}-কে উত্তর দিন…`}
-                            className="flex-1 bg-transparent font-bangla text-[13px] text-slate-900 dark:text-white outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setReplyingToId(null)}
-                            className="text-[11px] text-slate-400 hover:text-slate-600 px-2 font-bangla"
-                          >
-                            বাতিল
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={!replyText.trim()}
-                            className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-60"
-                          >
-                            উত্তর
-                          </button>
-                        </form>
-                      )}
-
-                      {/* Nested Threaded Replies */}
-                      {replies.length > 0 && (
-                        <div className="mt-2.5 pl-3 border-l-2 border-emerald-500/25 dark:border-white/10 space-y-2.5">
-                          {replies.map((r) => (
-                            <div key={r.id} className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (!isStandalonePage) onClose();
-                                  onNavigateProfile(r.authorId);
-                                }}
-                              >
-                                <Avatar src={r.avatar} name={r.author} size="size-7" />
-                              </button>
-                              <div className="min-w-0 flex-1">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (!isStandalonePage) onClose();
-                                    onNavigateProfile(r.authorId);
-                                  }}
-                                  className="block font-bangla text-left hover:underline"
-                                >
-                                  <span className="text-[12.5px] font-semibold text-pine-900 dark:text-white">{r.author}</span>
-                                </button>
-                                {editingCommentId === r.id ? (
-                                  <form
-                                    onSubmit={(e) => {
-                                      e.preventDefault();
-                                      const clean = editingText.trim();
-                                      if (clean && clean !== r.text) {
-                                        onEditComment?.(r.id, clean);
-                                      }
-                                      setEditingCommentId(null);
-                                    }}
-                                    className="mt-1 space-y-2"
-                                  >
-                                    <textarea
-                                      value={editingText}
-                                      onChange={(e) => setEditingText(e.target.value)}
-                                      autoFocus
-                                      rows={2}
-                                      className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                    <div className="flex items-center gap-1.5">
-                                      <button
-                                        type="submit"
-                                        disabled={!editingText.trim()}
-                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
-                                      >
-                                        সংরক্ষণ
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setEditingCommentId(null)}
-                                        className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
-                                      >
-                                        বাতিল
-                                      </button>
-                                    </div>
-                                  </form>
-                                ) : (
-                                  <p className="font-bangla text-[13.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">
-                                    {r.text}
-                                    {r.isEdited && (
-                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
-                                    )}
-                                  </p>
-                                )}
-                                <div className="mt-0.5 flex flex-wrap items-center gap-2 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
-                                  <span className="text-slate-400">{r.timestamp}</span>
-                                  {onReactComment && (
-                                    <LinkedInReactionPickerButton
-                                      compact
-                                      userReaction={r.userReaction}
-                                      onSelect={(type) => onReactComment(r.id, type)}
-                                      countLabel={r.likes > 0 ? String(r.likes) : undefined}
-                                    />
-                                  )}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setReplyingToId(c.id);
-                                      setReplyText(`@${r.author} `);
-                                    }}
-                                    className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                                  >
-                                    উত্তর দিন
-                                  </button>
-                                  {canManageComment(r) && (
-                                    <>
-                                      <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setEditingCommentId(r.id);
-                                          setEditingText(r.text);
-                                        }}
-                                        className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                                        title="মন্তব্য সম্পাদনা করুন"
-                                      >
-                                        এডিট
-                                      </button>
-                                      <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                                      <button
-                                        type="button"
-                                        onClick={() => onDeleteComment?.(r.id)}
-                                        className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
-                                        title="মন্তব্য মুছে ফেলুন"
-                                      >
-                                        মুছুন
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <CommentThread
+            className="mt-5"
+            comments={a.comments}
+            currentUser={currentUser}
+            onNavigateProfile={onNavigateProfile}
+            onReply={(text, parentId, replyTo) => onComment(text, parentId, replyTo)}
+            onEdit={onEditComment}
+            onDelete={onDeleteComment}
+            onReact={onReactComment}
+            initialVisible={8}
+          />
         </section>
       </div>
     </article>

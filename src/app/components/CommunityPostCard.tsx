@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { safeUrl } from '../lib/mappers';
 import { Globe2, MoreHorizontal, MessageCircle, Share2, Send, Bookmark, Bot, ExternalLink } from 'lucide-react';
-import type { Comment, CommunityPost, LinkedInReactionType, UserProfile } from '../types';
+import type { CommunityPost, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { SharePopoverButton } from './ShareModal';
+import { CommentThread } from './CommentThread';
+import { deepLinkCommentId } from '../lib/notifications';
 import { toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 export const TEXT_THEMES = [
@@ -49,20 +51,13 @@ export function CommunityPostCard({
   onOpenStory,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  // Open the thread straight away when a notification deep-links to one of its comments.
+  const [showComments, setShowComments] = useState(() => {
+    const id = deepLinkCommentId();
+    return Boolean(id && post.comments.some((c) => c.id === id));
+  });
   const [text, setText] = useState('');
-  const [replyingToId, setReplyingToId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingText, setEditingText] = useState('');
 
-  const canManageComment = (comment: Comment) =>
-    Boolean(
-      currentUser &&
-        currentUser.id &&
-        comment.authorId &&
-        (currentUser.id === comment.authorId),
-    );
   const long = post.content.length > 260;
   const shown = long && !expanded ? post.content.slice(0, 240).trimEnd() + '…' : post.content;
   const themed = post.textTheme && post.content.length < 140 && !post.images?.length;
@@ -329,280 +324,16 @@ export function CommunityPostCard({
       </div>
 
       {showComments && (
-        <div className="border-t border-canvas-border px-3 pb-1 pt-3 sm:px-4">
-          {post.comments.length === 0 && (
-            <p className="pb-2 text-center text-[12.5px] text-pine-900/50">প্রথম মন্তব্যটি আপনিই করুন।</p>
-          )}
-          {post.comments.filter((c) => !c.parentId).map((c) => {
-            const replies = post.comments.filter((r) => r.parentId === c.id);
-            const isReplying = replyingToId === c.id;
-            return (
-              <div key={c.id} className="mb-3 space-y-1.5">
-                <div className="flex gap-2">
-                  <button type="button" onClick={() => onNavigateProfile(c.authorId)} className="shrink-0">
-                    <Avatar src={c.avatar} name={c.author} size="size-8" />
-                  </button>
-                  <div className="min-w-0 flex-1">
-                    <div className="rounded-2xl bg-canvas-subtle px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => onNavigateProfile(c.authorId)}
-                        className="block font-bangla text-left hover:underline"
-                      >
-                        <span className="text-[12.5px] font-semibold text-slate-900 dark:text-white">{c.author}</span>
-                      </button>
-                      {editingCommentId === c.id ? (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            const clean = editingText.trim();
-                            if (clean && clean !== c.text) {
-                              onEditComment?.(c.id, clean);
-                            }
-                            setEditingCommentId(null);
-                          }}
-                          className="mt-1 space-y-2"
-                        >
-                          <textarea
-                            value={editingText}
-                            onChange={(e) => setEditingText(e.target.value)}
-                            autoFocus
-                            rows={2}
-                            className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
-                          />
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="submit"
-                              disabled={!editingText.trim()}
-                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
-                            >
-                              সংরক্ষণ
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingCommentId(null)}
-                              className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
-                            >
-                              বাতিল
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <p className="font-bangla text-[13.5px] leading-snug text-slate-800 dark:text-slate-200">
-                          {c.text}
-                          {c.isEdited && (
-                            <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
-                          )}
-                        </p>
-                      )}
-                    </div>
-                    <div className="ml-2 mt-0.5 flex flex-wrap items-center gap-2.5 font-bangla text-[12px] font-medium text-emerald-800 dark:text-emerald-400">
-                      <span className="font-semibold text-slate-500 dark:text-slate-400">{c.timestamp}</span>
-                      {onReactComment && (
-                        <LinkedInReactionPickerButton
-                          compact
-                          userReaction={c.userReaction}
-                          onSelect={(type) => onReactComment(c.id, type)}
-                          countLabel={c.likes > 0 ? String(c.likes) : undefined}
-                        />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (isReplying) {
-                            setReplyingToId(null);
-                          } else {
-                            setReplyingToId(c.id);
-                            setReplyText(`@${c.author} `);
-                          }
-                        }}
-                        className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                      >
-                        উত্তর দিন
-                      </button>
-                      {canManageComment(c) && (
-                        <>
-                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingCommentId(c.id);
-                              setEditingText(c.text);
-                            }}
-                            className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                            title="মন্তব্য সম্পাদনা করুন"
-                          >
-                            এডিট
-                          </button>
-                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteComment?.(c.id)}
-                            className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
-                            title="মন্তব্য মুছে ফেলুন"
-                          >
-                            মুছুন
-                          </button>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Inline Reply Input */}
-                    {isReplying && (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (replyText.trim()) {
-                            onComment(replyText.trim(), c.id, c.author);
-                            setReplyText('');
-                            setReplyingToId(null);
-                          }
-                        }}
-                        className="mt-2 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-canvas-subtle p-2"
-                      >
-                        <Avatar src={currentUser?.avatar || 'PS'} name={currentUser?.name || 'User'} size="size-7" />
-                        <input
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                          autoFocus
-                          placeholder={`${c.author}-কে উত্তর দিন…`}
-                          className="flex-1 bg-transparent font-bangla text-[12.5px] text-slate-900 dark:text-white outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setReplyingToId(null)}
-                          className="text-[11px] text-slate-400 hover:text-slate-600 px-2 font-bangla"
-                        >
-                          বাতিল
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={!replyText.trim()}
-                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-60"
-                        >
-                          উত্তর
-                        </button>
-                      </form>
-                    )}
-
-                    {/* Nested Threaded Replies */}
-                    {replies.length > 0 && (
-                      <div className="mt-2 pl-3 border-l-2 border-emerald-500/25 dark:border-white/10 space-y-2">
-                        {replies.map((r) => (
-                          <div key={r.id} className="flex gap-2">
-                            <button type="button" onClick={() => onNavigateProfile(r.authorId)} className="shrink-0">
-                              <Avatar src={r.avatar} name={r.author} size="size-7" />
-                            </button>
-                            <div className="min-w-0 flex-1">
-                              <div className="rounded-2xl bg-canvas-subtle/80 px-2.5 py-1.5">
-                                <button
-                                  type="button"
-                                  onClick={() => onNavigateProfile(r.authorId)}
-                                  className="block font-bangla text-left hover:underline"
-                                >
-                                  <span className="text-[12px] font-semibold text-slate-900 dark:text-white">{r.author}</span>
-                                </button>
-                                {editingCommentId === r.id ? (
-                                  <form
-                                    onSubmit={(e) => {
-                                      e.preventDefault();
-                                      const clean = editingText.trim();
-                                      if (clean && clean !== r.text) {
-                                        onEditComment?.(r.id, clean);
-                                      }
-                                      setEditingCommentId(null);
-                                    }}
-                                    className="mt-1 space-y-2"
-                                  >
-                                    <textarea
-                                      value={editingText}
-                                      onChange={(e) => setEditingText(e.target.value)}
-                                      autoFocus
-                                      rows={2}
-                                      className="w-full rounded-xl border border-emerald-500/50 bg-white dark:bg-canvas-card p-2 font-bangla text-xs text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-emerald-500"
-                                    />
-                                    <div className="flex items-center gap-1.5">
-                                      <button
-                                        type="submit"
-                                        disabled={!editingText.trim()}
-                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
-                                      >
-                                        সংরক্ষণ
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setEditingCommentId(null)}
-                                        className="rounded-lg border border-slate-300 dark:border-white/10 px-2.5 py-1 font-bangla text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
-                                      >
-                                        বাতিল
-                                      </button>
-                                    </div>
-                                  </form>
-                                ) : (
-                                  <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">
-                                    {r.text}
-                                    {r.isEdited && (
-                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
-                                    )}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="ml-2 mt-0.5 flex flex-wrap items-center gap-2 font-bangla text-[11px] font-medium text-emerald-800 dark:text-emerald-400">
-                                <span className="text-slate-400">{r.timestamp}</span>
-                                {onReactComment && (
-                                  <LinkedInReactionPickerButton
-                                    compact
-                                    userReaction={r.userReaction}
-                                    onSelect={(type) => onReactComment(r.id, type)}
-                                    countLabel={r.likes > 0 ? String(r.likes) : undefined}
-                                  />
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setReplyingToId(c.id);
-                                    setReplyText(`@${r.author} `);
-                                  }}
-                                  className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                                >
-                                  উত্তর দিন
-                                </button>
-                                {canManageComment(r) && (
-                                  <>
-                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setEditingCommentId(r.id);
-                                        setEditingText(r.text);
-                                      }}
-                                      className="font-bangla font-semibold text-slate-500 hover:text-emerald-700 dark:hover:text-[#03EF62] transition cursor-pointer"
-                                      title="মন্তব্য সম্পাদনা করুন"
-                                    >
-                                      এডিট
-                                    </button>
-                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => onDeleteComment?.(r.id)}
-                                      className="font-bangla font-semibold text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 transition cursor-pointer"
-                                      title="মন্তব্য মুছে ফেলুন"
-                                    >
-                                      মুছুন
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="border-t border-canvas-border px-3 pb-2 pt-3 sm:px-4">
+          <CommentThread
+            comments={post.comments}
+            currentUser={currentUser}
+            onNavigateProfile={onNavigateProfile}
+            onReply={(text, parentId, replyTo) => onComment(text, parentId, replyTo)}
+            onEdit={onEditComment}
+            onDelete={onDeleteComment}
+            onReact={onReactComment}
+          />
         </div>
       )}
 

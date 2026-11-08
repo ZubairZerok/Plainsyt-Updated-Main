@@ -117,6 +117,7 @@ export function LinkedInReactionPickerButton({
   floating,
   className,
   showLabel,
+  textOnly,
 }: {
   userReaction?: LinkedInReactionType | null;
   onSelect: (type: LinkedInReactionType) => void;
@@ -129,6 +130,8 @@ export function LinkedInReactionPickerButton({
   className?: string;
   /** Show the reaction name beside the icon (action-bar style, matches Comment/Share/Save). */
   showLabel?: boolean;
+  /** Render just the reaction word (e.g. "লাইক") — compact comment-row style. Long-press tray still works. */
+  textOnly?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<LinkedInReactionType | null>(null);
@@ -433,11 +436,16 @@ export function LinkedInReactionPickerButton({
         data-kind={isIdea ? 'idea' : 'like'}
         aria-pressed={!!userReaction}
         className={cn(
-          'react-btn',
-          compact ? '!h-6 !px-2 !py-0 !text-xs' : countLabel ? '!px-2.5 !py-1.5' : '!p-2',
+          textOnly ? 'react-text' : 'react-btn',
+          !textOnly && (compact ? '!h-6 !px-2 !py-0 !text-xs' : countLabel ? '!px-2.5 !py-1.5' : '!p-2'),
           className,
         )}
+        style={textOnly && activeMeta ? { color: activeMeta.color } : undefined}
       >
+        {textOnly ? (
+          <span>{activeMeta ? activeMeta.labelBn : 'লাইক'}</span>
+        ) : (
+          <>
         <span className={cn('react-ico-wrap', burstKind ? 'anim-on' : '')}>
           <svg className="react-ico" viewBox="0 0 24 24" aria-hidden="true">
             {isIdea ? (
@@ -472,7 +480,7 @@ export function LinkedInReactionPickerButton({
           )}
         </span>
         {showLabel && (
-          <span className="truncate font-bangla text-[12px] font-semibold sm:text-[13.5px]">
+          <span className="hidden truncate font-bangla text-[12px] font-semibold sm:inline sm:text-[13.5px]">
             {activeMeta ? activeMeta.labelBn : 'লাইক'}
           </span>
         )}
@@ -482,6 +490,8 @@ export function LinkedInReactionPickerButton({
               <Num>{countLabel}</Num>
             </span>
           </span>
+        )}
+          </>
         )}
       </button>
     </div>

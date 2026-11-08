@@ -264,10 +264,19 @@ export const fromNotificationRow = (r: Row): NotificationItem => {
     message,
     title: message,
     source: String(r.actor_name ?? ''),
-    time: created ? formatRelativeBn(created) : '',
+    time: formatRelativeBn(String(r.updated_at ?? r.created_at ?? '')) || (created ? formatRelativeBn(created) : ''),
     isRead,
     unread: !isRead,
     createdAt: String(r.created_at ?? ''),
+    updatedAt: String(r.updated_at ?? r.created_at ?? ''),
+    actors: Array.isArray(r.actors)
+      ? (r.actors as Row[]).map((a) => ({ id: String(a.id ?? ''), name: String(a.name ?? ''), avatar: String(a.avatar ?? '') }))
+      : r.actor_id
+        ? [{ id: String(r.actor_id), name: String(r.actor_name ?? ''), avatar: String(r.actor_avatar ?? '') }]
+        : [],
+    actorCount: Number(r.actor_count ?? 1) || 1,
+    entityLabel: String(r.entity_label ?? ''),
+    snippet: String(r.snippet ?? ''),
   };
 };
 
