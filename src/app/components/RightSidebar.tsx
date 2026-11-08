@@ -106,12 +106,12 @@ export function EventRow({
       <button
         type="button"
         onClick={() => onNavigate(`/events/${e.id}`)}
-        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white text-center shadow-xs hover:border-[#03EF62] transition"
+        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white dark:bg-white/5 dark:border-white/15 text-center shadow-xs hover:border-[#03EF62] transition"
       >
-        <span className="w-full bg-[#061621] py-0.5 font-mono text-[8.5px] font-bold text-[#03EF62]">
+        <span className="w-full bg-[#061621] py-0.5 font-mono text-[10.5px] font-bold text-[#03EF62]">
           {e.dateMonth}
         </span>
-        <span className="py-0.5 font-display text-base font-bold leading-none text-slate-800">
+        <span className="py-0.5 font-display text-base font-bold leading-none text-slate-800 dark:text-slate-100">
           {e.dateDay}
         </span>
       </button>
