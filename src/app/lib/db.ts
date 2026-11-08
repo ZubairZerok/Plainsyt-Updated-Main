@@ -92,6 +92,13 @@ export async function fetchFromSupabase(
       supabase.from('follows').select('follower_id, following_id').limit(5000),
       meId ? supabase.from('event_registrations').select('event_id').eq('user_id', meId) : Promise.resolve({ data: [], error: null }),
     ]);
+    // Older databases (before 20261109000000_notifications_v2.sql) have no updated_at: fall back to created_at.
+    let notifRows = (notifsRes.data ?? []) as Row[];
+    if (notifsRes.error && meId) {
+      const legacy = await supabase.from('notifications').select('*').eq('recipient_id', meId).order('created_at', { ascending: false }).limit(NOTIF_PAGE);
+      notifRows = (legacy.data ?? []) as Row[];
+    }
+
     // Non-critical collections failing must not hide the whole site.
     const myReactions = new Map<string, LinkedInReactionType>();
     for (const r of (myRxRes.data ?? []) as Row[]) {
@@ -149,7 +156,7 @@ export async function fetchFromSupabase(
       savedReelIds,
       followingIds: follows.filter((f) => f.followerId === meId).map((f) => f.followingId),
       follows,
-      notifications: ((notifsRes.data ?? []) as Row[]).map(fromNotificationRow),
+      notifications: notifRows.map(fromNotificationRow),
     };
     return { status: 'connected', snapshot };
   } catch (err) {
@@ -311,7 +318,13 @@ export const NOTIF_PAGE = 40;
 export async function dbFetchNotifications(meId: string, before?: string): Promise<DbResult<NotificationItem[]>> {
   let q = supabase.from('notifications').select('*').eq('recipient_id', meId).order('updated_at', { ascending: false }).limit(NOTIF_PAGE);
   if (before) q = q.lt('updated_at', before);
-  const { data, error } = await q;
+  let { data, error } = await q;
+  if (error) {
+    // Pre-v2 database: no updated_at column.
+    let legacy = supabase.from('notifications').select('*').eq('recipient_id', meId).order('created_at', { ascending: false }).limit(NOTIF_PAGE);
+    if (before) legacy = legacy.lt('created_at', before);
+    ({ data, error } = await legacy);
+  }
   return error ? fail(error) : ok(((data ?? []) as Row[]).map(fromNotificationRow));
 }
 
