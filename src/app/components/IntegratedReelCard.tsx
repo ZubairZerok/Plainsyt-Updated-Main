@@ -15,10 +15,10 @@ import { Avatar, FEED_CARD, VerifiedBadge, FollowIconButton, cn } from './Primit
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { SharePopoverButton } from './ShareModal';
 import { formatBengaliNumberCompact, totalReactions, toBengaliNumerals } from '../utils/pureLogic';
-import { getYouTubeEmbedInfo } from './ReelPlayerModal';
 import {
   YouTubeMark,
   buildYouTubeEmbedSrc,
+  getYouTubeEmbedInfo,
   ytPostCommand,
   parseDurationLabel,
 } from './YouTubeMark';

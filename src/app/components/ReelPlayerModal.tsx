@@ -22,9 +22,12 @@ import { toBengaliNumerals } from '../utils/pureLogic';
 import {
   YouTubeMark,
   buildYouTubeEmbedSrc,
+  getYouTubeEmbedInfo,
   ytPostCommand,
   parseDurationLabel,
 } from './YouTubeMark';
+
+export { getYouTubeEmbedInfo };
 
 export interface PlayerItem {
   id: string;
@@ -36,20 +39,6 @@ export interface PlayerItem {
   likes?: number;
   videoUrl?: string;
   duration?: string;
-}
-
-export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl: string; videoId: string } | null {
-  if (!url) return null;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:shorts\/|watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
-  if (match && match[1]) {
-    const videoId = match[1];
-    return {
-      videoId,
-      embedUrl: buildYouTubeEmbedSrc(videoId, { autoplay: true, muted: false, loop: true }),
-      directUrl: `https://www.youtube.com/shorts/${videoId}`,
-    };
-  }
-  return null;
 }
 
 interface Props {

@@ -30,13 +30,31 @@ export interface DatabaseSnapshot {
   notifications: NotificationItem[];
 }
 
+export const DEFAULT_SEED_REEL: StoryReel = {
+  id: 'reel-japan-robot-night-2026',
+  title: 'রাত ২টায় ক্ষেতে কাজ করছে রোবট কৃষক! 🤖 Plainsyt',
+  creatorId: 'usr-plainsyt-admin',
+  creator: 'PLAiNSYT',
+  creatorAvatar: '/logos/icon-192.png',
+  location: 'জাপান',
+  duration: '1:00',
+  views: 0,
+  gradientTheme: 'from-emerald-900 to-lime-700',
+  videoType: 'greenhouse-iot',
+  mediaUrl: 'https://i.ytimg.com/vi/BKUmGkQxAUU/hqdefault.jpg',
+  videoUrl: 'https://www.youtube.com/shorts/BKUmGkQxAUU',
+  likes: 0,
+  reactionCounts: {},
+  createdAt: '2026-11-02T10:00:00+06:00',
+};
+
 export const EMPTY_SNAPSHOT: DatabaseSnapshot = {
   profiles: [],
   currentUserId: '',
   articles: [],
   posts: [],
   comments: [],
-  reels: [],
+  reels: [DEFAULT_SEED_REEL],
   stories: [],
   events: [],
   eventRegistrations: [],
@@ -134,13 +152,19 @@ export async function fetchFromSupabase(
       }
     }
 
+    const mappedReels = reelRows.map((r) => fromReelRow(r, myReactions));
+    const reels =
+      mappedReels.length > 0 && mappedReels.some((r) => r.id === DEFAULT_SEED_REEL.id)
+        ? mappedReels
+        : [DEFAULT_SEED_REEL, ...mappedReels.filter((r) => r.id !== DEFAULT_SEED_REEL.id)];
+
     const snapshot: DatabaseSnapshot = {
       profiles,
       currentUserId: meId,
       articles: articleRows.map((r) => fromArticleRow(r, comments, myReactions)),
       posts: postRows.map((r) => fromPostRow(r, comments, myReactions, savedSet)),
       comments,
-      reels: reelRows.map((r) => fromReelRow(r, myReactions)),
+      reels,
       stories: ((storiesRes.data ?? []) as Row[]).map(fromStoryRow),
       events: ((eventsRes.data ?? []) as Row[]).map((r) => fromEventRow(r, registered)),
       eventRegistrations: Array.from(registered),
@@ -427,7 +451,10 @@ export async function fetchPostById(id: string, meId: string): Promise<{ post: C
 
 export async function fetchReelById(id: string, meId: string): Promise<StoryReel | null> {
   const { data } = await supabase.from('reels').select('*').eq('id', id).maybeSingle();
-  if (!data) return null;
+  if (!data) {
+    if (id === DEFAULT_SEED_REEL.id) return DEFAULT_SEED_REEL;
+    return null;
+  }
   const { my } = await commentsAndReactions([id], meId);
   return fromReelRow(data as Row, my);
 }

@@ -3,8 +3,9 @@ import { X, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { Avatar, FollowIconButton, Num, cn } from './Primitives';
 import type { TopicStory, UserProfile } from '../types';
 import { toBengaliNumerals } from '../utils/pureLogic';
-import { YouTubeMark, buildYouTubeEmbedSrc, ytPostCommand } from './YouTubeMark';
+import { YouTubeMark, buildYouTubeEmbedSrc, getYouTubeEmbedInfo, ytPostCommand } from './YouTubeMark';
 
+export { getYouTubeEmbedInfo };
 
 export interface AccountStoryGroup {
   authorId: string;
@@ -12,20 +13,6 @@ export interface AccountStoryGroup {
   authorAvatar: string;
   authorHandle?: string;
   stories: TopicStory[];
-}
-
-export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl: string; videoId: string } | null {
-  if (!url) return null;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:shorts\/|watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
-  if (match && match[1]) {
-    const videoId = match[1];
-    return {
-      videoId,
-      embedUrl: buildYouTubeEmbedSrc(videoId, { autoplay: true, muted: false, loop: true }),
-      directUrl: `https://www.youtube.com/shorts/${videoId}`,
-    };
-  }
-  return null;
 }
 
 

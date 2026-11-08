@@ -50,6 +50,20 @@ export function ytPostCommand(iframe: HTMLIFrameElement | null, func: string, ar
   );
 }
 
+export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; directUrl: string; videoId: string } | null {
+  if (!url) return null;
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:shorts\/|watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
+  if (match && match[1]) {
+    const videoId = match[1];
+    return {
+      videoId,
+      embedUrl: buildYouTubeEmbedSrc(videoId, { autoplay: true, muted: false, loop: true }),
+      directUrl: `https://www.youtube.com/shorts/${videoId}`,
+    };
+  }
+  return null;
+}
+
 /** Parse "1:23" / "0:45" style duration labels into seconds. */
 export function parseDurationLabel(label?: string): number {
   if (!label) return 30;
