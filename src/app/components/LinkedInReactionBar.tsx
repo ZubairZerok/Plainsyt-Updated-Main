@@ -472,7 +472,7 @@ export function LinkedInReactionPickerButton({
           )}
         </span>
         {showLabel && (
-          <span className="truncate font-bangla text-[12px] font-semibold sm:text-[13.5px]">
+          <span className="hidden truncate font-bangla text-[12px] font-semibold sm:inline sm:text-[13.5px]">
             {activeMeta ? activeMeta.labelBn : 'লাইক'}
           </span>
         )}

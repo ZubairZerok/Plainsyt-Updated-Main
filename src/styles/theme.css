@@ -477,7 +477,7 @@ html.dark .user-pfp-dropdown span svg {
 }
 
 /* Invert dark text color #061621 when not on a bright lime button / navbar */
-.dark [class*="text-[#061621]"]:not(header *):not(.bg-\[\#03EF62\] *):not([class*="bg-[#03EF62]"]):not([class*="bg-primary"]) {
+.dark [class*="text-[#061621]"]:not(header *):not(.bg-\[\#03EF62\] *):not([class*="bg-[#03EF62]"] *):not([class*="bg-[#03EF62]"]):not([class*="bg-primary"]) {
   color: #ffffff !important;
 }
 
