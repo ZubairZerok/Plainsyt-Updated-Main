@@ -3,7 +3,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const pub = (p) => path.join(root, 'public', p);
@@ -15,47 +14,92 @@ if (!fs.existsSync(path.join(root, 'dist'))) {
 }
 fs.mkdirSync(out('logos'), { recursive: true });
 
-const icon = fs.readFileSync(pub('logos/icon.png'));
-const english = fs.readFileSync(pub('logos/English.png'));
-const bangla = fs.readFileSync(pub('logos/Bangla.png'));
-const png = (buf, w, h, opts = {}) => sharp(buf).resize(w, h, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, ...opts }).png({ compressionLevel: 9, palette: true });
+let sharp = null;
+try {
+  const mod = await import('sharp');
+  sharp = mod.default || mod;
+} catch (e) {
+  console.warn('Notice: sharp could not be loaded, using direct asset fallbacks.');
+}
 
-// Square icons for browsers, iOS and the PWA manifest.
-for (const size of [48, 180, 192, 512]) await png(icon, size, size).toFile(out(`logos/icon-${size}.png`));
-await png(icon, 256, 256).toFile(out('logos/icon.png'));
+const copyIfExists = (src, dest) => {
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dest);
+  }
+};
 
-// Maskable icon: artwork inside the 80% safe zone on the brand colour.
-const inner = await png(icon, 358, 358).toBuffer();
-await sharp({ create: { width: 512, height: 512, channels: 4, background: '#061621' } })
-  .composite([{ input: inner, left: 77, top: 77 }])
-  .png({ compressionLevel: 9 })
-  .toFile(out('logos/icon-maskable-512.png'));
+if (!sharp) {
+  // Safe zero-dependency fallback: copy static icons directly
+  const iconSrc = pub('logos/icon.png');
+  for (const size of [48, 180, 192, 256, 512]) {
+    copyIfExists(iconSrc, out(`logos/icon-${size}.png`));
+  }
+  copyIfExists(iconSrc, out('logos/icon.png'));
+  copyIfExists(iconSrc, out('logos/icon-maskable-512.png'));
+  copyIfExists(pub('logos/English.png'), out('logos/English.png'));
+  copyIfExists(pub('logos/Bangla.png'), out('logos/Bangla.png'));
+  copyIfExists(iconSrc, out('og-image.png'));
+  copyIfExists(iconSrc, out('favicon.ico'));
+  console.log('✓ Brand assets copied using safe fallback.');
+  process.exit(0);
+}
 
-// Wordmarks are displayed at ~200px wide; 800px covers retina.
-await sharp(english).resize({ width: 800 }).png({ compressionLevel: 9, palette: true }).toFile(out('logos/English.png'));
-await sharp(bangla).resize({ width: 800 }).png({ compressionLevel: 9, palette: true }).toFile(out('logos/Bangla.png'));
+try {
+  const icon = fs.readFileSync(pub('logos/icon.png'));
+  const english = fs.readFileSync(pub('logos/English.png'));
+  const bangla = fs.readFileSync(pub('logos/Bangla.png'));
+  const png = (buf, w, h, opts = {}) => sharp(buf).resize(w, h, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 }, ...opts }).png({ compressionLevel: 9, palette: true });
 
-// Social share image (1200x630).
-const wordmark = await sharp(english).resize({ width: 900 }).png().toBuffer();
-await sharp({ create: { width: 1200, height: 630, channels: 4, background: '#061621' } })
-  .composite([{ input: wordmark, gravity: 'center' }])
-  .png({ compressionLevel: 9, palette: true })
-  .toFile(out('og-image.png'));
+  // Square icons for browsers, iOS and the PWA manifest.
+  for (const size of [48, 180, 192, 512]) await png(icon, size, size).toFile(out(`logos/icon-${size}.png`));
+  await png(icon, 256, 256).toFile(out('logos/icon.png'));
 
-// A real .ico (PNG-in-ICO) for /favicon.ico requests.
-const ico48 = await png(icon, 48, 48).toBuffer();
-const ico32 = await png(icon, 32, 32).toBuffer();
-const images = [ico32, ico48];
-const header = Buffer.alloc(6);
-header.writeUInt16LE(0, 0); header.writeUInt16LE(1, 2); header.writeUInt16LE(images.length, 4);
-let offset = 6 + 16 * images.length;
-const entries = images.map((buf, i) => {
-  const e = Buffer.alloc(16);
-  const size = i === 0 ? 32 : 48;
-  e.writeUInt8(size, 0); e.writeUInt8(size, 1); e.writeUInt16LE(1, 4); e.writeUInt16LE(32, 6);
-  e.writeUInt32LE(buf.length, 8); e.writeUInt32LE(offset, 12);
-  offset += buf.length;
-  return e;
-});
-fs.writeFileSync(out('favicon.ico'), Buffer.concat([header, ...entries, ...images]));
-console.log('✓ Brand assets generated.');
+  // Maskable icon: artwork inside the 80% safe zone on the brand colour.
+  const inner = await png(icon, 358, 358).toBuffer();
+  await sharp({ create: { width: 512, height: 512, channels: 4, background: '#061621' } })
+    .composite([{ input: inner, left: 77, top: 77 }])
+    .png({ compressionLevel: 9 })
+    .toFile(out('logos/icon-maskable-512.png'));
+
+  // Wordmarks are displayed at ~200px wide; 800px covers retina.
+  await sharp(english).resize({ width: 800 }).png({ compressionLevel: 9, palette: true }).toFile(out('logos/English.png'));
+  await sharp(bangla).resize({ width: 800 }).png({ compressionLevel: 9, palette: true }).toFile(out('logos/Bangla.png'));
+
+  // Social share image (1200x630).
+  const wordmark = await sharp(english).resize({ width: 900 }).png().toBuffer();
+  await sharp({ create: { width: 1200, height: 630, channels: 4, background: '#061621' } })
+    .composite([{ input: wordmark, gravity: 'center' }])
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(out('og-image.png'));
+
+  // A real .ico (PNG-in-ICO) for /favicon.ico requests.
+  const ico48 = await png(icon, 48, 48).toBuffer();
+  const ico32 = await png(icon, 32, 32).toBuffer();
+  const images = [ico32, ico48];
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); header.writeUInt16LE(1, 2); header.writeUInt16LE(images.length, 4);
+  let offset = 6 + 16 * images.length;
+  const entries = images.map((buf, i) => {
+    const e = Buffer.alloc(16);
+    const size = i === 0 ? 32 : 48;
+    e.writeUInt8(size, 0); e.writeUInt8(size, 1); e.writeUInt16LE(1, 4); e.writeUInt16LE(32, 6);
+    e.writeUInt32LE(buf.length, 8); e.writeUInt32LE(offset, 12);
+    offset += buf.length;
+    return e;
+  });
+  fs.writeFileSync(out('favicon.ico'), Buffer.concat([header, ...entries, ...images]));
+  console.log('✓ Brand assets generated.');
+} catch (err) {
+  console.warn('sharp processing failed, falling back to direct asset copying:', err.message);
+  const iconSrc = pub('logos/icon.png');
+  for (const size of [48, 180, 192, 256, 512]) {
+    copyIfExists(iconSrc, out(`logos/icon-${size}.png`));
+  }
+  copyIfExists(iconSrc, out('logos/icon.png'));
+  copyIfExists(iconSrc, out('logos/icon-maskable-512.png'));
+  copyIfExists(pub('logos/English.png'), out('logos/English.png'));
+  copyIfExists(pub('logos/Bangla.png'), out('logos/Bangla.png'));
+  copyIfExists(iconSrc, out('og-image.png'));
+  copyIfExists(iconSrc, out('favicon.ico'));
+  console.log('✓ Brand assets copied using safe fallback.');
+}
