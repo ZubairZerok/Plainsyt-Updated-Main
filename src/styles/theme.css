@@ -372,8 +372,10 @@ html.dark .user-pfp-dropdown span svg {
     line-height: 1.5;
   }
 
+  /* Buttons inherit their parent's size (a fixed 16px here blew up small inline actions
+     like the 12px "উত্তর দিন" links in comment rows). Utilities still override. */
   button {
-    font-size: var(--text-base);
+    font-size: inherit;
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
   }
@@ -867,4 +869,27 @@ html.dark .user-pfp-dropdown span svg {
   .dark textarea::placeholder {
     color: #94a3b8;
   }
+}
+
+/* Text-only reaction trigger used in comment rows ("লাইক" link). */
+.react-text {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.react-text:hover {
+  text-decoration: underline;
+}
+.react-text:active {
+  transform: scale(0.94);
+}
+.react-text[aria-pressed='true'] {
+  font-weight: 800;
 }

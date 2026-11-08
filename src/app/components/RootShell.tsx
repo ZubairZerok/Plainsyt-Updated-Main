@@ -1271,6 +1271,8 @@ export function RootShell() {
         onComment={handleCommentStoryOrReel}
         onEditComment={handleEditComment}
         onDeleteComment={handleDeleteComment}
+        onReactComment={(cid, type) => handleReact('comment', cid, type)}
+        onNavigateProfile={(uid) => { handleUiCloseModal(() => setPlayer(null)); window.setTimeout(() => navigateToProfile(uid), 150); }}
         onReactStory={(id) => handleReact('reel', id, 'like')}
         onBookmarkStory={handleSaveReel}
       />
