@@ -383,7 +383,7 @@ export function CreatePostModal({
             <div className="space-y-1.5">
               {takeaways.map((t, i) => (
                 <div key={i} className="flex gap-2">
-                  <span className="mt-2 font-mono text-[11px] text-pine-600">
+                  <span className="mt-2 font-mono text-[11px] text-accent-fg">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <input

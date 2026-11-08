@@ -411,7 +411,7 @@ export function IntegratedReelCard({
                 <span className={actionIcon}>
                   <Share2 className="size-[18px]" />
                 </span>
-                <span className="font-bangla text-[10.5px] font-medium drop-shadow">Share</span>
+                <span className="font-bangla text-[11px] font-medium drop-shadow">Share</span>
               </div>
             </SharePopoverButton>
 
@@ -419,7 +419,7 @@ export function IntegratedReelCard({
               <span className={actionIcon}>
                 <Bookmark className={cn('size-[18px]', saved && 'fill-current text-[#03EF62]')} />
               </span>
-              <span className="font-bangla text-[10.5px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
+              <span className="font-bangla text-[11px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
             </button>
 
             <button

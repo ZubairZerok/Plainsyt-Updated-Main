@@ -915,7 +915,6 @@ export function RootShell() {
       }
       return (
         <div className="space-y-4">
-          {backButton('ফিডে ফিরে যান', 'হোম ফিডে ফিরে যান')}
           <ArticleReaderContent
             article={standaloneArticle}
             bookmarked={snap.bookmarkedArticleIds.includes(standaloneArticle.id)}
@@ -965,6 +964,7 @@ export function RootShell() {
       return (
         <div className="space-y-4">
           {backButton('হোম ফিডে ফিরুন')}
+          <h1 className="sr-only">পোস্ট</h1>
           <CommunityPostCard
             key={foundPost.id}
             post={foundPost}
@@ -1204,7 +1204,7 @@ export function RootShell() {
               onNavigate={goNavigate}
               onOpenPhoto={(src, title, authorName, authorId) => openPhotoPopup([src], 0, title, undefined, authorName, authorId)}
             />
-            <main className="min-w-0 max-w-[760px] flex-1 pb-12 pt-3 xl:max-w-[800px]">
+            <main className="min-w-0 max-w-[760px] flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-3 md:pb-12 xl:max-w-[800px]">
               <h1 className="sr-only">PLAiNSYT · কৃষি ও কৃষি-প্রযুক্তি প্ল্যাটফর্ম</h1>
               {mainContent}
             </main>
@@ -1212,7 +1212,7 @@ export function RootShell() {
         </div>
       ) : (
         <div className="relative min-h-[calc(100vh-65px)] w-full">
-          <main className="mx-auto min-w-0 max-w-4xl px-4 pb-12 pt-4 xl:max-w-5xl">{mainContent}</main>
+          <main className="mx-auto min-w-0 max-w-4xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-4 md:pb-12 xl:max-w-5xl">{mainContent}</main>
         </div>
       )}
 

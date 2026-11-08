@@ -164,7 +164,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               <p className="text-[14.5px] font-semibold text-pine-900">
                 {currentUser?.name || 'Agri Researcher'}
               </p>
-              <p className="flex items-center gap-1 font-mono text-[11px] text-pine-600">
+              <p className="flex items-center gap-1 font-mono text-[11px] text-accent-fg">
                 Public <Globe2 className="size-3" />
               </p>
             </div>
@@ -260,7 +260,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
           <div>
             <SectionLabel className="mb-1">External Video / Study Link (Optional)</SectionLabel>
             <div className="flex items-center rounded-lg border border-pine-900/25 bg-canvas-card px-3">
-              <LinkIcon className="size-4 text-pine-600" />
+              <LinkIcon className="size-4 text-accent-fg" />
               <input
                 value={externalLink}
                 onChange={(e) => setExternalLink(e.target.value)}

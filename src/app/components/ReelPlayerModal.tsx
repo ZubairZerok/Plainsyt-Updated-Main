@@ -403,7 +403,7 @@ export function ReelPlayerModal({
                 <span className={actionIcon}>
                   <Share2 className="size-5" />
                 </span>
-                <span className="font-mono text-[10px]">Share</span>
+                <span className="font-mono text-[11px]">Share</span>
               </div>
             </SharePopoverButton>
 
@@ -411,7 +411,7 @@ export function ReelPlayerModal({
               <span className={cn(actionIcon, isSaved && 'bg-white/20')}>
                 <Bookmark className={cn('size-5', isSaved && 'fill-white')} />
               </span>
-              <span className="font-mono text-[10px]">{isSaved ? 'Saved' : 'Save'}</span>
+              <span className="font-mono text-[11px]">{isSaved ? 'Saved' : 'Save'}</span>
             </button>
 
             <button
@@ -550,14 +550,14 @@ export function ReelPlayerModal({
                                   <button
                                     type="submit"
                                     disabled={!editingText.trim()}
-                                    className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[10.5px] font-bold cursor-pointer"
+                                    className="rounded px-2 py-0.5 bg-[#03EF62] text-[#061621] text-[11px] font-bold cursor-pointer"
                                   >
                                     সংরক্ষণ
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => setEditingCommentId(null)}
-                                    className="rounded px-2 py-0.5 bg-white/10 text-white text-[10.5px] cursor-pointer"
+                                    className="rounded px-2 py-0.5 bg-white/10 text-white text-[11px] cursor-pointer"
                                   >
                                     বাতিল
                                   </button>
@@ -567,7 +567,7 @@ export function ReelPlayerModal({
                               <p className="mt-0.5 font-bangla text-[13px] text-white/90 leading-relaxed break-words">
                                 {c.text}
                                 {c.isEdited && (
-                                  <span className="ml-1 text-[10px] text-white/40 font-normal">(সম্পাদিত)</span>
+                                  <span className="ml-1 text-[11px] text-white/40 font-normal">(সম্পাদিত)</span>
                                 )}
                               </p>
                             )}
@@ -638,7 +638,7 @@ export function ReelPlayerModal({
                                       <div className="rounded-xl bg-white/5 border border-white/5 px-2.5 py-1.5">
                                         <div className="flex items-baseline justify-between gap-1">
                                           <span className="font-bangla text-[12px] font-bold text-white truncate">{r.author}</span>
-                                          <span className="font-bangla text-[10px] text-emerald-300 shrink-0">{r.timestamp || 'এখন'}</span>
+                                          <span className="font-bangla text-[11px] text-emerald-300 shrink-0">{r.timestamp || 'এখন'}</span>
                                         </div>
                                         <p className="mt-0.5 font-bangla text-[12px] text-white/85 leading-snug break-words">{r.text}</p>
                                       </div>
@@ -646,7 +646,7 @@ export function ReelPlayerModal({
                                         <button
                                           type="button"
                                           onClick={() => handleLikeComment(r.id)}
-                                          className="font-bangla text-[10px] font-medium text-white/60 hover:text-[#03EF62] transition"
+                                          className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition"
                                         >
                                           লাইক {rLikes > 0 && `(${toBengaliNumerals(rLikes)})`}
                                         </button>
@@ -657,7 +657,7 @@ export function ReelPlayerModal({
                                             setCommentText(`@${r.author} `);
                                             commentInputRef.current?.focus();
                                           }}
-                                          className="font-bangla text-[10px] font-medium text-white/60 hover:text-[#03EF62] transition"
+                                          className="font-bangla text-[11px] font-medium text-white/60 hover:text-[#03EF62] transition"
                                         >
                                           উত্তর দিন
                                         </button>
@@ -665,7 +665,7 @@ export function ReelPlayerModal({
                                           <button
                                             type="button"
                                             onClick={() => onDeleteComment?.(r.id)}
-                                            className="font-bangla text-[10px] text-rose-400 hover:text-rose-300 transition cursor-pointer"
+                                            className="font-bangla text-[11px] text-rose-400 hover:text-rose-300 transition cursor-pointer"
                                           >
                                             মুছুন
                                           </button>

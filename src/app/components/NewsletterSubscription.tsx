@@ -144,7 +144,7 @@ export function NewsletterSubscription({ className, variant = 'card' }: Props) {
           <p className="mt-2.5 text-xs text-rose-400 font-medium">{message}</p>
         )}
 
-        <p className="mt-3 font-mono text-[10px] text-white/40">
+        <p className="mt-3 font-mono text-[11px] text-white/40">
           যেকোনো সময় এক ক্লিকে আনসাবস্ক্রাইব করা যাবে · 100% Privacy Protected
         </p>
       </div>

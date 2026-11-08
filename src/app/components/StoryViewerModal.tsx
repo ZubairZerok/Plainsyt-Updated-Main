@@ -600,7 +600,7 @@ export function StoryViewerModal({
                       )}
                     </div>
                     {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
-                    <div className="inline-flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bangla text-white/80 drop-shadow whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
+                    <div className="inline-flex items-center gap-1 text-[11px] sm:text-[11px] font-bangla text-white/80 drop-shadow whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
                       <span className="truncate max-w-[100px] text-emerald-300 font-medium">
                         {currentStory.category || 'প্রতিবেদন'}
                       </span>

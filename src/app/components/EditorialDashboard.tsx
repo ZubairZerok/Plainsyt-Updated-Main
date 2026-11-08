@@ -114,7 +114,7 @@ export function EditorialDashboard({ currentUser, articles, onNavigate }: Props)
             {topArticles.map((art, idx) => (
               <li key={art.id} className="flex items-center justify-between gap-3 py-2.5">
                 <div className="min-w-0">
-                  <span className="font-mono text-[10px] font-bold text-slate-500">#{idx + 1} · {art.category}</span>
+                  <span className="font-mono text-[11px] font-bold text-slate-500">#{idx + 1} · {art.category}</span>
                   <h3 className="truncate text-sm font-bold text-slate-900 dark:text-white">{art.title}</h3>
                 </div>
                 <div className="flex shrink-0 items-center gap-4 text-xs text-slate-500">

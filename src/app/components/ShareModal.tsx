@@ -137,7 +137,7 @@ export function SharePopoverButton({
             >
               <Facebook className="size-4.5 fill-current" />
             </button>
-            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
               Facebook
             </span>
           </div>
@@ -153,7 +153,7 @@ export function SharePopoverButton({
             >
               {copied ? <Check className="size-4.5 text-[#03EF62]" /> : <Copy className="size-4" />}
             </button>
-            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
               {copied ? 'কপি হয়েছে' : 'লিংক কপি'}
             </span>
           </div>
@@ -170,7 +170,7 @@ export function SharePopoverButton({
               >
                 <Share2 className="size-4" />
               </button>
-              <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+              <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
                 শেয়ার
               </span>
             </div>

@@ -13,7 +13,7 @@ interface Props {
 export function PostCreatorBar(p: Props) {
   const firstName = p.currentUser ? p.currentUser.name.split(' ')[0] : 'Researcher';
   const actions = [
-    { label: 'Write Article', icon: PenLine, onClick: p.onWriteArticle, tone: 'text-pine-600' },
+    { label: 'Write Article', icon: PenLine, onClick: p.onWriteArticle, tone: 'text-accent-fg' },
     { label: 'Upload Video', icon: Video, onClick: p.onUploadVideo, tone: 'text-[#e41e3f]' },
   ];
   return (

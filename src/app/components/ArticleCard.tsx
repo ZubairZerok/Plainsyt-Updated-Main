@@ -454,7 +454,7 @@ export function ArticleCard({
                                   <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">
                                     {r.text}
                                     {r.isEdited && (
-                                      <span className="ml-1.5 text-[10px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
                                     )}
                                   </p>
                                 )}
@@ -534,7 +534,7 @@ export function ArticleCard({
                 type="submit"
                 disabled={!text.trim()}
                 aria-label="Send comment"
-                className="flex size-7 items-center justify-center rounded-full text-pine-600 disabled:opacity-30"
+                className="flex size-7 items-center justify-center rounded-full text-accent-fg disabled:opacity-30"
               >
                 <Send className="size-4" />
               </button>

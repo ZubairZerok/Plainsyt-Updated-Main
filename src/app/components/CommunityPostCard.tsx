@@ -154,15 +154,17 @@ export function CommunityPostCard({
             href={safeUrl(post.externalLink)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-pine-900/25 bg-pine-50 px-3 py-1.5 font-mono text-[12px] text-pine-800 hover:border-pine-900"
+            title={post.externalLink}
+            className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-pine-900/25 bg-pine-50 px-3 py-2 font-mono text-[12px] text-pine-800 hover:border-pine-900"
           >
-            {post.externalLink} <ExternalLink className="size-3.5" />
+            <span className="min-w-0 truncate">{post.externalLink?.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            <ExternalLink className="size-3.5 shrink-0" />
           </a>
         </div>
       )}
 
       {post.aiLabel && (
-        <p className="mx-3 mt-2 inline-flex items-center gap-1 rounded-md bg-canvas-subtle px-2 py-0.5 font-mono text-[10px] text-pine-600 sm:mx-4">
+        <p className="mx-3 mt-2 inline-flex items-center gap-1 rounded-md bg-canvas-subtle px-2 py-0.5 font-mono text-[11px] text-accent-fg sm:mx-4">
           <Bot className="size-3" />
           AI info · Made with AI
         </p>
@@ -228,6 +230,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 0, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="row-span-2 block size-full cursor-zoom-in"
           >
             <img src={imgs[0]} alt="Field visit" className="size-full object-cover" />
@@ -235,6 +238,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 1, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="block size-full cursor-zoom-in"
           >
             <img src={imgs[1]} alt="" className="size-full object-cover" />
@@ -242,6 +246,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 2, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="relative block size-full cursor-zoom-in"
           >
             <img src={imgs[2]} alt="" className="size-full object-cover" />
@@ -534,7 +539,7 @@ export function CommunityPostCard({
                                   <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">
                                     {r.text}
                                     {r.isEdited && (
-                                      <span className="ml-1.5 text-[10px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
                                     )}
                                   </p>
                                 )}
@@ -618,7 +623,7 @@ export function CommunityPostCard({
             type="submit"
             disabled={!text.trim()}
             aria-label="Send"
-            className="flex size-7 items-center justify-center rounded-full text-pine-600 disabled:opacity-30"
+            className="flex size-7 items-center justify-center rounded-full text-accent-fg disabled:opacity-30"
           >
             <Send className="size-4" />
           </button>

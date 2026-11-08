@@ -102,7 +102,7 @@ export function EventRegistrationModal({
             </p>
 
             <div className="mt-4 rounded-xl border border-dashed border-[#061621]/30 bg-pine-50 p-4 font-mono text-left">
-              <div className="flex justify-between text-[11.5px] text-pine-600">
+              <div className="flex justify-between text-[11.5px] text-accent-fg">
                 <span>TICKET ID</span>
                 <span className="font-bold text-[#061621]">#{ticketId}</span>
               </div>
@@ -127,7 +127,7 @@ export function EventRegistrationModal({
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 p-5 max-h-[80vh] overflow-y-auto">
             <div className="rounded-xl border border-canvas-border bg-canvas-subtle p-3">
-              <span className="font-mono text-[10.5px] uppercase tracking-wider text-pine-600">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-accent-fg">
                 Selected Event
               </span>
               <p className="mt-0.5 font-bangla text-[15px] font-bold text-pine-950">
@@ -148,7 +148,7 @@ export function EventRegistrationModal({
                 আপনার পুরো নাম *
               </label>
               <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                <User className="size-4 text-pine-600" />
+                <User className="size-4 text-accent-fg" />
                 <input
                   required
                   value={name}
@@ -165,7 +165,7 @@ export function EventRegistrationModal({
                   মোবাইল নম্বর *
                 </label>
                 <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                  <Phone className="size-4 text-pine-600" />
+                  <Phone className="size-4 text-accent-fg" />
                   <input
                     required
                     type="tel"
@@ -181,7 +181,7 @@ export function EventRegistrationModal({
                   ইমেইল অ্যাড্রেস *
                 </label>
                 <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                  <Mail className="size-4 text-pine-600" />
+                  <Mail className="size-4 text-accent-fg" />
                   <input
                     required
                     type="email"
@@ -199,7 +199,7 @@ export function EventRegistrationModal({
                 প্রতিষ্ঠান / বিশ্ববিদ্যালয় (Institution)
               </label>
               <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                <Building2 className="size-4 text-pine-600" />
+                <Building2 className="size-4 text-accent-fg" />
                 <input
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}

@@ -152,7 +152,7 @@ export function AuthModal({
                 >
                   {isNewUser ? 'নতুন অ্যাকাউন্ট তৈরি করুন' : 'প্ল্যাটফর্মে প্রবেশ করুন'}
                 </h2>
-                <p className="font-mono text-[10.5px] text-[#03EF62] tracking-wider uppercase">
+                <p className="font-mono text-[11px] text-[#03EF62] tracking-wider uppercase">
                   PLAiNSYT Ecosystem
                 </p>
               </div>

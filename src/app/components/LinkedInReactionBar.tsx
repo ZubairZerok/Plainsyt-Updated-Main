@@ -352,6 +352,8 @@ export function LinkedInReactionPickerButton({
           onContextMenu={(e) => e.preventDefault()}
           data-kind={isIdea ? 'idea' : 'like'}
           aria-pressed={!!userReaction}
+          aria-label={activeMeta ? activeMeta.labelBn : 'লাইক'}
+          title={activeMeta ? activeMeta.labelBn : 'লাইক'}
           className={cn('react-btn !p-2 !rounded-full', className)}
         >
           <span className={cn('react-ico-wrap', burstKind ? 'anim-on' : '')}>

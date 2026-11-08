@@ -113,7 +113,7 @@ export function ExploreTopicDropdown({
               <ActiveIcon className="size-4 sm:size-3.5" />
             </span>
             <div className="flex flex-col min-w-0">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-400 leading-tight">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-400 leading-tight">
                 বিষয় নির্বাচন
               </span>
               <span className="font-bangla text-sm font-semibold truncate leading-tight">
@@ -200,7 +200,7 @@ export function ExploreTopicDropdown({
                 </span>
                 <div className="min-w-0">
                   <div className="font-bangla font-semibold text-sm leading-tight">সকল বিষয়</div>
-                  <div className="text-[10px] text-slate-400 truncate">সমস্ত গবেষণা ও নিবন্ধ</div>
+                  <div className="text-[11px] text-slate-400 truncate">সমস্ত গবেষণা ও নিবন্ধ</div>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -249,7 +249,7 @@ export function ExploreTopicDropdown({
                     </span>
                     <div className="min-w-0">
                       <div className="font-bangla font-semibold text-sm leading-tight">{p.bn}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{p.label}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{p.label}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -434,7 +434,7 @@ export function EventsView({
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <span className="flex flex-col items-center justify-center rounded-lg bg-[#061621] px-2.5 py-1.5 text-center text-white">
-                        <span className="font-mono text-[9px] font-bold text-[#03EF62]">{e.dateMonth}</span>
+                        <span className="font-mono text-[11px] font-bold text-[#03EF62]">{e.dateMonth}</span>
                         <span className="font-display text-lg font-bold leading-tight">{e.dateDay}</span>
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
@@ -624,7 +624,7 @@ export function NotificationsView({
                         {n.actorName || n.source}
                       </span>
                       <span>·</span>
-                      <span className="uppercase text-[9.5px] bg-slate-100 px-1.5 py-0.5 rounded">
+                      <span className="uppercase text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">
                         {n.type || 'system'}
                       </span>
                     </div>
@@ -907,7 +907,7 @@ export function ProfileView({
             <p className="mt-0.5 font-sans text-xs text-slate-500">
               {profile.role} {profile.organization ? `· ${profile.organization}` : ''}
             </p>
-            <div className="mt-1 flex flex-wrap items-center gap-3 font-mono text-[10.5px] text-slate-400">
+            <div className="mt-1 flex flex-wrap items-center gap-3 font-mono text-[11px] text-slate-400">
               <span>@{profile.handle}</span>
               {safeUrl(profile.website) && (
                 <a
@@ -994,7 +994,7 @@ export function ProfileView({
         <section className={cn(FEED_CARD, 'p-4 sm:p-5')}>
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
             <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-bold">
                 কন্টেন্ট প্রকাশনা ও ব্যবস্থাপনা · Content Management
               </p>
               <h2 className="font-sans text-base font-bold text-slate-900 dark:text-white mt-0.5">
@@ -1186,7 +1186,7 @@ export function ProfileView({
                       </button>
                     )}
                     <div className="absolute bottom-3 inset-x-3 text-white">
-                      <span className="font-mono text-[10px] uppercase text-[#03EF62]">
+                      <span className="font-mono text-[11px] uppercase text-[#03EF62]">
                         {s.category}
                       </span>
                       <p className="mt-1 font-sans text-xs font-bold leading-snug line-clamp-2">

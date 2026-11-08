@@ -94,7 +94,7 @@ export function LeftSidebar(p: Props) {
                   </span>
                   {p.currentUser.isVerified && <VerifiedBadge />}
                 </span>
-                <span className="block truncate font-mono text-[10px] text-slate-500 dark:text-slate-400">
+                <span className="block truncate font-mono text-[11px] text-slate-500 dark:text-slate-400">
                   {p.currentUser.role || 'লেখক'}
                 </span>
               </span>
@@ -130,7 +130,7 @@ export function LeftSidebar(p: Props) {
                 {s.label}
               </span>
               {s.badge && (
-                <span className="rounded-full bg-slate-900 dark:bg-white/15 px-2 py-0.5 font-mono text-[9.5px] font-bold text-white">
+                <span className="rounded-full bg-slate-900 dark:bg-white/15 px-2 py-0.5 font-mono text-[11px] font-bold text-white">
                   {s.badge}
                 </span>
               )}
@@ -148,7 +148,7 @@ export function LeftSidebar(p: Props) {
               <button
                 type="button"
                 onClick={() => p.onPillar(null)}
-                className="text-[10px] text-[#03EF62] hover:underline font-mono"
+                className="text-[11px] text-[#03EF62] hover:underline font-mono"
               >
                 রিসেট
               </button>

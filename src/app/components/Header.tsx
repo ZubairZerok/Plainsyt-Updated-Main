@@ -128,7 +128,7 @@ export function Header(p: Props) {
       />
       <div className="absolute left-2 right-2 top-[calc(100%+8px)] z-50 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-canvas-card p-2 shadow-2xl md:left-4 md:right-auto md:w-[420px]">
         <div className="flex items-center gap-2 rounded-xl bg-canvas-subtle px-3.5">
-          <Search className="size-4 text-pine-600" />
+          <Search className="size-4 text-accent-fg" />
           <input
             ref={inputRef}
             value={q}
@@ -147,7 +147,7 @@ export function Header(p: Props) {
             </button>
           )}
         </div>
-        <p className="px-2 pb-1 pt-3 font-mono text-[10.5px] uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 font-semibold">
+        <p className="px-2 pb-1 pt-3 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 font-semibold">
           {q ? 'Search Results' : 'Recent Articles'}
         </p>
         {results.a.length === 0 && results.c.length === 0 && (
@@ -170,7 +170,7 @@ export function Header(p: Props) {
               <span className="line-clamp-1 font-bangla text-[13.5px] font-semibold text-slate-900 dark:text-white">
                 {a.title}
               </span>
-              <span className="font-mono text-[10.5px] text-slate-500 dark:text-slate-400">
+              <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
                 {a.categoryEn} · {a.readTimeMinutes} min
               </span>
             </span>
@@ -178,7 +178,7 @@ export function Header(p: Props) {
         ))}
         {results.c.length > 0 && (
           <>
-            <p className="px-2 pb-1 pt-2 font-mono text-[10.5px] uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 font-semibold">
+            <p className="px-2 pb-1 pt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 font-semibold">
               Community Posts
             </p>
             {results.c.map((c) => (
@@ -225,7 +225,7 @@ export function Header(p: Props) {
           <button
             type="button"
             onClick={p.onReadNotifications}
-            className="font-mono text-[10px] uppercase tracking-wider text-pine-600 hover:text-pine-900 hover:underline"
+            className="font-mono text-[11px] uppercase tracking-wider text-accent-fg hover:text-pine-900 hover:underline"
           >
             সব পড়া হয়েছে
           </button>
@@ -293,7 +293,7 @@ export function Header(p: Props) {
                     <p className="font-bangla text-[12.5px] leading-snug text-pine-900 font-medium">
                       {n.message || n.title}
                     </p>
-                    <div className="mt-1 flex items-center gap-2 font-mono text-[10px] text-pine-600">
+                    <div className="mt-1 flex items-center gap-2 font-mono text-[11px] text-accent-fg">
                       <span>{n.time}</span>
                       <span>·</span>
                       <span className="font-sans font-semibold text-emerald-700 dark:text-emerald-400">
@@ -436,7 +436,7 @@ export function Header(p: Props) {
                 >
                   <Bookmark className="size-[18px]" />
                   {p.savedCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[10px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
+                    <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#061621] px-1 font-bangla text-[11px] font-bold text-[#03EF62] ring-2 ring-[#03EF62]">
                       {p.savedCount}
                     </span>
                   )}
@@ -449,7 +449,7 @@ export function Header(p: Props) {
                 >
                   <Bell className="size-[18px]" />
                   {unread > 0 && (
-                    <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-[#e41e3f] font-bangla text-[10px] font-bold text-white shadow-xs">
+                    <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-[#e41e3f] font-bangla text-[11px] font-bold text-white shadow-xs">
                       {unread}
                     </span>
                   )}
@@ -546,7 +546,7 @@ export function Header(p: Props) {
                 <p className="font-mono text-[11px] text-emerald-600 dark:text-[#03EF62] truncate">
                   @{p.currentUser.handle || 'user'}
                 </p>
-                <span className="inline-block mt-0.5 rounded-full bg-emerald-100 dark:bg-[#03EF62]/20 px-2 py-0.5 font-sans text-[10px] font-semibold text-emerald-800 dark:text-[#03EF62]">
+                <span className="inline-block mt-0.5 rounded-full bg-emerald-100 dark:bg-[#03EF62]/20 px-2 py-0.5 font-sans text-[11px] font-semibold text-emerald-800 dark:text-[#03EF62]">
                   {p.currentUser.role || 'গবেষক'}
                 </span>
               </div>
@@ -586,7 +586,7 @@ export function Header(p: Props) {
                   </span>
                   <span className="truncate">সিকিউরিটি ও ডিভাইস</span>
                 </div>
-                <span className="rounded-md bg-emerald-100 dark:bg-[#03EF62]/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:text-[#03EF62]">
+                <span className="rounded-md bg-emerald-100 dark:bg-[#03EF62]/20 px-1.5 py-0.5 font-mono text-[11px] font-bold text-emerald-800 dark:text-[#03EF62]">
                   Verified
                 </span>
               </button>
@@ -696,7 +696,7 @@ export function Header(p: Props) {
                   <span className="relative flex items-center justify-center">
                     <t.icon className={cn('size-5', active ? 'text-white' : 'text-[#061621]')} strokeWidth={active ? 2.5 : 2} />
                     {t.badge && (
-                      <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e41e3f] px-1 font-bangla text-[9px] font-bold text-white shadow-xs">
+                      <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#e41e3f] px-1 font-bangla text-[11px] font-bold text-white shadow-xs">
                         {t.badge}
                       </span>
                     )}
@@ -750,7 +750,7 @@ export function SeeAllLink({ children, onClick }: { children: string; onClick?: 
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 font-bangla text-[12px] font-bold tracking-tight text-[#008f3c] dark:text-[#03EF62] hover:text-[#006e2e] dark:hover:text-[#29f57c] transition active:scale-95"
+      className="inline-flex items-center gap-1 font-bangla text-[12px] font-bold tracking-tight text-[#00703a] dark:text-[#03EF62] hover:text-[#005a2f] dark:hover:text-[#29f57c] transition active:scale-95"
     >
       <span>{children}</span> <ArrowUpRight className="size-3.5" />
     </button>

@@ -152,7 +152,7 @@ export function ProfileSettingsModal({
                 style={{ background: coverGradient }}
                 className="relative h-28 w-full transition-all duration-300"
               >
-                <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-0.5 font-mono text-[10px] text-white backdrop-blur-sm">
+                <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm">
                   Live Cover Preview
                 </span>
               </div>
@@ -185,7 +185,7 @@ export function ProfileSettingsModal({
                     <p className="font-display text-[19px] font-bold leading-tight text-pine-950">
                       {name || 'Your Name'}
                     </p>
-                    <p className="font-mono text-[11px] text-pine-600">
+                    <p className="font-mono text-[11px] text-accent-fg">
                       {role || 'Role / Designation'} {organization ? `· ${organization}` : ''}
                     </p>
                   </div>
@@ -232,7 +232,7 @@ export function ProfileSettingsModal({
                 <SectionLabel className="flex items-center gap-1.5">
                   <Palette className="size-3.5" /> Cover Background Gradient Color
                 </SectionLabel>
-                <span className="font-mono text-[10px] text-pine-600">12 Presets + Custom Builder</span>
+                <span className="font-mono text-[11px] text-accent-fg">12 Presets + Custom Builder</span>
               </div>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {COVER_GRADIENT_PRESETS.map((g) => {
@@ -248,7 +248,7 @@ export function ProfileSettingsModal({
                       )}
                       style={{ background: g.css }}
                     >
-                      <span className="absolute inset-x-1.5 bottom-1 truncate rounded bg-black/45 px-1 py-0.5 font-mono text-[9px] text-white backdrop-blur-[1px]">
+                      <span className="absolute inset-x-1.5 bottom-1 truncate rounded bg-black/45 px-1 py-0.5 font-mono text-[11px] text-white backdrop-blur-[1px]">
                         {g.name}
                       </span>
                     </button>
@@ -259,7 +259,7 @@ export function ProfileSettingsModal({
               {/* Custom 2-stop color picker */}
               <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-canvas-border pt-3">
                 <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-pine-900">
-                  <Sparkles className="size-3.5 text-pine-600" /> Custom Gradient:
+                  <Sparkles className="size-3.5 text-accent-fg" /> Custom Gradient:
                 </span>
                 <label className="inline-flex items-center gap-1.5 text-[12px] text-pine-900">
                   Start

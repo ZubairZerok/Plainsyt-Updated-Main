@@ -90,6 +90,7 @@ html.dark .user-pfp-dropdown span svg {
   --pine-700: #00bf50;
   --pine-600: #03EF62;
   --pine-500: #03EF62;
+  --accent-fg: #00703a; /* readable green for TEXT on light surfaces (>= 5:1) */
   --pine-400: #29f57c;
   --pine-200: #b3fad1;
   --pine-100: #e2fceb;
@@ -151,6 +152,7 @@ html.dark .user-pfp-dropdown span svg {
   --pine-700: #f1f5f9;
   --pine-600: #03EF62;
   --pine-500: #03EF62;
+  --accent-fg: #03EF62;
   --pine-400: #29f57c;
   --pine-200: #1a3c2c;
   --pine-100: #133627;
@@ -246,6 +248,7 @@ html.dark .user-pfp-dropdown span svg {
   --color-pine-900: var(--pine-900);
   --color-pine-800: var(--pine-800);
   --color-pine-700: var(--pine-700);
+  --color-accent-fg: var(--accent-fg);
   --color-pine-600: var(--pine-600);
   --color-pine-500: var(--pine-500);
   --color-pine-400: var(--pine-400);
@@ -803,3 +806,38 @@ button.text-white svg.lucide,
   to { transform: none; opacity: 1; }
 }
 
+
+/* Touch accessibility: comfortable tap targets on touch screens (>= 36px) without changing mouse layouts. */
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  a.flex,
+  a.inline-flex,
+  summary {
+    min-height: 36px;
+  }
+  button:has(> svg:only-child),
+  a:has(> svg:only-child) {
+    min-width: 36px;
+  }
+  button {
+    min-width: 32px;
+  }
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  textarea,
+  select {
+    min-height: 36px;
+  }
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
