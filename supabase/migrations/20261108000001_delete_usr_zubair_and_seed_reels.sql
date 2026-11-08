@@ -1,6 +1,9 @@
 -- Migration: Delete usr-zubair profile completely & insert YouTube Reel seed
 -- Generated: 2026-11-08
 
+-- Disable triggers temporarily so cascade recount triggers do not collide with row deletion (Error 27000 prevention)
+set session_replication_role = 'replica';
+
 -- 1. Purge usr-zubair and all associated records across the database
 delete from public.bookmarks where user_id = 'usr-zubair';
 delete from public.reactions where user_id = 'usr-zubair';
@@ -13,6 +16,9 @@ delete from public.stories where author_id = 'usr-zubair';
 delete from public.notifications where recipient_id = 'usr-zubair' or actor_id = 'usr-zubair';
 delete from public.profile_login_aliases where auth_user_id = 'usr-zubair';
 delete from public.profiles where id = 'usr-zubair' or handle = 'zubair';
+
+-- Re-enable normal triggers
+set session_replication_role = 'origin';
 
 -- 2. Ensure Flagship YouTube Reel exists in public.reels
 insert into public.reels (
@@ -51,3 +57,4 @@ insert into public.reels (
   video_url = excluded.video_url,
   media_url = excluded.media_url,
   title = excluded.title;
+
