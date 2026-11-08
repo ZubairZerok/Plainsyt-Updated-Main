@@ -46,3 +46,5 @@ jobs:
           done
       - name: Row-level-security regression tests
         run: psql -v ON_ERROR_STOP=1 -tA -f supabase/tests/rls_test.sql | tee rls.out; ! grep -q '^FAIL' rls.out
+      - name: Notification behaviour tests
+        run: psql -v ON_ERROR_STOP=1 -tA -f supabase/tests/notifications_test.sql | tee notif.out; ! grep -q '^FAIL' notif.out

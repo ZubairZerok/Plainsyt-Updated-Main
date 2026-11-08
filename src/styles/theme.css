@@ -893,3 +893,13 @@ html.dark .user-pfp-dropdown span svg {
 .react-text[aria-pressed='true'] {
   font-weight: 800;
 }
+
+/* Bell wiggles once when the unread count changes. */
+@keyframes bell-ring {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(9deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(3deg); }
+}

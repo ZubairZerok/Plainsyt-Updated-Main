@@ -17,6 +17,7 @@ import {
 import { Avatar, cn } from './Primitives';
 import { SharePopoverButton } from './ShareModal';
 import { CommentThread } from './CommentThread';
+import { deepLinkCommentId } from '../lib/notifications';
 import type { Comment, LinkedInReactionType, UserProfile } from '../types';
 import { toBengaliNumerals } from '../utils/pureLogic';
 import {
@@ -88,7 +89,10 @@ export function ReelPlayerModal({
   const [paused, setPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showCenterIcon, setShowCenterIcon] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(() => {
+    const id = deepLinkCommentId();
+    return Boolean(id && comments.some((c) => c.id === id));
+  });
   const [commentText, setCommentText] = useState('');
   const [replyingTo, setReplyingTo] = useState<{ id: string; author: string } | null>(null);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
@@ -107,10 +111,14 @@ export function ReelPlayerModal({
   useEffect(() => {
     setIdx(start);
     setPaused(false);
-    setShowComments(false);
+    {
+      const deepId = deepLinkCommentId();
+      setShowComments(Boolean(deepId && comments.some((c) => c.id === deepId)));
+    }
     setProgress(0);
     accumulated.current = 0;
     startedAt.current = 0;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when a different reel list opens
   }, [start, items]);
 
   const count = items?.length ?? 0;

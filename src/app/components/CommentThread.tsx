@@ -4,6 +4,7 @@ import type { Comment, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar, cn } from './Primitives';
 import { LinkedInReactionPickerButton } from './LinkedInReactionBar';
 import { getReactionMeta, toBengaliNumerals } from '../utils/pureLogic';
+import { deepLinkCommentId } from '../lib/notifications';
 
 /**
  * One threaded comment list used everywhere (post cards, article cards, article reader, reel player).
@@ -248,9 +249,13 @@ function CommentItem({
   editingId,
   setEditingId,
   onStartReply,
+  flash,
+  mention,
 }: {
   c: Comment;
   isReply: boolean;
+  flash?: boolean;
+  mention?: string;
   props: CommentThreadProps;
   editingId: string | null;
   setEditingId: (id: string | null) => void;
@@ -267,7 +272,7 @@ function CommentItem({
   const editing = editingId === c.id;
 
   return (
-    <div className="flex items-start gap-2">
+    <div id={`comment-${c.id}`} className="flex scroll-mt-24 items-start gap-2">
       <button
         type="button"
         onClick={() => props.onNavigateProfile(c.authorId)}
@@ -295,7 +300,13 @@ function CommentItem({
         ) : (
           <div className="flex items-start gap-1">
             <div className="relative min-w-0 max-w-full">
-              <div className={cn('inline-block max-w-full rounded-2xl px-3 py-2', t.bubble)}>
+              <div
+                className={cn(
+                  'inline-block max-w-full rounded-2xl px-3 py-2 transition-shadow duration-700',
+                  t.bubble,
+                  flash && 'shadow-[0_0_0_3px_rgba(3,239,98,0.85)]',
+                )}
+              >
                 <button
                   type="button"
                   onClick={() => props.onNavigateProfile(c.authorId)}
@@ -305,7 +316,7 @@ function CommentItem({
                 </button>
                 <CommentText
                   text={c.text}
-                  mention={c.replyToAuthor}
+                  mention={mention}
                   className={cn('mt-0.5 whitespace-pre-wrap break-words font-bangla text-[14px] leading-[1.55]', t.text)}
                 />
               </div>
@@ -371,6 +382,37 @@ export function CommentThread(props: CommentThreadProps) {
   const [showAll, setShowAll] = useState(false);
   const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const handledLink = useRef<string | null>(null);
+
+  // "@Name …" — longest matching participant name in this list.
+  const names = useMemo(
+    () => [...new Set(comments.map((c) => c.author).filter(Boolean))].sort((a, b) => b.length - a.length),
+    [comments],
+  );
+  const mentionOf = (text: string) => (text.startsWith('@') ? names.find((n) => text.startsWith(`@${n}`)) : undefined);
+
+  // Notification deep link (?c=<comment id>): reveal, scroll to and briefly highlight that comment.
+  useEffect(() => {
+    const id = deepLinkCommentId();
+    if (!id || handledLink.current === id) return;
+    const target = comments.find((c) => c.id === id);
+    if (!target) return;
+    handledLink.current = id;
+    setShowAll(true);
+    if (target.parentId) setOpenReplies((s) => ({ ...s, [target.parentId!]: true }));
+    setFlashId(id);
+    const t1 = window.setTimeout(
+      () => document.getElementById(`comment-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+      400,
+    );
+    const t2 = window.setTimeout(() => setFlashId(null), 4000);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [comments]);
+
   const { roots, byParent } = useMemo(() => {
     const roots: Comment[] = [];
     const byParent = new Map<string, Comment[]>();
@@ -418,6 +460,8 @@ export function CommentThread(props: CommentThreadProps) {
             <CommentItem
               c={c}
               isReply={false}
+              flash={flashId === c.id}
+              mention={mentionOf(c.text)}
               props={props}
               editingId={editingId}
               setEditingId={setEditingId}
@@ -440,6 +484,8 @@ export function CommentThread(props: CommentThreadProps) {
                     key={r.id}
                     c={r}
                     isReply
+                    flash={flashId === r.id}
+                    mention={mentionOf(r.text)}
                     props={props}
                     editingId={editingId}
                     setEditingId={setEditingId}

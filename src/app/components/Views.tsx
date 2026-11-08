@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Plus, Bell, Edit3, MapPin, Globe2, UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard, CheckCheck, ArrowRight, ArrowUpRight, AlertTriangle, LogOut, ChevronDown, X } from 'lucide-react';
+import { Plus, Edit3, MapPin, Globe2, UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard, CheckCheck, ArrowUpRight, AlertTriangle, LogOut, ChevronDown, X } from 'lucide-react';
 import type {
   Article, CommunityPost, LinkedInReactionType,
   NotificationItem, ReactionTargetType, TopicStory, UpcomingEvent, UserProfile,
@@ -11,7 +11,9 @@ import { ImageGraphic } from './ImageGraphic';
 import { SavedList } from './SavedArticlesModal';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
-import { ExplorePageSkeleton, EventsPageSkeleton, NotificationsPageSkeleton, ProfilePageSkeleton } from './Skeletons';
+import { NotificationList } from './NotificationList';
+import { FILTERS as NOTIF_FILTERS, isUnread as isNotifUnread, matchesFilter, type NotificationFilter } from '../lib/notifications';
+import { ExplorePageSkeleton, EventsPageSkeleton, ProfilePageSkeleton } from './Skeletons';
 import { toBengaliNumerals } from '../utils/pureLogic';
 import { canCreateStory } from '../lib/auth';
 import { safeUrl } from '../lib/mappers';
@@ -499,187 +501,110 @@ export function NotificationsView({
   onRead,
   onToggleRead,
   onDelete,
-  onNavigate,
-  onOpenArticle,
-  onNavigateProfile,
-  isLoading,
+  onOpen,
+  onLoadMore,
+  loadingMore,
+  followingIds,
+  onFollowBack,
 }: {
   items: NotificationItem[];
   onRead: () => void;
   onToggleRead?: (id: string, isRead: boolean) => void;
   onDelete?: (id: string) => void;
-  onNavigate: (path: string) => void;
-  onOpenArticle?: (id: string) => void;
-  onNavigateProfile?: (userId: string) => void;
+  onOpen: (n: NotificationItem) => void;
+  onLoadMore?: () => void;
+  loadingMore?: boolean;
+  followingIds?: string[];
+  onFollowBack?: (userId: string) => void;
   isLoading?: boolean;
 }) {
-  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
-
-  const filtered = useMemo(() => {
-    return items.filter((n) => {
-      const isUnread = n.isRead !== undefined ? !n.isRead : n.unread;
-      if (filter === 'unread') return isUnread;
-      if (filter === 'read') return !isUnread;
-      return true;
-    });
-  }, [items, filter]);
-
-  const unreadCount = items.filter((n) => (n.isRead !== undefined ? !n.isRead : n.unread)).length;
-
-  if (isLoading) {
-    return <NotificationsPageSkeleton />;
-  }
+  const [filter, setFilter] = useState<NotificationFilter>('all');
+  const filtered = useMemo(() => items.filter((n) => matchesFilter(n, filter)), [items, filter]);
+  const unreadCount = useMemo(() => items.filter(isNotifUnread).length, [items]);
+  const counts = useMemo(() => {
+    const c: Partial<Record<NotificationFilter, number>> = {};
+    for (const f of NOTIF_FILTERS) c[f.key] = items.filter((n) => matchesFilter(n, f.key)).length;
+    return c;
+  }, [items]);
 
   return (
-    <div className="flex flex-col gap-4 animate-in fade-in duration-300">
-      <div className="flex flex-wrap items-end justify-between gap-3 px-3 sm:px-0">
+    <div className="mx-auto max-w-[720px] space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3 px-1">
         <div>
-          <SectionLabel>রিয়েলটাইম বিজ্ঞপ্তি ও কার্যকলাপ</SectionLabel>
-          <h1 className="mt-1 font-display text-[28px] font-bold leading-tight tracking-[-0.01em] text-slate-900 sm:text-[36px]">
-            সকল নোটিফিকেশন
-          </h1>
-          <p className="mt-1 font-sans text-sm text-slate-600">
-            মোট {toBengaliNumerals(items.length)}টি বিজ্ঞপ্তি · {toBengaliNumerals(unreadCount)}টি অপঠিত
+          <h1 className="font-bangla text-[24px] font-bold leading-tight text-slate-900 dark:text-white">বিজ্ঞপ্তি</h1>
+          <p className="mt-0.5 font-bangla text-[13px] text-slate-500 dark:text-slate-400">
+            {unreadCount > 0 ? `${toBengaliNumerals(unreadCount)}টি নতুন বিজ্ঞপ্তি` : 'সব বিজ্ঞপ্তি পড়া হয়েছে'}
           </p>
         </div>
         {unreadCount > 0 && (
           <button
             type="button"
             onClick={onRead}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3.5 text-xs font-semibold text-slate-800 shadow-xs hover:bg-slate-50 transition"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-canvas-border bg-canvas-card px-3.5 font-bangla text-[13px] font-bold text-accent-fg transition hover:bg-canvas-subtle"
           >
-            <CheckCheck className="size-4 text-emerald-600" /> সব পড়া হয়েছে চিহ্নিত করুন
+            <CheckCheck className="size-4" /> সব পড়া হয়েছে
           </button>
         )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-200 px-3 sm:px-0 pb-1">
-        {[
-          { key: 'all', label: `সকল (${toBengaliNumerals(items.length)})` },
-          { key: 'unread', label: `অপঠিত (${toBengaliNumerals(unreadCount)})` },
-          { key: 'read', label: `পড়া হয়েছে (${toBengaliNumerals(items.length - unreadCount)})` },
-        ].map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() => setFilter(t.key as typeof filter)}
-            className={cn(
-              'px-3.5 py-1.5 rounded-full text-xs font-bold transition',
-              filter === t.key
-                ? 'bg-[#061621] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div role="tablist" aria-label="বিজ্ঞপ্তি ফিল্টার" className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        {NOTIF_FILTERS.map((f) => {
+          const active = filter === f.key;
+          const n = counts[f.key] ?? 0;
+          return (
+            <button
+              key={f.key}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 font-bangla text-[13px] font-bold transition',
+                active
+                  ? 'bg-[#061621] text-white dark:bg-[#03EF62] dark:text-[#061621]'
+                  : 'border border-canvas-border bg-canvas-card text-slate-700 hover:bg-canvas-subtle dark:text-slate-200',
+              )}
+            >
+              {f.label}
+              {f.key !== 'all' && n > 0 && (
+                <span className={cn('rounded-full px-1.5 text-[11px]', active ? 'bg-white/20 dark:bg-black/15' : 'bg-canvas-subtle')}>
+                  {toBengaliNumerals(n)}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {filtered.length === 0 ? (
-        <section className={cn(FEED_CARD, 'p-12 text-center')}>
-          <Bell className="mx-auto size-10 text-slate-300" />
-          <h2 className="mt-3 font-sans text-base font-bold text-slate-800">
-            {filter === 'unread' ? 'কোনো অপঠিত বিজ্ঞপ্তি নেই' : 'কোনো বিজ্ঞপ্তি পাওয়া যায়নি'}
-          </h2>
-          <p className="mt-1 font-sans text-xs text-slate-500">
-            আপনার নিবন্ধ বা পোস্টে নতুন প্রতিক্রিয়া বা মন্তব্য এলে এখানে দেখতে পাবেন।
-          </p>
-        </section>
-      ) : (
-        <ul className={cn(FEED_CARD, 'divide-y divide-slate-100')}>
-          {filtered.map((n) => {
-            const isUnread = n.isRead !== undefined ? !n.isRead : n.unread;
-            const dest = n.targetUrl || n.targetRoute || '/';
-            return (
-              <li
-                key={n.id}
-                className={cn(
-                  'flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 transition-colors',
-                  isUnread ? 'bg-emerald-50/40' : 'hover:bg-slate-50/70',
-                )}
-              >
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <button
-                    type="button"
-                    onClick={() => n.actorId && onNavigateProfile?.(n.actorId)}
-                    className="shrink-0 mt-0.5"
-                    title={n.actorName || n.source}
-                  >
-                    <Avatar
-                      src={n.actorAvatar || ''}
-                      name={n.actorName || n.source || 'PS'}
-                      size="size-10"
-                    />
-                  </button>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="font-sans text-sm font-semibold text-slate-900 leading-snug">
-                      {n.message || n.title}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[11px] text-slate-500">
-                      <span>{n.time}</span>
-                      <span>·</span>
-                      <span className="font-sans font-semibold text-emerald-700">
-                        {n.actorName || n.source}
-                      </span>
-                      <span>·</span>
-                      <span className="uppercase text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">
-                        {n.type || 'system'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (onToggleRead && isUnread) {
-                        onToggleRead(n.id, true);
-                      }
-                      if (dest.startsWith('/article/')) {
-                        const artId = dest.replace('/article/', '');
-                        if (onOpenArticle) onOpenArticle(artId);
-                          else onNavigate(dest);
-                      } else {
-                        onNavigate(dest);
-                      }
-                    }}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-50 border border-emerald-200/80 px-2.5 text-xs font-bold text-emerald-800 hover:bg-emerald-100 transition"
-                  >
-                    গন্তব্যে যান <ArrowRight className="size-3" />
-                  </button>
-
-                  {onToggleRead && (
-                    <button
-                      type="button"
-                      onClick={() => onToggleRead(n.id, !isUnread)}
-                      aria-label={isUnread ? 'Mark read' : 'Mark unread'}
-                      title={isUnread ? 'পড়া হয়েছে হিসেবে চিহ্নিত করুন' : 'অপঠিত হিসেবে চিহ্নিত করুন'}
-                      className="inline-flex h-8 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      {isUnread ? 'পড়া হয়েছে' : 'অপঠিত করুন'}
-                    </button>
-                  )}
-
-                  {onDelete && (
-                    <button
-                      type="button"
-                      onClick={() => onDelete(n.id)}
-                      aria-label="Delete notification"
-                      title="বিজ্ঞপ্তি মুছে ফেলুন"
-                      className="flex size-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400 hover:text-rose-600 hover:border-rose-200 transition"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <section className={cn(FEED_CARD, 'p-2 sm:p-3')}>
+        <NotificationList
+          items={filtered}
+          variant="page"
+          onOpen={onOpen}
+          onToggleRead={onToggleRead}
+          onDelete={onDelete}
+          followingIds={followingIds}
+          onFollowBack={onFollowBack}
+          emptyTitle={filter === 'all' ? 'সব শান্ত এখানে' : 'এই ফিল্টারে কিছু নেই'}
+          emptyText={
+            filter === 'unread'
+              ? 'আপনি সব বিজ্ঞপ্তি পড়ে ফেলেছেন।'
+              : 'কেউ আপনার পোস্টে প্রতিক্রিয়া, মন্তব্য বা ফলো করলে এখানে সাথে সাথে দেখা যাবে।'
+          }
+        />
+        {onLoadMore && filter === 'all' && (
+          <div className="p-2 pt-3 text-center">
+            <button
+              type="button"
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-canvas-border px-5 font-bangla text-[13px] font-bold text-slate-700 transition hover:bg-canvas-subtle disabled:opacity-60 dark:text-slate-200"
+            >
+              {loadingMore ? 'লোড হচ্ছে…' : 'আগের বিজ্ঞপ্তি দেখুন'}
+            </button>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

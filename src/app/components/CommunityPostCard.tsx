@@ -6,6 +6,7 @@ import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { SharePopoverButton } from './ShareModal';
 import { CommentThread } from './CommentThread';
+import { deepLinkCommentId } from '../lib/notifications';
 import { toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 export const TEXT_THEMES = [
@@ -50,7 +51,11 @@ export function CommunityPostCard({
   onOpenStory,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  // Open the thread straight away when a notification deep-links to one of its comments.
+  const [showComments, setShowComments] = useState(() => {
+    const id = deepLinkCommentId();
+    return Boolean(id && post.comments.some((c) => c.id === id));
+  });
   const [text, setText] = useState('');
 
   const long = post.content.length > 260;

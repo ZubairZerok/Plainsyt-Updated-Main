@@ -6,6 +6,7 @@ import { Avatar, FEED_CARD, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { SharePopoverButton } from './ShareModal';
 import { CommentThread } from './CommentThread';
+import { deepLinkCommentId } from '../lib/notifications';
 import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 interface Props {
@@ -48,7 +49,10 @@ export function ArticleCard({
 }: Props) {
   const [text, setText] = useState('');
 
-  const [showComments, setShowComments] = useState(Boolean(lead));
+  const [showComments, setShowComments] = useState(() => {
+    const id = deepLinkCommentId();
+    return Boolean(lead) || Boolean(id && a.comments.some((c) => c.id === id));
+  });
 
   const submit = () => {
     if (!text.trim()) return;

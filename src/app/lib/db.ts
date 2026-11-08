@@ -86,7 +86,7 @@ export async function fetchFromSupabase(
         : Promise.resolve({ data: [], error: null }),
       meId ? supabase.from('reactions').select('*').eq('user_id', meId) : Promise.resolve({ data: [], error: null }),
       meId
-        ? supabase.from('notifications').select('*').eq('recipient_id', meId).order('created_at', { ascending: false }).limit(50)
+        ? supabase.from('notifications').select('*').eq('recipient_id', meId).order('updated_at', { ascending: false }).limit(NOTIF_PAGE)
         : Promise.resolve({ data: [], error: null }),
       meId ? supabase.from('bookmarks').select('*').eq('user_id', meId) : Promise.resolve({ data: [], error: null }),
       supabase.from('follows').select('follower_id, following_id').limit(5000),
@@ -304,6 +304,16 @@ async function deleteOwned(table: 'posts' | 'stories' | 'articles', id: string):
 export const dbDeletePost = (id: string) => deleteOwned('posts', id);
 export const dbDeleteStory = (id: string) => deleteOwned('stories', id);
 export const dbDeleteArticle = (id: string) => deleteOwned('articles', id);
+
+export const NOTIF_PAGE = 40;
+
+/** Older notifications for "আরও দেখুন" (cursor = updated_at of the last loaded row). */
+export async function dbFetchNotifications(meId: string, before?: string): Promise<DbResult<NotificationItem[]>> {
+  let q = supabase.from('notifications').select('*').eq('recipient_id', meId).order('updated_at', { ascending: false }).limit(NOTIF_PAGE);
+  if (before) q = q.lt('updated_at', before);
+  const { data, error } = await q;
+  return error ? fail(error) : ok(((data ?? []) as Row[]).map(fromNotificationRow));
+}
 
 export async function dbUpdateNotificationRead(id: string, isRead: boolean): Promise<DbResult> {
   const { error } = await supabase.from('notifications').update({ is_read: isRead }).eq('id', id);
