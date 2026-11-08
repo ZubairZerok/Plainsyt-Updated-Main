@@ -18,7 +18,7 @@ export function SavedList({ articles, posts, onOpenArticle, onRemoveArticle, onR
   if (!articles.length && !posts.length)
     return (
       <div className="flex flex-col items-center gap-2 py-12 text-center">
-        <span className="flex size-14 items-center justify-center rounded-full border border-dashed border-pine-900/40 text-pine-600"><Bookmark className="size-6" /></span>
+        <span className="flex size-14 items-center justify-center rounded-full border border-dashed border-pine-900/40 text-accent-fg"><Bookmark className="size-6" /></span>
         <p className="font-display text-[19px] font-semibold text-pine-900">এখনো কিছু সংরক্ষণ করেননি</p>
         <p className="max-w-[280px] font-bangla text-[13.5px] text-pine-900/60">যেকোনো প্রতিবেদন বা পোস্টের বুকমার্ক চিহ্নে চাপ দিন — পরে পড়ার জন্য এখানে জমা থাকবে।</p>
       </div>

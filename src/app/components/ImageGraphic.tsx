@@ -85,14 +85,14 @@ export function ImageGraphic({
         {m.tags.map((t) => (
           <span
             key={t}
-            className="rounded-[4px] border border-white/40 bg-black/40 px-1.5 py-0.5 font-mono text-[10px] tracking-wide text-white backdrop-blur-sm"
+            className="rounded-[4px] border border-white/40 bg-black/40 px-1.5 py-0.5 font-mono text-[11px] tracking-wide text-white backdrop-blur-sm"
           >
             {t}
           </span>
         ))}
       </div>
       {plate && (
-        <span className="pointer-events-none absolute bottom-3 right-3 font-mono text-[10px] tracking-[0.16em] text-white/80">
+        <span className="pointer-events-none absolute bottom-3 right-3 font-mono text-[11px] tracking-[0.16em] text-white/80">
           {plate}
         </span>
       )}

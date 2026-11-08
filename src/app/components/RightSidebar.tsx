@@ -54,7 +54,7 @@ export function TrendingList({
             onClick={() => onOpenPopup(a.id)}
             className="flex min-w-0 flex-1 items-start gap-2 text-left"
           >
-            <span className="w-5 shrink-0 font-display text-lg font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-[#03EF62] transition-colors">
+            <span className="w-8 shrink-0 whitespace-nowrap tabular-nums font-display text-lg font-bold text-slate-400 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-[#03EF62] transition-colors">
               {String(idx + 1).padStart(2, '0')}
             </span>
             <span className="min-w-0 flex-1">
@@ -106,12 +106,12 @@ export function EventRow({
       <button
         type="button"
         onClick={() => onNavigate(`/events/${e.id}`)}
-        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white text-center shadow-xs hover:border-[#03EF62] transition"
+        className="flex w-10 shrink-0 self-start flex-col items-center overflow-hidden rounded-md border border-slate-200 bg-white dark:bg-white/5 dark:border-white/15 text-center shadow-xs hover:border-[#03EF62] transition"
       >
-        <span className="w-full bg-[#061621] py-0.5 font-mono text-[8.5px] font-bold text-[#03EF62]">
+        <span className="w-full bg-[#061621] py-0.5 font-mono text-[10.5px] font-bold text-[#03EF62]">
           {e.dateMonth}
         </span>
-        <span className="py-0.5 font-display text-base font-bold leading-none text-slate-800">
+        <span className="py-0.5 font-display text-base font-bold leading-none text-slate-800 dark:text-slate-100">
           {e.dateDay}
         </span>
       </button>
@@ -123,7 +123,7 @@ export function EventRow({
         >
           {e.title}
         </button>
-        <span className="mt-0.5 flex items-center gap-1 text-[10.5px] text-slate-500">
+        <span className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500">
           <MapPin className="size-2.5 shrink-0" />
           <span className="truncate">{e.location}</span>
         </span>
@@ -151,7 +151,7 @@ export function EventRow({
           <button
             type="button"
             onClick={() => onNavigate(`/events/${e.id}`)}
-            className="text-[10px] text-slate-500 hover:text-slate-900 hover:underline px-1"
+            className="text-[11px] text-slate-500 hover:text-slate-900 hover:underline px-1"
           >
             বিস্তারিত
           </button>
@@ -235,11 +235,11 @@ export function RightSidebar(p: Props) {
                   href="https://www.facebook.com/profile.php?id=61563107955120"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block truncate text-xs font-bold text-slate-900 dark:text-white hover:text-[#1877F2] transition"
+                  className="block truncate text-xs font-bold text-slate-900 dark:text-white hover:text-[#1565d8] transition"
                 >
                   PLAiNSYT
                 </a>
-                <span className="inline-flex items-center gap-1 font-bangla text-[10.5px] font-medium text-[#1877F2] dark:text-blue-400">
+                <span className="inline-flex items-center gap-1 font-bangla text-[11px] font-medium text-[#1565d8] dark:text-blue-400">
                   <span>অফিসিয়াল ফেসবুক পেজ</span>
                 </span>
               </div>
@@ -248,7 +248,7 @@ export function RightSidebar(p: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title="ফেসবুকে ফলো করুন"
-                className="h-6.5 shrink-0 inline-flex items-center gap-1 rounded-full px-3 text-[11px] font-bold bg-[#1877F2] text-white hover:bg-[#166fe5] shadow-xs active:scale-95 transition"
+                className="h-6.5 shrink-0 inline-flex items-center gap-1 rounded-full px-3 text-[11px] font-bold bg-[#1565d8] text-white hover:bg-[#1259c2] shadow-xs active:scale-95 transition"
               >
                 ফলো
               </a>
@@ -258,7 +258,7 @@ export function RightSidebar(p: Props) {
           {/* User Profiles to follow - strictly only the 3 verified editorial accounts */}
           {editorialProfiles.length > 0 && (
             <div className="pt-2 border-t border-slate-100 dark:border-white/5">
-              <p className="font-mono text-[9.5px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">ভেরিফাইড গবেষক ও লেখক</p>
+              <p className="font-mono text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 px-0.5">ভেরিফাইড গবেষক ও লেখক</p>
               <ul className="divide-y divide-slate-100 dark:divide-white/5">
                 {editorialProfiles.map((s) => {
                   const isFollowing = (p.followingIds ?? []).includes(s.id);
@@ -282,7 +282,7 @@ export function RightSidebar(p: Props) {
                           </button>
                           <VerifiedBadge />
                         </div>
-                        <span className="block truncate text-[10px] text-slate-400">
+                        <span className="block truncate text-[11px] text-slate-400">
                           {s.focusArea || s.role || 'লেখক'}
                         </span>
                       </span>

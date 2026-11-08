@@ -5,6 +5,7 @@ import type {
 } from '../types';
 
 import { NewsletterSubscription } from './NewsletterSubscription';
+import { PostCreatorBar } from './PostCreatorBar';
 import { TopicStoriesCarousel } from './TopicStoriesCarousel';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
@@ -195,6 +196,15 @@ export function CentralFeed(f: FeedApi) {
           onNavigateProfile={f.onNavigateProfile}
         />
       </div>
+
+      {!isEmpty && (
+        <PostCreatorBar
+          currentUser={f.currentUser}
+          onWriteArticle={f.onWriteArticle}
+          onUploadVideo={f.onUploadVideo}
+          onNavigateProfile={() => (f.currentUser ? f.onNavigateProfile(f.currentUser.id) : f.onOpenProfileSettings())}
+        />
+      )}
 
       {isEmpty ? (
         <section className={cn(FEED_CARD, 'p-6 text-center sm:p-10')}>

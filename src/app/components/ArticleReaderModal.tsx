@@ -189,7 +189,7 @@ export function ArticleReaderContent({
       )}
 
       <div className="px-5 pb-8 pt-6 sm:px-10">
-        <p className="font-bangla text-[13px] font-semibold text-pine-600">{a.category}</p>
+        <p className="font-bangla text-[13px] font-semibold text-accent-fg">{a.category}</p>
         <h1
           id="reader-title"
           className="mt-2 font-display text-[28px] font-bold leading-[1.15] tracking-[-0.01em] text-pine-950 sm:text-[38px]"
@@ -284,7 +284,7 @@ export function ArticleReaderContent({
                     </p>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/80 dark:border-[#03EF62]/40 bg-emerald-50/80 dark:bg-[#03EF62]/10 px-2.5 py-0.5 font-bangla text-[10.5px] font-bold text-emerald-800 dark:text-[#03EF62]">
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/80 dark:border-[#03EF62]/40 bg-emerald-50/80 dark:bg-[#03EF62]/10 px-2.5 py-0.5 font-bangla text-[11px] font-bold text-emerald-800 dark:text-[#03EF62]">
                   <ShieldCheck className="size-3" /> যাচাইকৃত সোর্স
                 </span>
               </div>
@@ -311,7 +311,7 @@ export function ArticleReaderContent({
                     </div>
                     {a.researchBasis.keyMetric && (
                       <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1.5 text-right">
-                        <span className="block text-[10px] text-slate-400 font-medium">মূল প্রযুক্তিগত পরিমাপক</span>
+                        <span className="block text-[11px] text-slate-400 font-medium">মূল প্রযুক্তিগত পরিমাপক</span>
                         <span className="font-bangla text-xs font-bold text-emerald-700 dark:text-[#03EF62]">
                           <Num>{a.researchBasis.keyMetric}</Num>
                         </span>
@@ -326,12 +326,12 @@ export function ArticleReaderContent({
                   href={resolvedSourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-600/30 dark:border-[#03EF62]/40 bg-emerald-600 dark:bg-[#03EF62] px-4 py-2 text-xs font-bold text-white dark:text-[#061621] hover:bg-emerald-700 dark:hover:bg-[#02d857] transition shadow-xs cursor-pointer active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-700/30 dark:border-[#03EF62]/40 bg-emerald-700 dark:bg-[#03EF62] px-4 py-2 text-xs font-bold text-white dark:text-[#061621] hover:bg-emerald-800 dark:hover:bg-[#02d857] transition shadow-xs cursor-pointer active:scale-95"
                 >
                   <span>মূল গবেষণা ও অফিসিয়াল সোর্স দেখুন</span>
                   <ExternalLink className="size-3.5 stroke-[2.5]" />
                 </a>
-                <span className="font-mono text-[10.5px] text-slate-400 dark:text-slate-500 truncate max-w-xs">
+                <span className="font-mono text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-xs">
                   {resolvedSourceUrl.replace(/^https?:\/\//, '')}
                 </span>
               </div>
@@ -390,13 +390,13 @@ export function ArticleReaderContent({
                 onChange={(e) => setText(e.target.value)}
                 rows={2}
                 placeholder="তথ্যভিত্তিক মতামত দিন…"
-                className="w-full resize-none bg-transparent px-2 py-1 font-bangla text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400"
+                className="w-full resize-none bg-transparent px-2 py-1 font-bangla text-[14.5px] text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400"
               />
               <div className="flex justify-end pt-1">
                 <button
                   type="submit"
                   disabled={!text.trim()}
-                  className="flex h-8 items-center gap-1.5 rounded-full bg-[#03EF62] hover:bg-[#02d857] text-[#061621] px-4 text-[12.5px] font-bold shadow-sm disabled:opacity-40 transition"
+                  className="flex h-8 items-center gap-1.5 rounded-full bg-[#03EF62] hover:bg-[#02d857] text-[#061621] px-4 text-[12.5px] font-bold shadow-sm disabled:opacity-60 transition"
                 >
                   <Send className="size-3.5 text-[#061621]" />
                   Post Comment
@@ -454,7 +454,7 @@ export function ArticleReaderContent({
                             <button
                               type="submit"
                               disabled={!editingText.trim()}
-                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                             >
                               সংরক্ষণ
                             </button>
@@ -501,7 +501,7 @@ export function ArticleReaderContent({
                         </button>
                         {canManageComment(c) && (
                           <>
-                            <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                            <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                             <button
                               type="button"
                               onClick={() => {
@@ -513,7 +513,7 @@ export function ArticleReaderContent({
                             >
                               এডিট
                             </button>
-                            <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                            <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                             <button
                               type="button"
                               onClick={() => onDeleteComment?.(c.id)}
@@ -557,7 +557,7 @@ export function ArticleReaderContent({
                           <button
                             type="submit"
                             disabled={!replyText.trim()}
-                            className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-40"
+                            className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-60"
                           >
                             উত্তর
                           </button>
@@ -612,7 +612,7 @@ export function ArticleReaderContent({
                                       <button
                                         type="submit"
                                         disabled={!editingText.trim()}
-                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                                       >
                                         সংরক্ষণ
                                       </button>
@@ -629,7 +629,7 @@ export function ArticleReaderContent({
                                   <p className="font-bangla text-[13.5px] leading-relaxed text-pine-900/85 dark:text-slate-200">
                                     {r.text}
                                     {r.isEdited && (
-                                      <span className="ml-1.5 text-[10px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
                                     )}
                                   </p>
                                 )}
@@ -655,7 +655,7 @@ export function ArticleReaderContent({
                                   </button>
                                   {canManageComment(r) && (
                                     <>
-                                      <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                      <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                       <button
                                         type="button"
                                         onClick={() => {
@@ -667,7 +667,7 @@ export function ArticleReaderContent({
                                       >
                                         এডিট
                                       </button>
-                                      <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                      <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                       <button
                                         type="button"
                                         onClick={() => onDeleteComment?.(r.id)}

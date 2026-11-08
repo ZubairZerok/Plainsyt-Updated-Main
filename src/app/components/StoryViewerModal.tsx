@@ -40,6 +40,16 @@ export function StoryViewerModal({
   onOpenAuth,
   onNavigateProfile,
 }: Props) {
+  // Lock page scroll while the viewer is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   // 1. Group stories by author account
   const accountGroups: AccountStoryGroup[] = useMemo(() => {
     if (!stories || stories.length === 0) return [];
@@ -400,7 +410,7 @@ export function StoryViewerModal({
           onClose();
         }
       }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md select-none overflow-hidden"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/95 backdrop-blur-md select-none overflow-hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Story Viewer"
@@ -587,7 +597,7 @@ export function StoryViewerModal({
                       )}
                     </div>
                     {/* Smaller tags / designations in a single line (beside name or wraps to next line) */}
-                    <div className="inline-flex items-center gap-1 text-[10px] sm:text-[10.5px] font-bangla text-white/80 drop-shadow whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
+                    <div className="inline-flex items-center gap-1 text-[11px] sm:text-[11px] font-bangla text-white/80 drop-shadow whitespace-nowrap overflow-hidden text-ellipsis max-w-full shrink-0">
                       <span className="truncate max-w-[100px] text-emerald-300 font-medium">
                         {currentStory.category || 'প্রতিবেদন'}
                       </span>

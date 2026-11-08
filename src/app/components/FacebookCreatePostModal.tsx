@@ -142,7 +142,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               <h2 id="upload-reel-title" className="font-display text-[19px] font-semibold">
                 Upload Video Reel / Field Story
               </h2>
-              <p className="text-[12px] text-slate-400">
+              <p className="text-[12px] text-slate-300">
                 কমিউনিটির সাথে ভিডিও বা ফিল্ড স্টোরি শেয়ার করুন
               </p>
             </div>
@@ -164,7 +164,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               <p className="text-[14.5px] font-semibold text-pine-900">
                 {currentUser?.name || 'Agri Researcher'}
               </p>
-              <p className="flex items-center gap-1 font-mono text-[11px] text-pine-600">
+              <p className="flex items-center gap-1 font-mono text-[11px] text-accent-fg">
                 Public <Globe2 className="size-3" />
               </p>
             </div>
@@ -260,7 +260,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
           <div>
             <SectionLabel className="mb-1">External Video / Study Link (Optional)</SectionLabel>
             <div className="flex items-center rounded-lg border border-pine-900/25 bg-canvas-card px-3">
-              <LinkIcon className="size-4 text-pine-600" />
+              <LinkIcon className="size-4 text-accent-fg" />
               <input
                 value={externalLink}
                 onChange={(e) => setExternalLink(e.target.value)}
@@ -305,7 +305,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               type="submit"
               disabled={!canSubmit}
               className={cn(
-                'inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-6 text-[14px] font-bold text-white shadow-md disabled:opacity-40 transition',
+                'inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 hover:bg-emerald-800 px-6 text-[14px] font-bold text-white shadow-md disabled:opacity-60 transition',
               )}
             >
               <Video className="size-4" /> প্রকাশ করুন

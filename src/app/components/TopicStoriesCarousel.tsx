@@ -124,7 +124,7 @@ export function TopicStoriesCarousel({
 
                 {/* Multiple stories indicator badge */}
                 {storyCount > 1 && (
-                  <span className="absolute top-2 right-2 z-10 rounded-full bg-black/60 backdrop-blur-md px-1.5 py-0.5 font-bangla text-[10px] font-bold text-[#03EF62] border border-[#03EF62]/40 shadow-xs">
+                  <span className="absolute top-2 right-2 z-10 rounded-full bg-black/60 backdrop-blur-md px-1.5 py-0.5 font-bangla text-[11px] font-bold text-[#03EF62] border border-[#03EF62]/40 shadow-xs">
                     <Num>{toBengaliNumerals(storyCount)}</Num> টি
                   </span>
                 )}
@@ -137,7 +137,7 @@ export function TopicStoriesCarousel({
 
                 {/* Category kicker */}
                 <span className="absolute inset-x-2 bottom-2">
-                  <span className="mb-0.5 hidden truncate font-bangla text-[9.5px] font-semibold text-[#03EF62] drop-shadow md:block">
+                  <span className="mb-0.5 hidden truncate font-bangla text-[11px] font-semibold text-[#03EF62] drop-shadow md:block">
                     {s.category}
                   </span>
                   <span className="line-clamp-2 font-bangla text-[12px] font-bold leading-tight text-white drop-shadow md:text-[12.5px]">

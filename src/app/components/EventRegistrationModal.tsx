@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CalendarDays, CheckCircle2, MapPin, Ticket, User, Mail, Phone, Building2, X } from 'lucide-react';
 import type { UpcomingEvent, UserProfile } from '../types';
-import { cn } from './Primitives';
+import { cn, Modal } from './Primitives';
 
 interface Props {
   open: boolean;
@@ -60,20 +60,14 @@ export function EventRegistrationModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-      />
-
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#061621] bg-canvas shadow-tactile-lg z-10">
+    <Modal open onClose={onClose} className="max-w-lg" labelledBy="event-registration-title" centerOnMobile>
+      <div className="relative w-full overflow-hidden rounded-2xl border border-canvas-border bg-canvas shadow-tactile-lg">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#061621]/15 bg-[#03EF62] px-5 py-4 text-[#061621]">
           <div className="flex items-center gap-2.5">
             <Ticket className="size-5" />
             <div>
-              <h2 className="font-bangla text-[18px] font-bold leading-tight">
+              <h2 id="event-registration-title" className="font-bangla text-[18px] text-[#061621] font-bold leading-tight">
                 ইভেন্ট রেজিস্ট্রেশন · Event Registration
               </h2>
               <p className="font-mono text-[11px] opacity-80">
@@ -102,11 +96,11 @@ export function EventRegistrationModal({
             </p>
 
             <div className="mt-4 rounded-xl border border-dashed border-[#061621]/30 bg-pine-50 p-4 font-mono text-left">
-              <div className="flex justify-between text-[11.5px] text-pine-600">
+              <div className="flex justify-between text-[11.5px] text-accent-fg">
                 <span>TICKET ID</span>
-                <span className="font-bold text-[#061621]">#{ticketId}</span>
+                <span className="font-bold text-pine-950">#{ticketId}</span>
               </div>
-              <p className="mt-1 font-bangla text-[15px] font-semibold text-[#061621]">
+              <p className="mt-1 font-bangla text-[15px] font-semibold text-pine-950">
                 {event.title}
               </p>
               <div className="mt-2 text-[12px] text-pine-900/80">
@@ -127,7 +121,7 @@ export function EventRegistrationModal({
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 p-5 max-h-[80vh] overflow-y-auto">
             <div className="rounded-xl border border-canvas-border bg-canvas-subtle p-3">
-              <span className="font-mono text-[10.5px] uppercase tracking-wider text-pine-600">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-accent-fg">
                 Selected Event
               </span>
               <p className="mt-0.5 font-bangla text-[15px] font-bold text-pine-950">
@@ -148,7 +142,7 @@ export function EventRegistrationModal({
                 আপনার পুরো নাম *
               </label>
               <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                <User className="size-4 text-pine-600" />
+                <User className="size-4 text-accent-fg" />
                 <input
                   required
                   value={name}
@@ -165,7 +159,7 @@ export function EventRegistrationModal({
                   মোবাইল নম্বর *
                 </label>
                 <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                  <Phone className="size-4 text-pine-600" />
+                  <Phone className="size-4 text-accent-fg" />
                   <input
                     required
                     type="tel"
@@ -181,7 +175,7 @@ export function EventRegistrationModal({
                   ইমেইল অ্যাড্রেস *
                 </label>
                 <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                  <Mail className="size-4 text-pine-600" />
+                  <Mail className="size-4 text-accent-fg" />
                   <input
                     required
                     type="email"
@@ -199,7 +193,7 @@ export function EventRegistrationModal({
                 প্রতিষ্ঠান / বিশ্ববিদ্যালয় (Institution)
               </label>
               <div className="flex items-center rounded-xl border border-pine-900/20 bg-canvas-card px-3 focus-within:border-[#03EF62]">
-                <Building2 className="size-4 text-pine-600" />
+                <Building2 className="size-4 text-accent-fg" />
                 <input
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
@@ -272,6 +266,6 @@ export function EventRegistrationModal({
           </form>
         )}
       </div>
-    </div>
+    </Modal>
   );
 }

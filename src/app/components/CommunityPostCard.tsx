@@ -142,7 +142,7 @@ export function CommunityPostCard({
               onClick={() => setExpanded((e) => !e)}
               className="ml-1 font-sans text-[14px] font-semibold text-pine-900/60 hover:underline"
             >
-              {expanded ? 'See less' : 'See more'}
+              {expanded ? 'কম দেখুন' : 'আরও দেখুন'}
             </button>
           )}
         </div>
@@ -154,15 +154,17 @@ export function CommunityPostCard({
             href={safeUrl(post.externalLink)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-pine-900/25 bg-pine-50 px-3 py-1.5 font-mono text-[12px] text-pine-800 hover:border-pine-900"
+            title={post.externalLink}
+            className="inline-flex max-w-full items-center gap-1.5 rounded-lg border border-pine-900/25 bg-pine-50 px-3 py-2 font-mono text-[12px] text-pine-800 hover:border-pine-900"
           >
-            {post.externalLink} <ExternalLink className="size-3.5" />
+            <span className="min-w-0 truncate">{post.externalLink?.replace(/^https?:\/\/(www\.)?/, '')}</span>
+            <ExternalLink className="size-3.5 shrink-0" />
           </a>
         </div>
       )}
 
       {post.aiLabel && (
-        <p className="mx-3 mt-2 inline-flex items-center gap-1 rounded-md bg-canvas-subtle px-2 py-0.5 font-mono text-[10px] text-pine-600 sm:mx-4">
+        <p className="mx-3 mt-2 inline-flex items-center gap-1 rounded-md bg-canvas-subtle px-2 py-0.5 font-mono text-[11px] text-accent-fg sm:mx-4">
           <Bot className="size-3" />
           AI info · Made with AI
         </p>
@@ -218,16 +220,17 @@ export function CommunityPostCard({
               onClick={() => onOpenPhoto(imgs, idx, post.content.slice(0, 90), post.author.name, post.authorId)}
               className="block cursor-zoom-in"
             >
-              <img src={s} alt="" className="aspect-square w-full object-cover" />
+              <img src={s} alt="" className="aspect-square w-full object-cover sm:aspect-[4/3]" />
             </button>
           ))}
         </div>
       )}
       {imgs.length >= 3 && (
-        <div className="mt-3 grid aspect-[4/3] grid-cols-[1.5fr_1fr] grid-rows-2 gap-0.5 bg-pine-100">
+        <div className="mt-3 grid aspect-[4/3] sm:aspect-auto sm:h-[26rem] grid-cols-[1.5fr_1fr] grid-rows-2 gap-0.5 bg-pine-100">
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 0, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="row-span-2 block size-full cursor-zoom-in"
           >
             <img src={imgs[0]} alt="Field visit" className="size-full object-cover" />
@@ -235,6 +238,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 1, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="block size-full cursor-zoom-in"
           >
             <img src={imgs[1]} alt="" className="size-full object-cover" />
@@ -242,6 +246,7 @@ export function CommunityPostCard({
           <button
             type="button"
             onClick={() => onOpenPhoto(imgs, 2, post.content.slice(0, 90), post.author.name, post.authorId)}
+            aria-label="ছবি বড় করে দেখুন"
             className="relative block size-full cursor-zoom-in"
           >
             <img src={imgs[2]} alt="" className="size-full object-cover" />
@@ -277,16 +282,18 @@ export function CommunityPostCard({
           userReaction={post.userReaction}
           onSelect={onReact}
           countLabel={reactionTotal > 0 ? toBengaliNumerals(reactionTotal) : undefined}
-          className="w-full justify-center"
+          showLabel
+          className="h-9 w-full justify-center !rounded-lg !border-transparent !bg-transparent !py-0 hover:!bg-canvas-subtle !text-[12px] sm:!text-[13.5px]"
         />
         <button
           type="button"
           onClick={() => setShowComments((s) => !s)}
           aria-label="মন্তব্য দেখুন বা লিখুন"
           title="মন্তব্য"
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <MessageCircle className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
+          <span className="truncate">মন্তব্য</span>
           {post.comments.length > 0 && (
             <span className="font-bangla font-bold text-[12px] opacity-90">
               (<Num>{toBengaliNumerals(post.comments.length)}</Num>)
@@ -294,15 +301,16 @@ export function CommunityPostCard({
           )}
         </button>
         <SharePopoverButton
+          wrapperClassName="w-full"
           title={post.content.slice(0, 60)}
           url={`/post/${post.id}`}
         >
           <button
             type="button"
-            className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+            className="flex w-full items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
           >
             <Share2 className="size-4 sm:size-[19px] shrink-0 dark:text-[#03EF62]" />
-            <span className="truncate">Share</span>
+            <span className="truncate">শেয়ার</span>
           </button>
         </SharePopoverButton>
         <button
@@ -311,12 +319,12 @@ export function CommunityPostCard({
           aria-pressed={post.userSaved}
           aria-label="Save post"
           className={cn(
-            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            'flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13.5px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
             post.userSaved ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/60 dark:text-slate-300',
           )}
         >
           <Bookmark className={cn('size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]', post.userSaved && 'fill-current')} />
-          <span className="truncate">{post.userSaved ? 'Saved' : 'Save'}</span>
+          <span className="truncate">{post.userSaved ? 'সংরক্ষিত' : 'সংরক্ষণ'}</span>
         </button>
       </div>
 
@@ -366,7 +374,7 @@ export function CommunityPostCard({
                             <button
                               type="submit"
                               disabled={!editingText.trim()}
-                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                             >
                               সংরক্ষণ
                             </button>
@@ -414,7 +422,7 @@ export function CommunityPostCard({
                       </button>
                       {canManageComment(c) && (
                         <>
-                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                           <button
                             type="button"
                             onClick={() => {
@@ -426,7 +434,7 @@ export function CommunityPostCard({
                           >
                             এডিট
                           </button>
-                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                           <button
                             type="button"
                             onClick={() => onDeleteComment?.(c.id)}
@@ -470,7 +478,7 @@ export function CommunityPostCard({
                         <button
                           type="submit"
                           disabled={!replyText.trim()}
-                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-40"
+                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-60"
                         >
                           উত্তর
                         </button>
@@ -517,7 +525,7 @@ export function CommunityPostCard({
                                       <button
                                         type="submit"
                                         disabled={!editingText.trim()}
-                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                                       >
                                         সংরক্ষণ
                                       </button>
@@ -534,7 +542,7 @@ export function CommunityPostCard({
                                   <p className="font-bangla text-[13px] leading-snug text-slate-800 dark:text-slate-200">
                                     {r.text}
                                     {r.isEdited && (
-                                      <span className="ml-1.5 text-[10px] text-slate-400 font-normal">(সম্পাদিত)</span>
+                                      <span className="ml-1.5 text-[11px] text-slate-400 font-normal">(সম্পাদিত)</span>
                                     )}
                                   </p>
                                 )}
@@ -561,7 +569,7 @@ export function CommunityPostCard({
                                 </button>
                                 {canManageComment(r) && (
                                   <>
-                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                     <button
                                       type="button"
                                       onClick={() => {
@@ -573,7 +581,7 @@ export function CommunityPostCard({
                                     >
                                       এডিট
                                     </button>
-                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                     <button
                                       type="button"
                                       onClick={() => onDeleteComment?.(r.id)}
@@ -612,13 +620,13 @@ export function CommunityPostCard({
             onChange={(e) => setText(e.target.value)}
             onFocus={() => setShowComments(true)}
             placeholder="মন্তব্য লিখুন…"
-            className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/40"
+            className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/60"
           />
           <button
             type="submit"
             disabled={!text.trim()}
             aria-label="Send"
-            className="flex size-7 items-center justify-center rounded-full text-pine-600 disabled:opacity-30"
+            className="flex size-7 items-center justify-center rounded-full text-accent-fg disabled:opacity-50"
           >
             <Send className="size-4" />
           </button>

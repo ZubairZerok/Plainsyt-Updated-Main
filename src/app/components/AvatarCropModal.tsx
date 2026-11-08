@@ -196,7 +196,7 @@ export function AvatarCropModal({
             </div>
           </div>
 
-          <p className="mt-2 text-[10.5px] text-slate-400 dark:text-slate-500 font-sans">
+          <p className="mt-2 text-[11px] text-slate-400 dark:text-slate-500 font-sans">
             ছবি ড্র্যাগ করে পজিশন করুন অথবা হুইল ঘুরিয়ে জুম করুন
           </p>
         </div>

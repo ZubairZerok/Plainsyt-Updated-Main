@@ -13,12 +13,15 @@ export function SharePopoverButton({
   url,
   children,
   className,
+  wrapperClassName,
   floating,
 }: {
   title: string;
   url?: string;
   children?: React.ReactNode;
   className?: string;
+  /** Extra classes for the outer wrapper — pass `w-full` to stretch inside a grid cell. */
+  wrapperClassName?: string;
   floating?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -99,12 +102,12 @@ export function SharePopoverButton({
   const hasNative = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   return (
-    <div ref={rootRef} className="relative inline-flex items-center">
-      <div onClick={(e) => { e.stopPropagation(); setOpen((prev) => !prev); }} className="cursor-pointer">
+    <div ref={rootRef} className={cn('relative inline-flex items-center', wrapperClassName)}>
+      <div onClick={(e) => { e.stopPropagation(); setOpen((prev) => !prev); }} className={cn('cursor-pointer', wrapperClassName?.includes('w-full') && 'w-full')}>
         {children || (
           <button
             type="button"
-            className={className || "flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0 cursor-pointer"}
+            className={className || "flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0 cursor-pointer"}
             aria-label="শেয়ার"
             title="শেয়ার"
           >
@@ -137,7 +140,7 @@ export function SharePopoverButton({
             >
               <Facebook className="size-4.5 fill-current" />
             </button>
-            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
               Facebook
             </span>
           </div>
@@ -153,7 +156,7 @@ export function SharePopoverButton({
             >
               {copied ? <Check className="size-4.5 text-[#03EF62]" /> : <Copy className="size-4" />}
             </button>
-            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+            <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
               {copied ? 'কপি হয়েছে' : 'লিংক কপি'}
             </span>
           </div>
@@ -170,7 +173,7 @@ export function SharePopoverButton({
               >
                 <Share2 className="size-4" />
               </button>
-              <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
+              <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900/95 dark:bg-black/95 px-2 py-0.5 font-bangla text-[11px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md z-30">
                 শেয়ার
               </span>
             </div>

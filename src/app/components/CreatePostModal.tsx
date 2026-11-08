@@ -150,7 +150,7 @@ export function CreatePostModal({
   };
 
   const field =
-    'w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 px-3.5 py-2.5 font-bangla text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white dark:focus:bg-canvas-card transition';
+    'w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 px-3.5 py-2.5 font-bangla text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white dark:focus:bg-canvas-card transition';
 
   return (
     <Modal open={open} onClose={onClose} className="max-w-[760px]" labelledBy="write-title">
@@ -180,7 +180,7 @@ export function CreatePostModal({
                   className={cn(
                     'rounded-full px-3.5 py-1.5 text-xs font-semibold transition',
                     cat === i
-                      ? 'bg-emerald-600 text-white shadow-sm'
+                      ? 'bg-emerald-700 text-white shadow-sm'
                       : 'border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100',
                   )}
                 >
@@ -314,7 +314,7 @@ export function CreatePostModal({
                 className={cn(
                   'px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5',
                   showPreview
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-emerald-700 text-white'
                     : 'border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
                 )}
               >
@@ -383,7 +383,7 @@ export function CreatePostModal({
             <div className="space-y-1.5">
               {takeaways.map((t, i) => (
                 <div key={i} className="flex gap-2">
-                  <span className="mt-2 font-mono text-[11px] text-pine-600">
+                  <span className="mt-2 font-mono text-[11px] text-accent-fg">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <input
@@ -434,7 +434,7 @@ export function CreatePostModal({
               type="button"
               disabled={!ready}
               onClick={publish}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-2 font-bangla text-[13px] font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-40 transition"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-5 py-2 font-bangla text-[13px] font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60 transition"
             >
               <PenLine className="size-4" />
               প্রকাশ করুন

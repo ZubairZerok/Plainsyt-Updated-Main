@@ -107,7 +107,7 @@ export function ProfileSettingsModal({
   };
 
   const inputCls =
-    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-400 focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/20 transition';
+    'w-full rounded-xl border border-slate-200/90 dark:border-white/10 bg-canvas-card px-3.5 py-2.5 text-[14px] text-slate-900 dark:text-white outline-none placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:border-[#03EF62] focus:ring-2 focus:ring-[#03EF62]/20 transition';
 
   if (!currentUser) {
     return (
@@ -137,7 +137,7 @@ export function ProfileSettingsModal({
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 bg-canvas-card px-5 py-4">
           <div>
             <h2 id="profile-settings-title" className="font-display text-[21px] font-semibold text-pine-900">
-              Profile &amp; Appearance Settings
+              প্রোফাইল ও অ্যাপিয়ারেন্স সেটিংস
             </h2>
             <p className="text-[12px] text-slate-500 dark:text-slate-400">
               আপনার ব্যক্তিগত তথ্য ও প্রোফাইল কাস্টমাইজ করুন
@@ -152,7 +152,7 @@ export function ProfileSettingsModal({
                 style={{ background: coverGradient }}
                 className="relative h-28 w-full transition-all duration-300"
               >
-                <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-0.5 font-mono text-[10px] text-white backdrop-blur-sm">
+                <span className="absolute right-3 top-3 rounded-full bg-black/50 px-2.5 py-0.5 font-mono text-[11px] text-white backdrop-blur-sm">
                   Live Cover Preview
                 </span>
               </div>
@@ -185,7 +185,7 @@ export function ProfileSettingsModal({
                     <p className="font-display text-[19px] font-bold leading-tight text-pine-950">
                       {name || 'Your Name'}
                     </p>
-                    <p className="font-mono text-[11px] text-pine-600">
+                    <p className="font-mono text-[11px] text-accent-fg">
                       {role || 'Role / Designation'} {organization ? `· ${organization}` : ''}
                     </p>
                   </div>
@@ -221,7 +221,7 @@ export function ProfileSettingsModal({
               <input
                 value={avatar.startsWith('data:') ? '' : avatar}
                 onChange={(e) => setAvatar(e.target.value)}
-                placeholder={avatar.startsWith('data:') ? 'Custom uploaded photo active (paste URL to override)' : 'https://...'}
+                placeholder="https://… (অথবা উপরের বাটন দিয়ে ছবি আপলোড করুন)"
                 className={inputCls}
               />
             </div>
@@ -232,7 +232,7 @@ export function ProfileSettingsModal({
                 <SectionLabel className="flex items-center gap-1.5">
                   <Palette className="size-3.5" /> Cover Background Gradient Color
                 </SectionLabel>
-                <span className="font-mono text-[10px] text-pine-600">12 Presets + Custom Builder</span>
+                <span className="font-mono text-[11px] text-accent-fg">12 Presets + Custom Builder</span>
               </div>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {COVER_GRADIENT_PRESETS.map((g) => {
@@ -243,12 +243,12 @@ export function ProfileSettingsModal({
                       type="button"
                       onClick={() => setCoverGradient(g.css)}
                       className={cn(
-                        'group relative h-12 overflow-hidden rounded-lg border text-left transition',
+                        'group relative h-16 overflow-hidden rounded-lg border text-left transition',
                         selected ? 'border-pine-900 ring-2 ring-pine-600' : 'border-pine-900/20',
                       )}
                       style={{ background: g.css }}
                     >
-                      <span className="absolute inset-x-1.5 bottom-1 truncate rounded bg-black/45 px-1 py-0.5 font-mono text-[9px] text-white backdrop-blur-[1px]">
+                      <span className="absolute inset-x-1 bottom-1 rounded bg-black/60 px-1 py-0.5 text-center font-mono text-[11px] leading-tight text-white [overflow-wrap:anywhere]">
                         {g.name}
                       </span>
                     </button>
@@ -259,7 +259,7 @@ export function ProfileSettingsModal({
               {/* Custom 2-stop color picker */}
               <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-canvas-border pt-3">
                 <span className="inline-flex items-center gap-1 font-mono text-[11px] font-semibold text-pine-900">
-                  <Sparkles className="size-3.5 text-pine-600" /> Custom Gradient:
+                  <Sparkles className="size-3.5 text-accent-fg" /> Custom Gradient:
                 </span>
                 <label className="inline-flex items-center gap-1.5 text-[12px] text-pine-900">
                   Start
@@ -382,7 +382,7 @@ export function ProfileSettingsModal({
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="h-10 rounded-full bg-[#03EF62] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition disabled:opacity-40"
+                className="h-10 rounded-full bg-[#03EF62] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition disabled:opacity-60"
               >
                 Save Profile
               </button>
