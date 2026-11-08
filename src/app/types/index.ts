@@ -6,7 +6,8 @@ export type ArticleCategory =
   | 'খাদ্য ও কোল্ড চেইন'
   | 'জলবায়ু ও স্থায়িত্ব'
   | 'স্টার্টআপ ও উদ্ভাবন'
-  | 'মৎস্য ও প্রাণিসম্পদ';
+  | 'মৎস্য ও প্রাণিসম্পদ'
+  | 'বিজ্ঞান';
 
 export type LinkedInReactionType =
   | 'like'
@@ -44,6 +45,8 @@ export interface UserProfile {
   avatar: string;
   coverGradient: string;
   isVerified: boolean;
+  /** Server-granted editor/admin capability (from the app_admins table). Never trust client-supplied values. */
+  isEditor?: boolean;
   focusArea: string;
   website?: string;
   email?: string;
@@ -224,19 +227,6 @@ export interface FeaturedScientist {
   isFollowing?: boolean;
 }
 
-export interface ResearchPaper {
-  id: string;
-  institution: string;
-  institutionCode: 'BAU' | 'BRRI' | 'BARI' | 'SAU';
-  title: string;
-  summary: string;
-  practicalImpact: string;
-  publishedDate: string;
-  researchers: string[];
-  authorId?: string;
-  doiLink?: string;
-}
-
 export interface NotificationItem {
   id: string;
   userId?: string;
@@ -256,71 +246,6 @@ export interface NotificationItem {
   targetRoute?: string;
   targetUrl?: string;
   createdAt?: string;
-}
-
-export interface StoreProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  unit: string;
-  tag: string;
-  image: string;
-  sellerId: string;
-  seller: string;
-  stock: number;
-  createdAt: string;
-}
-
-export interface CartItem {
-  productId: string;
-  quantity: number;
-}
-
-export interface BkashOrderItem {
-  productId: string;
-  name: string;
-  unit: string;
-  unitPrice: number;
-  quantity: number;
-  lineTotal: number;
-  image: string;
-}
-
-export interface BkashOrder {
-  id: string;
-  orderNumber: string;
-  buyerId: string;
-  buyerName: string;
-  buyerPhone: string;
-  district: string;
-  deliveryAddress: string;
-  deliveryZone: 'inside_dhaka' | 'outside_dhaka';
-  notes?: string;
-  items: BkashOrderItem[];
-  subtotalBdt: number;
-  deliveryFeeBdt: number;
-  totalBdt: number;
-  receiverBkash: '01771047033';
-  senderBkash: string;
-  trxId: string;
-  paymentMethod: 'bkash_send_money' | 'bkash_checkout';
-  paymentScreenshot?: string;
-  status: 'paid_verifying' | 'confirmed' | 'shipped' | 'delivered';
-  createdAt: string;
-}
-
-export interface CommunityIdea {
-  id: string;
-  title: string;
-  body: string;
-  authorId: string;
-  author: string;
-  authorAvatar?: string;
-  votes: number;
-  tag: string;
-  voted?: boolean;
-  createdAt: string;
 }
 
 export interface LightboxPayload {

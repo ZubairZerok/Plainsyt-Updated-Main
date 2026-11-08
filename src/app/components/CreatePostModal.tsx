@@ -6,6 +6,8 @@ import {
 import type { Article, ArticleCategory, UserProfile } from '../types';
 import { Modal, CloseButton, SectionLabel, cn } from './Primitives';
 import { RichArticleParagraph } from '../utils/richText';
+import { uploadImage } from '../lib/media';
+import { toast } from 'sonner';
 
 const CATS: { bn: ArticleCategory; en: string; img: Article['imageType'] }[] = [
   { bn: 'শস্য ও কৃষিবিজ্ঞান', en: 'Crops & Agronomy', img: 'floating' },
@@ -44,12 +46,20 @@ export function CreatePostModal({
   const words = body.trim() ? body.trim().split(/\s+/).length : 0;
   const ready = title.trim().length > 3 && body.trim().length > 10;
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploading, setUploading] = useState(false);
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCoverImageUrl(String(reader.result));
-    reader.readAsDataURL(file);
+    if (!currentUser?.id) {
+      toast.error('ছবি আপলোড করতে অনুগ্রহ করে লগইন করুন।');
+      return;
+    }
+    setUploading(true);
+    const res = await uploadImage(file, currentUser.id);
+    setUploading(false);
+    if (res.ok) setCoverImageUrl(res.url);
+    else toast.error(res.error);
   };
 
   const applyFormatting = (prefix: string, suffix = '') => {
@@ -84,14 +94,14 @@ export function CreatePostModal({
   const publish = () => {
     if (!ready) return;
     if (!currentUser?.id) {
-      alert('প্রতিবেদন প্রকাশ করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
+      toast.error('প্রতিবেদন প্রকাশ করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
       return;
     }
     const c = CATS[cat];
     const authorId = currentUser.id;
     const nowIso = new Date().toISOString();
     onPublish({
-      id: `art-${Date.now().toString(36)}`,
+      id: `art-${crypto.randomUUID()}`,
       title: title.trim(),
       subtitle: subtitle.trim() || body.trim().slice(0, 120) + '…',
       category: c.bn,
@@ -201,9 +211,9 @@ export function CreatePostModal({
             <SectionLabel className="mb-1">Cover Photo (Upload or Image URL)</SectionLabel>
             <div className="flex gap-2">
               <input
-                value={coverImageUrl.startsWith('data:') ? '' : coverImageUrl}
+                value={coverImageUrl}
                 onChange={(e) => setCoverImageUrl(e.target.value)}
-                placeholder={coverImageUrl.startsWith('data:') ? 'Uploaded cover photo attached' : 'https://...'}
+                placeholder={uploading ? 'আপলোড হচ্ছে…' : 'https://...'}
                 className={cn(field, 'flex-1 font-sans text-[13.5px]')}
               />
               <button
@@ -213,7 +223,7 @@ export function CreatePostModal({
               >
                 <Upload className="size-4" /> Upload Photo
               </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleFile} />
             </div>
             {coverImageUrl && (
               <div className="relative mt-2">

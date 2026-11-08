@@ -4,7 +4,9 @@ import { RefreshCw, Home } from 'lucide-react';
 import { LOGOS } from '../lib/supabase';
 
 // Filter out developer / runtime JS errors like "useState is not defined", ReferenceError, etc.
-function getSafeErrorMessage(error: any): string {
+type ErrorLike = { status?: number; statusText?: string; message?: string; data?: unknown } | null | undefined;
+function getSafeErrorMessage(rawError: unknown): string {
+  const error = rawError as ErrorLike;
   if (error?.status === 404 || error?.statusText === 'Not Found') {
     return 'কাঙ্ক্ষিত পৃষ্ঠা বা তথ্যটি খুঁজে পাওয়া যায়নি।';
   }

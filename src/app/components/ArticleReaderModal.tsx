@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { isZubairIdentifier } from '../lib/auth';
-import { Bookmark, Share2, Clock, Send, Eye, ExternalLink, Calendar, GraduationCap, ShieldCheck, CornerDownRight, ArrowLeft } from 'lucide-react';
+import { Bookmark, Share2, Clock, Send, ExternalLink, Calendar, GraduationCap, ShieldCheck, ArrowLeft } from 'lucide-react';
 import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
+import { safeUrl } from '../lib/mappers';
 import { Modal, CloseButton, Avatar, SectionLabel, Num, cn } from './Primitives';
 import { ImageGraphic } from './ImageGraphic';
 import { SharePopoverButton } from './ShareModal';
@@ -42,7 +42,6 @@ export function ArticleReaderContent({
   onEditComment,
   onDeleteComment,
   onReactComment,
-  onShare,
   onNavigateProfile,
   onOpenPhoto,
 }: Omit<Props, 'article'> & { article: Article; isStandalonePage?: boolean }) {
@@ -57,8 +56,7 @@ export function ArticleReaderContent({
       currentUser &&
         currentUser.id &&
         c.authorId &&
-        (currentUser.id === c.authorId ||
-          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
+        (currentUser.id === c.authorId),
     );
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const touchStartY = useRef<number | null>(null);
@@ -262,11 +260,9 @@ export function ArticleReaderContent({
         {/* Authoritative Peer-Reviewed Research & Primary Source Citation */}
         {(a.researchBasis || a.externalLink) && (() => {
           const resolvedSourceUrl =
-            a.researchBasis?.sourceUrl ||
-            a.externalLink ||
-            (a.researchBasis?.doiOrSource?.startsWith('http') ? a.researchBasis.doiOrSource : '') ||
-            (a.id === 'art-bina-gamma-2026' ? 'http://bina.gov.bd/' : '') ||
-            (a.id === 'art-japan-cucumber-robot-2026' ? 'https://www.zen-noh.or.jp/' : '') ||
+            safeUrl(a.researchBasis?.sourceUrl) ||
+            safeUrl(a.externalLink) ||
+            safeUrl(a.researchBasis?.doiOrSource?.startsWith('http') ? a.researchBasis.doiOrSource : '') ||
             `https://scholar.google.com/scholar?q=${encodeURIComponent(a.researchBasis?.journalOrInst || a.title)}`;
 
           return (

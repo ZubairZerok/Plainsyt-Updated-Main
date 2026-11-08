@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /checkout
 Disallow: /auth/
 
-Sitemap: https://plainsyt.com/sitemap.xml
+Sitemap: https://pla.insyt.bd/sitemap.xml

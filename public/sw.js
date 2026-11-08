@@ -1,4 +1,5 @@
-// PLAiNSYT Self-Destructing Service Worker — Purges old caches and unregisters to prevent stale localhost views
+// PLAiNSYT kill-switch service worker. The site no longer registers a service worker; this file stays
+// deployed so browsers that still have an old one installed fetch it, clear caches and unregister.
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });

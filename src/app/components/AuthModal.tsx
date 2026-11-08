@@ -1,25 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  User,
-  ShieldCheck,
-  ArrowRight,
-  Loader2,
-  Sparkles,
-  UserPlus,
-} from 'lucide-react';
-import { Modal, CloseButton, cn } from './Primitives';
-import { loginWithPassword, signupWithEmail, loginWithGoogle } from '../lib/auth';
-import { supabase } from '../lib/supabase';
-import type { UserProfile } from '../types';
+import { Eye, EyeOff, Lock, Mail, User, ShieldCheck, ArrowRight, Loader2, UserPlus } from 'lucide-react';
+import { Modal, CloseButton } from './Primitives';
+import { loginWithPassword, signupWithEmail, loginWithGoogle, requestPasswordReset } from '../lib/auth';
 
 interface Props {
   open?: boolean;
   onClose: () => void;
-  onSuccess: (user: UserProfile) => void;
+  onSuccess: () => void;
   promptReason?: string | null;
   reason?: string | null;
   initialTab?: 'login' | 'signup';
@@ -70,92 +57,59 @@ export function AuthModal({
     }
   };
 
-  /**
-   * Smart submit handler:
-   * 1. If in new user mode with name: registers the new user immediately.
-   * 2. If in regular login mode: attempts login.
-   *    If credentials fail, it checks if the email is registered in Supabase.
-   *    If NOT registered, it intelligently detects this is a new person,
-   *    switches to signup mode, and asks for their name in one seamless step!
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setInfoNotice(null);
     setSuccessMsg(null);
 
-    const cleanEmail = email.trim();
-    const isSpecialAlias = ['zubair2001!', 'zubair2001', 'plainsyt', 'hasanzubair'].includes(cleanEmail.toLowerCase());
-    if (!cleanEmail || (!cleanEmail.includes('@') && !isSpecialAlias)) {
-      setError('একটি বৈধ ইমেইল বা ব্যবহারকারী নাম প্রদান করুন।');
+    const cleanEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setError('একটি বৈধ ইমেইল ঠিকানা প্রদান করুন।');
       return;
     }
     if (!password || password.length < 6) {
-      setError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+      setError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
       return;
     }
 
     setLoading(true);
-
     try {
-      // If already in new user mode, proceed to signup
       if (isNewUser) {
         if (!name.trim()) {
           setError('আপনার সম্পূর্ণ নাম লিখুন।');
-          setLoading(false);
           nameInputRef.current?.focus();
           return;
         }
-
         const res = await signupWithEmail(cleanEmail, password, name.trim());
-        if (res.ok && res.user) {
-          setSuccessMsg(`স্বাগতম, ${res.user.name}! আপনার অ্যাকাউন্ট তৈরি সম্পন্ন হয়েছে।`);
-          setTimeout(() => {
-            onSuccess(res.user!);
-            onClose();
-          }, 350);
-        } else {
-          setError(res.error || 'অ্যাকাউন্ট তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+        if (!res.ok) {
+          setError(res.error);
+          return;
         }
-        return;
-      }
-
-      // In login mode: attempt sign in
-      const res = await loginWithPassword(cleanEmail, password);
-      if (res.ok && res.user) {
-        setSuccessMsg(`স্বাগতম, ${res.user.name}!`);
+        if (res.needsEmailConfirmation) {
+          setInfoNotice('আপনার ইমেইলে একটি যাচাইকরণ লিংক পাঠানো হয়েছে। লিংকে ক্লিক করার পর লগইন করুন।');
+          setIsNewUser(false);
+          return;
+        }
+        setSuccessMsg('স্বাগতম! আপনার অ্যাকাউন্ট তৈরি সম্পন্ন হয়েছে।');
         setTimeout(() => {
-          onSuccess(res.user!);
+          onSuccess();
           onClose();
-        }, 300);
+        }, 350);
         return;
       }
 
-      // Login failed — let's check if this email is completely new!
-      const norm = cleanEmail.toLowerCase();
-      let existsInDb = false;
-      try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', norm)
-          .maybeSingle();
-        existsInDb = Boolean(data);
-      } catch {
-        existsInDb = false;
+      const res = await loginWithPassword(cleanEmail, password);
+      if (!res.ok) {
+        // One generic message for wrong password and unknown e-mail (prevents account enumeration).
+        setError(res.error);
+        return;
       }
-
-      if (!existsInDb) {
-        // Goddamn smart auto-detection: user does NOT exist!
-        setIsNewUser(true);
-        setInfoNotice(
-          'স্বাগতম! আপনি নতুন সদস্য হিসেবে শনাক্ত হয়েছেন। অনুগ্রহ করে শুধু আপনার নামটি লিখুন, এখনই অ্যাকাউন্ট তৈরি হয়ে যাবে।'
-        );
-        setTimeout(() => nameInputRef.current?.focus(), 100);
-      } else {
-        // User exists, password was just incorrect
-        setError(res.error || 'ইমেইল বা পাসওয়ার্ড সঠিক নয়। অনুগ্রহ করে যাচাই করুন।');
-      }
+      setSuccessMsg('স্বাগতম!');
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 300);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ত্রুটি ঘটেছে। আবার চেষ্টা করুন।');
     } finally {
@@ -163,9 +117,14 @@ export function AuthModal({
     }
   };
 
-  const handleForgotPassword = () => {
-    if (!email.trim() || !email.includes('@')) {
-      setError('পাসওয়ার্ড রিকভারির জন্য আপনার ইমেইল প্রদান করুন।');
+  const handleForgotPassword = async () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('পাসওয়ার্ড রিকভারির জন্য আপনার ইমেইল প্রদান করুন।');
+      return;
+    }
+    const res = await requestPasswordReset(email);
+    if (!res.ok) {
+      setError(res.error);
       return;
     }
     setForgotSent(true);

@@ -20,8 +20,9 @@ export function SEOHead({
     if (typeof document === 'undefined') return;
 
     const pageTitle = article ? `${article.title} · PLAiNSYT` : (title ? `${title} · PLAiNSYT` : 'PLAiNSYT · উন্মুক্ত কৃষি ও প্রযুক্তি গবেষণা প্ল্যাটফর্ম');
-    const pageDesc = article ? (article.subtitle || article.excerpt || article.content.slice(0, 160)) : (description || 'কৃষি, পরমাণু প্রযুক্তি, স্মার্ট রোবোটিক্স ও জীবপ্রযুক্তি নিয়ে উন্মুক্ত গবেষণা ও উদ্ভাবন প্ল্যাটফর্ম।');
-    const pageImage = article?.coverImage || image || 'https://pla.insyt.bd/logos/Bangla.png';
+    const pageDesc = article ? (article.subtitle || article.content.join(' ').slice(0, 160)) : (description || 'কৃষি, পরমাণু প্রযুক্তি, স্মার্ট রোবোটিক্স ও জীবপ্রযুক্তি নিয়ে উন্মুক্ত গবেষণা ও উদ্ভাবন প্ল্যাটফর্ম।');
+    const rawImage = article?.coverImageUrl || image || '/logos/Bangla.png';
+    const pageImage = rawImage.startsWith('http') ? rawImage : `${window.location.origin}${rawImage}`;
     const rawUrl = url || (article ? `/article/${article.slug || article.id}` : window.location.pathname);
     const pageUrl = rawUrl.startsWith('http') ? rawUrl : `https://pla.insyt.bd${rawUrl}`;
 
@@ -85,8 +86,8 @@ export function SEOHead({
         dateModified: article.publishedAt || new Date().toISOString(),
         author: {
           '@type': 'Person',
-          name: article.author?.name || 'Hasan Zubair',
-          url: `https://pla.insyt.bd/profile/${article.author?.id || 'hasanzubair'}`,
+          name: article.author?.name || 'PLAiNSYT',
+          url: `https://pla.insyt.bd/profile/${article.author?.id || ''}`,
         },
         publisher: {
           '@type': 'Organization',

@@ -3,7 +3,7 @@ import { PenLine, Video, UserPlus, FileText } from 'lucide-react';
 import type {
   Article, CommunityPost, LinkedInReactionType, ReactionTargetType, StoryReel, TopicStory, UserProfile,
 } from '../types';
-import { PostCreatorBar } from './PostCreatorBar';
+
 import { NewsletterSubscription } from './NewsletterSubscription';
 import { TopicStoriesCarousel } from './TopicStoriesCarousel';
 import { ArticleCard } from './ArticleCard';
@@ -24,7 +24,6 @@ export interface FeedApi {
   isLoading?: boolean;
   onWriteArticle: () => void;
   onUploadVideo: () => void;
-  onAskAI?: () => void;
   onOpenProfileSettings: () => void;
   onOpenStory: (storyIdOrIndex: string | number) => void;
   onCreateStory: () => void;
@@ -32,9 +31,9 @@ export interface FeedApi {
   onReact: (targetType: ReactionTargetType, targetId: string, type: LinkedInReactionType) => void;
   onOpenReactionsBreakdown: (targetType: ReactionTargetType, targetId: string) => void;
   onBookmarkArticle: (id: string) => void;
-  onCommentArticle: (id: string, text: string) => void;
+  onCommentArticle: (id: string, text: string, parentId?: string, replyToAuthor?: string) => void;
   onSavePost: (id: string) => void;
-  onCommentPost: (id: string, text: string) => void;
+  onCommentPost: (id: string, text: string, parentId?: string, replyToAuthor?: string) => void;
   onEditComment?: (id: string, newText: string) => void;
   onDeleteComment?: (id: string) => void;
   onShare: (label: string) => void;
@@ -72,7 +71,7 @@ export function CentralFeed(f: FeedApi) {
         onReact={(type) => f.onReact('article', a.id, type)}
         onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('article', a.id)}
         onBookmark={() => f.onBookmarkArticle(a.id)}
-        onComment={(t) => f.onCommentArticle(a.id, t)}
+        onComment={(t, pid, rta) => f.onCommentArticle(a.id, t, pid, rta)}
         onEditComment={f.onEditComment}
         onDeleteComment={f.onDeleteComment}
         onReactComment={(cid, type) => f.onReact('comment', cid, type)}
@@ -98,7 +97,7 @@ export function CentralFeed(f: FeedApi) {
         onReact={(type) => f.onReact('post', p.id, type)}
         onOpenReactionsBreakdown={() => f.onOpenReactionsBreakdown('post', p.id)}
         onSave={() => f.onSavePost(p.id)}
-        onComment={(t) => f.onCommentPost(p.id, t)}
+        onComment={(t, pid, rta) => f.onCommentPost(p.id, t, pid, rta)}
         onEditComment={f.onEditComment}
         onDeleteComment={f.onDeleteComment}
         onReactComment={(cid, type) => f.onReact('comment', cid, type)}

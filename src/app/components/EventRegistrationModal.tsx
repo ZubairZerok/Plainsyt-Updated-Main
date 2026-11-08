@@ -15,7 +15,7 @@ interface Props {
     organization: string;
     passType: 'in-person' | 'virtual';
     note?: string;
-  }) => void;
+  }) => Promise<boolean>;
 }
 
 export function EventRegistrationModal({
@@ -36,13 +36,12 @@ export function EventRegistrationModal({
 
   if (!open || !event) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !phone.trim() || !email.trim()) return;
 
-    const regId = `REG-${Date.now().toString(36).toUpperCase().slice(-5)}`;
-    setTicketId(regId);
-    onConfirmRegistration(event.id, {
+    const regId = `REG-${crypto.randomUUID().replace(/-/g, '').slice(0, 6).toUpperCase()}`;
+    const saved = await onConfirmRegistration(event.id, {
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
@@ -50,6 +49,8 @@ export function EventRegistrationModal({
       passType,
       note: note.trim(),
     });
+    if (!saved) return;
+    setTicketId(regId);
     setSubmitted(true);
   };
 

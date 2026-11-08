@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ZoomIn, ZoomOut, RotateCw, Check, X, RefreshCw } from 'lucide-react';
-import { Modal } from './Primitives';
+
 
 interface AvatarCropModalProps {
   open: boolean;
@@ -22,7 +22,6 @@ export function AvatarCropModal({
   const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const panStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Reset state whenever new image is loaded
   useEffect(() => {

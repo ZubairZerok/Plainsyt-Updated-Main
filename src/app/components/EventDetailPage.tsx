@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   CalendarDays,
@@ -40,21 +41,24 @@ export function EventDetailPage({
 }: Props) {
   const [copied, setCopied] = useState(false);
 
-  // Resolve event from prop or lookup by ID from list
-  const activeEvent: UpcomingEvent =
-    propEvent ||
-    (eventId && events?.find((e) => e.id === eventId)) || {
-      id: eventId || 'event-default',
-      title: 'জাতীয় কৃষি উদ্ভাবন ও এগ্রো-টেক সম্মেলন ২০২৬',
-      location: 'কৃষিবিদ ইনস্টিটিউশন বাংলাদেশ (KIB), ফার্মগেট, ঢাকা',
-      dateMonth: 'MAR',
-      dateDay: '28',
-      attendeesCount: 240,
-      isRegistered: false,
-      organizerName: 'PLAiNSYT Research & Agritech Forum',
-      description:
-        'বাংলাদেশের কৃষিবিজ্ঞান, প্রিসিশন প্রযুক্তি ও আধুনিক কৃষি উদ্যোক্তাদের মিলনমেলা। দেশের শীর্ষ গবেষক ও কৃষিবিজ্ঞানীদের নিয়ে বিশেষ আলোচনা সভা ও মাঠ প্রদর্শনী।',
-    };
+  // Resolve event from prop or lookup by ID from list. Unknown ids show a real "not found" page.
+  const activeEvent: UpcomingEvent | undefined = propEvent || (eventId ? events?.find((e) => e.id === eventId) : undefined);
+
+  if (!activeEvent) {
+    return (
+      <section className="rounded-2xl border border-slate-200 bg-white p-8 text-center font-bangla dark:border-white/10 dark:bg-canvas-card">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">ইভেন্টটি পাওয়া যায়নি</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">এই ইভেন্টটি বর্তমানে নেই বা মুছে ফেলা হয়েছে।</p>
+        <button
+          type="button"
+          onClick={() => (onBack ? onBack() : onNavigate?.('/events'))}
+          className="mt-4 inline-flex h-10 items-center rounded-lg bg-pine-900 px-4 text-[13.5px] font-semibold text-canvas"
+        >
+          সব ইভেন্ট দেখুন
+        </button>
+      </section>
+    );
+  }
 
   const isRegistered = propIsRegistered ?? activeEvent.isRegistered ?? false;
 
@@ -64,10 +68,14 @@ export function EventDetailPage({
       return;
     }
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      toast.success('Copied', { duration: 1500 });
-      setTimeout(() => setCopied(false), 2000);
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => {
+          setCopied(true);
+          toast.success('Copied', { duration: 1500 });
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(() => toast.error('লিংক কপি করা যায়নি'));
     }
   };
 

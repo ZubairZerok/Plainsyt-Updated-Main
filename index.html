@@ -4,39 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Plainsyt (প্লেইনসাইট) — কৃষি ও কৃষি-প্রযুক্তি প্ল্যাটফর্ম | Agri-Tech Bangladesh</title>
-    <link rel="icon" type="image/png" href="/logos/icon.png" />
-    <link rel="shortcut icon" type="image/png" href="/icon.png" />
-    <link rel="apple-touch-icon" href="/logos/icon.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/logos/icon-192.png" />
+    <link rel="apple-touch-icon" href="/logos/icon-180.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#03EF62" />
     <meta name="description" content="বাংলাদেশের আধুনিক কৃষি, শস্যবিজ্ঞান, ড্রোন সেন্সিং, বায়োচার, কোল্ড চেইন ও এগ্রি-টেক উদ্ভাবনের প্ল্যাটফর্ম। সরাসরি কৃষক, বিজ্ঞানী ও উদ্যোক্তাদের সংযোগ।" />
     <meta property="og:title" content="Plainsyt (প্লেইনসাইট) — কৃষি ও কৃষি-প্রযুক্তি প্ল্যাটফর্ম" />
     <meta property="og:description" content="বাংলাদেশের আধুনিক কৃষি, শস্যবিজ্ঞান, ড্রোন সেন্সিং ও এগ্রি-টেক উদ্ভাবনের প্ল্যাটফর্ম।" />
-    <meta property="og:image" content="/logos/English.png" />
-    <script>
-      // Service worker registration in production & cache killer on localhost
-      if ('serviceWorker' in navigator) {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for (var reg of registrations) {
-              reg.unregister();
-              console.log('[Plainsyt] Stale Service Worker unregistered.');
-            }
-          });
-          if ('caches' in window) {
-            caches.keys().then(function(names) {
-              for (var name of names) {
-                caches.delete(name);
-              }
-            });
-          }
-        } else {
-          window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/sw.js').catch(function() {});
-          });
-        }
-      }
-    </script>
+    <meta property="og:image" content="https://pla.insyt.bd/og-image.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pla.insyt.bd/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://pla.insyt.bd/" />
     <style>
       html, body { height: 100%; margin: 0; background-color: #fdfaf5; }
       #root { min-height: 100%; }

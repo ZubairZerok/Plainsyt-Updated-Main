@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import {
-  Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays,
-  Clapperboard, FileText, ArrowUpRight, Trash2, LogIn, User, LogOut,
-  Settings, Check, ShieldCheck, CheckCircle2, BarChart3,
-} from 'lucide-react';
+import { Search, X, Sun, Moon, Bookmark, Bell, Home, Compass, CalendarDays, FileText, ArrowUpRight, Trash2, LogIn, User, LogOut, Settings, ShieldCheck, BarChart3 } from 'lucide-react';
 import type { Article, CommunityPost, NotificationItem, TopicStory, UserProfile } from '../types';
 import { isEditorialAuthorized } from '../lib/auth';
 import { PlainsytLogo } from './PlainsytLogo';
@@ -670,9 +666,9 @@ export function Header(p: Props) {
         <ul className="grid grid-cols-5 h-13 items-center px-1">
           {(
             [
-              { key: 'home', path: '/', label: 'হোম', icon: Home },
-              { key: 'explore', path: '/explore', label: 'এক্সপ্লোর', icon: Compass },
-              { key: 'events', path: '/events', label: 'ইভেন্ট', icon: CalendarDays },
+              { key: 'home', path: '/', label: 'হোম', icon: Home, badge: '' },
+              { key: 'explore', path: '/explore', label: 'এক্সপ্লোর', icon: Compass, badge: '' },
+              { key: 'events', path: '/events', label: 'ইভেন্ট', icon: CalendarDays, badge: '' },
               {
                 key: 'notifications',
                 path: '/notifications',

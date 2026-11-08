@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { isZubairIdentifier } from '../lib/auth';
+import { safeUrl } from '../lib/mappers';
 import { Globe2, MoreHorizontal, MessageCircle, Share2, Send, Bookmark, Bot, ExternalLink } from 'lucide-react';
-import type { CommunityPost, LinkedInReactionType, UserProfile } from '../types';
+import type { Comment, CommunityPost, LinkedInReactionType, UserProfile } from '../types';
 import { Avatar, FEED_CARD, VerifiedBadge, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
 import { SharePopoverButton } from './ShareModal';
@@ -43,7 +43,6 @@ export function CommunityPostCard({
   onEditComment,
   onDeleteComment,
   onReactComment,
-  onShare,
   onNavigateProfile,
   onOpenPhoto,
   hasStory,
@@ -62,8 +61,7 @@ export function CommunityPostCard({
       currentUser &&
         currentUser.id &&
         comment.authorId &&
-        (currentUser.id === comment.authorId ||
-          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(comment.authorId))),
+        (currentUser.id === comment.authorId),
     );
   const long = post.content.length > 260;
   const shown = long && !expanded ? post.content.slice(0, 240).trimEnd() + '…' : post.content;
@@ -150,10 +148,10 @@ export function CommunityPostCard({
         </div>
       )}
 
-      {post.externalLink && (
+      {safeUrl(post.externalLink) && (
         <div className="mx-3 mt-2.5 sm:mx-4">
           <a
-            href={post.externalLink}
+            href={safeUrl(post.externalLink)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-lg border border-pine-900/25 bg-pine-50 px-3 py-1.5 font-mono text-[12px] text-pine-800 hover:border-pine-900"
@@ -613,7 +611,7 @@ export function CommunityPostCard({
             value={text}
             onChange={(e) => setText(e.target.value)}
             onFocus={() => setShowComments(true)}
-            placeholder="Write a comment…"
+            placeholder="মন্তব্য লিখুন…"
             className="flex-1 bg-transparent font-bangla text-[13.5px] text-pine-900 outline-none placeholder:text-pine-900/40"
           />
           <button

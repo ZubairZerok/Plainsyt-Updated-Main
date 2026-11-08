@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
-import { X, Globe2, MapPin, Upload, Video, Clapperboard, Link as LinkIcon } from 'lucide-react';
+import { X, Globe2, Upload, Video, Clapperboard, Link as LinkIcon } from 'lucide-react';
 import type { ArticleCategory, CommunityPost, StoryReel, TopicStory, UserProfile } from '../types';
 import { Avatar, Modal, SectionLabel, cn } from './Primitives';
 import { canCreateStory } from '../lib/auth';
+import { uploadImage } from '../lib/media';
+import { toast } from 'sonner';
 
 interface Props {
   open: boolean;
@@ -24,7 +26,7 @@ const CATEGORIES: ArticleCategory[] = [
 export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitReel }: Props) {
   const [title, setTitle] = useState('');
   const [caption, setCaption] = useState('');
-  const [location, setLocation] = useState(currentUser?.location || 'ময়মনসিংহ');
+  const [location] = useState(currentUser?.location || 'ময়মনসিংহ');
   const [duration, setDuration] = useState('1:15');
   const [category, setCategory] = useState<ArticleCategory>('এগ্রি-টেক ও ড্রোন');
   const [mediaUrl, setMediaUrl] = useState('');
@@ -33,12 +35,20 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
   const [alsoShareToFeed, setAlsoShareToFeed] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploading, setUploading] = useState(false);
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
+    e.target.value = '';
     if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => setMediaUrl(String(reader.result));
-    reader.readAsDataURL(f);
+    if (!currentUser?.id) {
+      toast.error('ছবি আপলোড করতে অনুগ্রহ করে লগইন করুন।');
+      return;
+    }
+    setUploading(true);
+    const res = await uploadImage(f, currentUser.id);
+    setUploading(false);
+    if (res.ok) setMediaUrl(res.url);
+    else toast.error(res.error);
   };
 
   const canSubmit = title.trim().length > 2 && (mediaUrl.trim().length > 0 || caption.trim().length > 0);
@@ -47,7 +57,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
     e.preventDefault();
     if (!canSubmit) return;
     if (!currentUser?.id) {
-      alert('পোস্ট বা স্টোরি তৈরি করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
+      toast.error('পোস্ট বা স্টোরি তৈরি করতে অনুগ্রহ করে আগে আপনার অ্যাকাউন্টে লগইন করুন।');
       return;
     }
     const authorId = currentUser.id;
@@ -56,7 +66,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
     const nowIso = new Date().toISOString();
 
     const reel: StoryReel = {
-      id: `reel-${Date.now().toString(36)}`,
+      id: `reel-${crypto.randomUUID()}`,
       title: title.trim(),
       creatorId: authorId,
       creator: authorName,
@@ -76,7 +86,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
     const allowedStory = canCreateStory(currentUser);
     const story: TopicStory | undefined = (allowedStory && alsoShareToStories)
       ? {
-          id: `st-${Date.now().toString(36)}`,
+          id: `st-${crypto.randomUUID()}`,
           title: title.trim(),
           category,
           imageUrl: mediaUrl.trim(),
@@ -91,7 +101,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
 
     const feedPost: CommunityPost | undefined = alsoShareToFeed
       ? {
-          id: `post-${Date.now().toString(36)}`,
+          id: `post-${crypto.randomUUID()}`,
           authorId,
           author: {
             id: authorId,
@@ -100,7 +110,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
             role: `${currentUser?.role || 'Researcher'}${currentUser?.organization ? ` · ${currentUser.organization}` : ''}`,
             isVerified: true,
           },
-          timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+          timestamp: 'এইমাত্র',
           createdAt: nowIso,
           content: `${title.trim()}${caption.trim() ? `\n\n${caption.trim()}` : ''}`,
           images: mediaUrl.trim() ? [mediaUrl.trim()] : [],
@@ -201,9 +211,10 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
             <SectionLabel className="mb-1">Visual Media (Upload Photo/Cover or Paste URL)</SectionLabel>
             <div className="flex gap-2">
               <input
-                value={mediaUrl.startsWith('data:') ? '' : mediaUrl}
+                value={mediaUrl}
                 onChange={(e) => setMediaUrl(e.target.value)}
-                placeholder={mediaUrl.startsWith('data:') ? 'Uploaded visual attached' : 'https://...'}
+                placeholder="https://..."
+                maxLength={2000}
                 className="flex-1 rounded-lg border border-pine-900/25 bg-canvas-card px-3 py-2 text-[13.5px] text-pine-900 outline-none"
               />
               <button
@@ -211,12 +222,12 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
                 onClick={() => fileRef.current?.click()}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-pine-900 bg-canvas-subtle px-3 text-[12.5px] font-semibold text-pine-900 hover:bg-pine-100"
               >
-                <Upload className="size-4" /> Upload File
+                <Upload className="size-4" /> {uploading ? 'Uploading…' : 'Upload File'}
               </button>
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*,video/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
                 onChange={handleFile}
               />

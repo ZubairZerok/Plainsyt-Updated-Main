@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import { MapPin, Users, Check, MessageCircle, Eye, ExternalLink, Calendar } from 'lucide-react';
+import { MapPin, Users, Check, MessageCircle, ExternalLink, Calendar } from 'lucide-react';
 import type { Article, UpcomingEvent, UserProfile } from '../types';
-import { Avatar, CARD, FollowIconButton, Num, SectionLabel, VerifiedBadge, cn } from './Primitives';
+import { Avatar, CARD, FollowIconButton, Num, VerifiedBadge, cn } from './Primitives';
 import { SeeAllLink } from './Header';
-import { formatBengaliNumberCompact, toBengaliNumerals, totalReactions } from '../utils/pureLogic';
-import { ADMIN_PROFILE, ZUBAIR_PROFILE, ZUBAIR_BAU_PROFILE, isEditorialAuthorized } from '../lib/auth';
+import { toBengaliNumerals, totalReactions } from '../utils/pureLogic';
 
 interface Props {
   articles: Article[];
@@ -13,7 +12,6 @@ interface Props {
   currentUserId: string;
   followingIds: string[];
   className?: string;
-  onToggleEvent: (id: string) => void;
   onOpenRegister?: (event: UpcomingEvent) => void;
   onToggleFollow: (id: string) => void;
   onOpenArticlePopup: (id: string) => void;
@@ -25,7 +23,6 @@ interface Props {
 export function TrendingList({
   articles,
   onOpenPopup,
-  onOpenPhoto,
 }: {
   articles: Article[];
   onOpenPopup: (id: string) => void;
@@ -165,32 +162,11 @@ export function EventRow({
 }
 
 export function RightSidebar(p: Props) {
-  // Only the 3 authorized editorial accounts (Hasan Zubair / PLAiNSYT / BAU) can be suggested and followed
-  const editorialProfiles = useMemo(() => {
-    const defaultList = [ZUBAIR_PROFILE, ADMIN_PROFILE, ZUBAIR_BAU_PROFILE];
-    const map = new Map<string, UserProfile>();
-
-    for (const d of defaultList) {
-      map.set(d.email.toLowerCase(), { ...d, isVerified: true });
-    }
-
-    // Overlay any live updates from p.profiles for these 3 accounts
-    for (const u of p.profiles) {
-      const email = (u.email || '').toLowerCase().trim();
-      if (
-        email === 'z65gt9@gmail.com' ||
-        email === 'plaiinsyt@gmail.com' ||
-        email === 'zubair.bau.01@gmail.com' ||
-        isEditorialAuthorized(u)
-      ) {
-        const key = email || u.id;
-        const existing = map.get(email);
-        map.set(key, { ...(existing || u), ...u, isVerified: true });
-      }
-    }
-
-    return Array.from(map.values()).filter((u) => u.id !== p.currentUserId);
-  }, [p.profiles, p.currentUserId]);
+  // Suggest verified accounts (verification is granted server-side) that the user does not follow yet.
+  const editorialProfiles = useMemo(
+    () => p.profiles.filter((u) => u.isVerified && u.id !== p.currentUserId).slice(0, 5),
+    [p.profiles, p.currentUserId],
+  );
 
   return (
     <aside

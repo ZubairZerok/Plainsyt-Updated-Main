@@ -1,164 +1,116 @@
+// Build step: pre-render SEO-friendly HTML for each published article and write dist/sitemap.xml.
+// Reads PUBLIC data with the public (anon) key. If the database is unreachable the build still
+// succeeds and ships a sitemap with the static pages only.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '..');
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(rootDir, 'dist');
-const templatePath = path.join(distDir, 'index.html');
+const SITE = (process.env.SITE_URL || 'https://pla.insyt.bd').replace(/\/$/, '');
 
+const clientSrc = fs.readFileSync(path.join(rootDir, 'src/app/lib/supabase.ts'), 'utf-8');
+const fallback = (re) => clientSrc.match(re)?.[1];
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || fallback(/SUPABASE_URL = env\.VITE_SUPABASE_URL \|\| '([^']+)'/);
+const SUPABASE_KEY =
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY ||
+  fallback(/'(sb_publishable_[A-Za-z0-9_-]+)'/);
+
+const esc = (v) =>
+  String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const jsonLdSafe = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c');
+const abs = (u) => (!u ? `${SITE}/logos/Bangla.png` : /^https?:\/\//.test(u) ? u : `${SITE}${u.startsWith('/') ? '' : '/'}${u}`);
+
+const templatePath = path.join(distDir, 'index.html');
 if (!fs.existsSync(templatePath)) {
   console.log('Skipping prerender: dist/index.html does not exist yet.');
   process.exit(0);
 }
-
 const template = fs.readFileSync(templatePath, 'utf-8');
 
-// Canonical Articles for Pre-rendering & SEO
-const ARTICLES = [
-  {
-    id: 'art-bina-gamma-ray',
-    slug: 'bina-gamma-ray-irradiation-center',
-    title: 'বিনা (BINA) গামা-রশ্মি বিকিরণ কেন্দ্র: বাংলাদেশের নিউক্লীয় কৃষি বিপ্লবের ৫০ বছর',
-    subtitle: 'পরমাণু রশ্মির নিয়ন্ত্রিত ব্যবহারে খাদ্য নিরাপত্তা ও উচ্চফলনশীল মিউট্যান্ট ফসলের ইতিহাস',
-    excerpt: 'বাংলাদেশ পরমাণু কৃষি গবেষণা ইনস্টিটিউট (বিনা)-এর কোবাল্ট-৬০ গামা সেল ও বিকিরণ প্রযুক্তির গবেষণার বিশদ বিশ্লেষণ।',
-    coverImage: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&w=1200&q=80',
-    author: 'হাসান জুবায়ের (Hasan Zubair)',
-    publishedAt: '2026-02-15T09:00:00.000Z',
-    category: 'পরমাণু কৃষি',
-  },
-  {
-    id: 'art-japan-cucumber-robot',
-    slug: 'japan-cucumber-harvesting-robot',
-    title: 'জাপানের শসা কাটার রোবট: গ্রিনহাউস এগ্রিকালচারে রোবোটিক্স বিপ্লব ও বাংলাদেশের ভবিষ্যৎ',
-    subtitle: 'কৃত্রিম বুদ্ধিমত্তা ও ৩ডি ভিশন সেন্সর দিয়ে প্রতি সেকেন্ডে পাকা শসা শনাক্ত ও স্বয়ংক্রিয় কাটার বিজ্ঞান',
-    excerpt: 'জাপানি কৃষি রোবোটিক্স কীভাবে গভীর শিখন ও মোশন প্ল্যানিং অ্যালগরিদম ব্যবহার করে ফল ক্ষতি না করে তোলার বৈজ্ঞানিক পর্যালোচনা।',
-    coverImage: '/images/JapanRobot.jpg',
-    author: 'হাসান জুবায়ের (Hasan Zubair)',
-    publishedAt: '2026-03-01T10:30:00.000Z',
-    category: 'এগ্রো-আইওটি ও রোবোটিক্স',
-  },
-];
+async function fetchArticles() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return [];
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/articles?select=id,slug,title,subtitle,cover_image_url,author_json,created_at,category&order=created_at.desc&limit=200`;
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`⚠ Could not load articles for prerender (${err.message}). Continuing with static pages only.`);
+    return [];
+  }
+}
 
-console.log('🚀 Pre-rendering SEO-friendly static article pages...');
+const articles = await fetchArticles();
+console.log(`Pre-rendering ${articles.length} article page(s)...`);
 
-for (const art of ARTICLES) {
-  const pageUrl = `https://pla.insyt.bd/article/${art.slug}`;
-  const pageTitle = `${art.title} · PLAiNSYT`;
-  const pageDesc = art.subtitle || art.excerpt;
-  const pageImage = art.coverImage.startsWith('http') ? art.coverImage : `https://pla.insyt.bd${art.coverImage}`;
+for (const a of articles) {
+  const slug = String(a.slug || a.id);
+  const pageUrl = `${SITE}/article/${encodeURIComponent(slug)}`;
+  const title = `${a.title} · PLAiNSYT`;
+  const desc = a.subtitle || a.title;
+  const image = abs(a.cover_image_url);
+  const authorName = a.author_json?.name || 'PLAiNSYT';
+  const published = a.created_at;
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
-    headline: art.title,
-    description: pageDesc,
-    image: [pageImage],
-    datePublished: art.publishedAt,
-    dateModified: art.publishedAt,
-    author: {
-      '@type': 'Person',
-      name: art.author,
-      url: 'https://pla.insyt.bd/profile/hasanzubair',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'PLAiNSYT',
-      logo: {
-        '@type': 'ImageObject',
-        url: 'https://pla.insyt.bd/logos/Bangla.png',
-      },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': pageUrl,
-    },
+    headline: a.title,
+    description: desc,
+    image: [image],
+    datePublished: published,
+    dateModified: published,
+    author: { '@type': 'Person', name: authorName },
+    publisher: { '@type': 'Organization', name: 'PLAiNSYT', logo: { '@type': 'ImageObject', url: `${SITE}/logos/Bangla.png` } },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
   };
 
-  const metaTags = `
-    <title>${pageTitle}</title>
-    <meta name="description" content="${pageDesc}" />
-    <link rel="canonical" href="${pageUrl}" />
-    <!-- Open Graph / Facebook -->
+  const meta = `
+    <title>${esc(title)}</title>
+    <meta name="description" content="${esc(desc)}" />
+    <link rel="canonical" href="${esc(pageUrl)}" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:title" content="${pageTitle}" />
-    <meta property="og:description" content="${pageDesc}" />
-    <meta property="og:image" content="${pageImage}" />
+    <meta property="og:url" content="${esc(pageUrl)}" />
+    <meta property="og:title" content="${esc(title)}" />
+    <meta property="og:description" content="${esc(desc)}" />
+    <meta property="og:image" content="${esc(image)}" />
     <meta property="og:site_name" content="PLAiNSYT" />
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="${pageUrl}" />
-    <meta name="twitter:title" content="${pageTitle}" />
-    <meta name="twitter:description" content="${pageDesc}" />
-    <meta name="twitter:image" content="${pageImage}" />
-    <!-- Structured JSON-LD -->
-    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
-  `;
+    <meta name="twitter:title" content="${esc(title)}" />
+    <meta name="twitter:description" content="${esc(desc)}" />
+    <meta name="twitter:image" content="${esc(image)}" />
+    <script type="application/ld+json">${jsonLdSafe(jsonLd)}</script>`;
 
-  // Pre-rendered article semantic HTML inside #root
-  const semanticArticleHtml = `
-    <article class="prerendered-seo-article font-bangla p-4 max-w-4xl mx-auto" style="visibility:visible">
-      <header class="mb-4">
-        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">${art.category}</span>
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2 mb-2">${art.title}</h1>
-        <p class="text-base text-slate-600">${art.subtitle}</p>
-        <div class="mt-3 text-xs text-slate-500">লেখক: <strong>${art.author}</strong> · তারিখ: ${new Date(art.publishedAt).toLocaleDateString('bn-BD')}</div>
-      </header>
-      <div class="my-4">
-        <img src="${art.coverImage}" alt="${art.title}" class="rounded-xl w-full max-h-[420px] object-cover" />
-      </div>
-      <div class="text-slate-800 text-sm leading-relaxed">${art.excerpt}</div>
-    </article>
-  `;
+  const body = `<article class="prerendered-seo-article" style="max-width:56rem;margin:0 auto;padding:1rem"><h1>${esc(a.title)}</h1><p>${esc(desc)}</p></article>`;
 
-  // Inject into template
-  let renderedHtml = template.replace(/<title>.*?<\/title>/i, '');
-  renderedHtml = renderedHtml.replace('</head>', `${metaTags}\n</head>`);
-  renderedHtml = renderedHtml.replace('<div id="root"></div>', `<div id="root">${semanticArticleHtml}</div>`);
+  let html = template.replace(/<title>[\s\S]*?<\/title>/i, '').replace(/<meta (name|property)="(description|og:[a-z:]+)"[^>]*>\s*/gi, '');
+  html = html.replace('</head>', `${meta}\n</head>`).replace('<div id="root"></div>', `<div id="root">${body}</div>`);
 
-  // Write for both /article/:slug and /article/:id
-  const paths = [
-    path.join(distDir, 'article', art.slug),
-    path.join(distDir, 'article', art.id),
-  ];
-
-  for (const targetDir of paths) {
-    fs.mkdirSync(targetDir, { recursive: true });
-    fs.writeFileSync(path.join(targetDir, 'index.html'), renderedHtml, 'utf-8');
+  for (const key of new Set([slug, String(a.id)])) {
+    const dir = path.join(distDir, 'article', key);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf-8');
   }
-
-  console.log(`  ✓ Pre-rendered: /article/${art.slug}`);
 }
 
-// Update sitemap.xml in dist/
-const sitemapPath = path.join(distDir, 'sitemap.xml');
-const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+const urls = [
+  { loc: `${SITE}/`, changefreq: 'daily', priority: '1.0' },
+  { loc: `${SITE}/explore`, changefreq: 'daily', priority: '0.8' },
+  { loc: `${SITE}/events`, changefreq: 'weekly', priority: '0.6' },
+  ...articles.map((a) => ({
+    loc: `${SITE}/article/${encodeURIComponent(String(a.slug || a.id))}`,
+    lastmod: String(a.created_at || '').slice(0, 10),
+    changefreq: 'weekly',
+    priority: '0.9',
+  })),
+];
+const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://pla.insyt.bd/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://pla.insyt.bd/explore</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-${ARTICLES.map(
-  (a) => `  <url>
-    <loc>https://pla.insyt.bd/article/${a.slug}</loc>
-    <lastmod>${a.publishedAt.split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>`,
-).join('\n')}
-</urlset>`;
-
-fs.writeFileSync(sitemapPath, sitemapXml, 'utf-8');
-const publicSitemap = path.join(rootDir, 'public', 'sitemap.xml');
-fs.writeFileSync(publicSitemap, sitemapXml, 'utf-8');
-
+${urls
+  .map((u) => `  <url>\n    <loc>${esc(u.loc)}</loc>${u.lastmod ? `\n    <lastmod>${esc(u.lastmod)}</lastmod>` : ''}\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`)
+  .join('\n')}
+</urlset>
+`;
+fs.writeFileSync(path.join(distDir, 'sitemap.xml'), xml, 'utf-8');
 console.log('✓ Prerendering & sitemap complete.');
-

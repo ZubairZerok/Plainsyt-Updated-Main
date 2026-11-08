@@ -5,6 +5,20 @@
 > **Status:** findings only. Nothing in the app was changed by this audit.
 > **Supersedes:** `audit-reports/AllTogether.md`. That report is **wrong in several places** (see §9). Do not trust it.
 
+> ## STATUS UPDATE (same day): fixes implemented
+> The issues below were fixed in the follow-up commits on branch `claude/loving-clarke-kge5zv`. Items that **cannot** be done from code are listed here and still need the site owner:
+>
+> | Still needs the owner | Why |
+> |---|---|
+> | Revoke the leaked OpenRouter key | Only the key owner can; removal from git does not un-leak it |
+> | Apply `supabase/migrations/20261108000000_security_lockdown.sql` to the live database (after a backup) and grant your admin role | I have no access to the production database |
+> | Supabase dashboard: redirect URLs, CAPTCHA, confirm-email | Dashboard-only settings (`supabase/README.md`) |
+> | Re-upload the founder avatar | The old Facebook-hosted URL is stored in profile *data*, and expires 2026-11-11 |
+> | Check Cloudflare deploy | Needs Cloudflare access (`docs/DEPLOYMENT.md`) |
+> | Review YouTube player branding (COMP-01) | Product/legal decision; only the postMessage origin was fixed |
+>
+> Verified locally: type-check 0 errors (was 104), lint 0 errors, 16 unit tests, 39 database security tests (fresh DB from migrations), 40 browser checks (every route, CSP applied). Not verified: production database and Cloudflare.
+
 ---
 
 ## 0. How to use this report (read first)

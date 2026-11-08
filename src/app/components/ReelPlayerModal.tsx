@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { isZubairIdentifier } from '../lib/auth';
 import {
   X,
   Heart,
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Avatar, cn } from './Primitives';
 import { SharePopoverButton } from './ShareModal';
-import type { CommentItem, UserProfile } from '../types';
+import type { Comment, UserProfile } from '../types';
 import { toBengaliNumerals } from '../utils/pureLogic';
 import {
   YouTubeMark,
@@ -57,7 +56,7 @@ interface Props {
   items: PlayerItem[] | null;
   start: number;
   currentUser?: UserProfile | null;
-  comments?: CommentItem[];
+  comments?: Comment[];
   onClose: () => void;
   onShare: (t: string) => void;
   onOpenAuth?: () => void;
@@ -74,7 +73,6 @@ export function ReelPlayerModal({
   currentUser,
   comments = [],
   onClose,
-  onShare,
   onOpenAuth,
   onComment,
   onEditComment,
@@ -513,8 +511,7 @@ export function ReelPlayerModal({
                     currentUser &&
                       currentUser.id &&
                       c.authorId &&
-                      (currentUser.id === c.authorId ||
-                        (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
+                      (currentUser.id === c.authorId),
                   );
                   const replies = itemComments.filter((r) => r.parentId === c.id);
 
@@ -527,7 +524,7 @@ export function ReelPlayerModal({
                             <div className="flex items-baseline justify-between gap-1">
                               <span className="font-bangla text-[13px] font-bold text-white truncate">{c.author}</span>
                               <span className="font-bangla text-[11px] font-medium text-emerald-300 shrink-0">
-                                {c.timestampLabel || 'এখন'}
+                                {c.timestamp || 'এখন'}
                               </span>
                             </div>
                             {editingCommentId === c.id ? (
@@ -632,8 +629,7 @@ export function ReelPlayerModal({
                                   currentUser &&
                                     currentUser.id &&
                                     r.authorId &&
-                                    (currentUser.id === r.authorId ||
-                                      (isZubairIdentifier(currentUser.id) && isZubairIdentifier(r.authorId))),
+                                    (currentUser.id === r.authorId),
                                 );
                                 return (
                                   <div key={r.id} className="flex items-start gap-2">
@@ -642,7 +638,7 @@ export function ReelPlayerModal({
                                       <div className="rounded-xl bg-white/5 border border-white/5 px-2.5 py-1.5">
                                         <div className="flex items-baseline justify-between gap-1">
                                           <span className="font-bangla text-[12px] font-bold text-white truncate">{r.author}</span>
-                                          <span className="font-bangla text-[10px] text-emerald-300 shrink-0">{r.timestampLabel || 'এখন'}</span>
+                                          <span className="font-bangla text-[10px] text-emerald-300 shrink-0">{r.timestamp || 'এখন'}</span>
                                         </div>
                                         <p className="mt-0.5 font-bangla text-[12px] text-white/85 leading-snug break-words">{r.text}</p>
                                       </div>

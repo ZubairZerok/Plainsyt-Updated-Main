@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Supabase stand-ins (roles + auth schema)
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/00_supabase_stub.sql
+      - name: Apply every migration in order
+        run: |
+          for f in $(ls supabase/migrations/*.sql | sort); do
+            echo "== $f"; psql -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+      - name: Row-level-security regression tests
+        run: psql -v ON_ERROR_STOP=1 -tA -f supabase/tests/rls_test.sql | tee rls.out; ! grep -q '^FAIL' rls.out

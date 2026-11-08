@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Share2, Copy, Check, Facebook, ExternalLink, Globe } from 'lucide-react';
-import { Modal, CloseButton, cn } from './Primitives';
+import { Share2, Copy, Check, Facebook } from 'lucide-react';
+import { cn } from './Primitives';
 import { toast } from 'sonner';
 
 export interface SharePayload {

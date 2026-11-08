@@ -6,21 +6,32 @@
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#061621",
-  "theme_color": "#00ED64",
+  "theme_color": "#03EF62",
   "lang": "bn",
-  "categories": ["education", "agriculture", "technology", "news"],
+  "categories": [
+    "education",
+    "agriculture",
+    "technology",
+    "news"
+  ],
   "icons": [
     {
-      "src": "/logos/icon.png",
+      "src": "/logos/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/logos/icon.png",
+      "src": "/logos/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/logos/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

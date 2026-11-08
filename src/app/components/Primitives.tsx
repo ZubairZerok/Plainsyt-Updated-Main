@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { X, UserPlus, Check } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -124,17 +124,47 @@ export function VerifiedBadge() {
 export function Modal({
   open, onClose, children, className, labelledBy, centerOnMobile = false,
 }: { open: boolean; onClose: () => void; children: ReactNode; className?: string; labelledBy?: string; centerOnMobile?: boolean }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    const opener = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.offsetParent !== null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    // Move focus into the dialog (first real control, not the backdrop button).
+    queueMicrotask(() => (focusables().find((el) => el.getAttribute('aria-label') !== 'Close') ?? panelRef.current)?.focus());
     return () => {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
+      opener?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
   if (!open) return null;
   return (
     <div
@@ -147,7 +177,7 @@ export function Modal({
       aria-labelledby={labelledBy}
     >
       <button aria-label="Close" className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
-      <div className={cn('relative max-h-[92dvh] w-full overflow-y-auto', className)}>{children}</div>
+      <div ref={panelRef} tabIndex={-1} className={cn('relative max-h-[92dvh] w-full overflow-y-auto outline-none', className)}>{children}</div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { isZubairIdentifier } from '../lib/auth';
-import { MessageCircle, Bookmark, Share2, Clock, Send, Eye, ArrowRight, ExternalLink, Calendar } from 'lucide-react';
-import type { Article, LinkedInReactionType, UserProfile } from '../types';
+import { MessageCircle, Bookmark, Share2, Clock, Send, ArrowRight, ExternalLink, Calendar } from 'lucide-react';
+import type { Article, Comment, LinkedInReactionType, UserProfile } from '../types';
 import { ImageGraphic } from './ImageGraphic';
 import { Avatar, FEED_CARD, Num, cn } from './Primitives';
 import { LinkedInReactionPickerButton, LinkedInReactionSummary } from './LinkedInReactionBar';
@@ -41,7 +40,6 @@ export function ArticleCard({
   onEditComment,
   onDeleteComment,
   onReactComment,
-  onShare,
   onNavigateProfile,
   onOpenPhoto,
   hasStory,
@@ -58,8 +56,7 @@ export function ArticleCard({
       currentUser &&
         currentUser.id &&
         c.authorId &&
-        (currentUser.id === c.authorId ||
-          (isZubairIdentifier(currentUser.id) && isZubairIdentifier(c.authorId))),
+        (currentUser.id === c.authorId),
     );
   const [showComments, setShowComments] = useState(Boolean(lead));
 

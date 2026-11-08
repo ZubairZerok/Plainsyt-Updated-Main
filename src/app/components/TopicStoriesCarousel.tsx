@@ -1,21 +1,10 @@
 import { useRef, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Plane, Sprout, CloudSun, Wheat, Home, Landmark, Layers, Cpu, UserRound } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, UserRound } from 'lucide-react';
 import type { TopicStory, UserProfile } from '../types';
 import { canCreateStory } from '../lib/auth';
 import { Avatar, Num } from './Primitives';
 import { YouTubeMark } from './YouTubeMark';
 import { toBengaliNumerals } from '../utils/pureLogic';
-
-const ICONS = {
-  drone: Plane,
-  seedling: Sprout,
-  climate: CloudSun,
-  food: Wheat,
-  rural: Home,
-  policy: Landmark,
-  soil: Layers,
-  tech: Cpu,
-} as const;
 
 export function TopicStoriesCarousel({
   stories,
@@ -44,7 +33,7 @@ export function TopicStoriesCarousel({
     }[] = [];
 
     for (const story of stories) {
-      const authorId = story.authorId || 'usr-plainsyt-admin';
+      const authorId = story.authorId || 'unknown';
       let g = groups.find((grp) => grp.authorId === authorId);
       if (!g) {
         g = {
@@ -110,7 +99,6 @@ export function TopicStoriesCarousel({
         {/* Account Story Cards — Grouped by Account */}
         {accountGroups.map((g) => {
           const s = g.latestStory;
-          const Icon = ICONS[s.iconName] ?? Sprout;
           const storyCount = g.stories.length;
 
           return (

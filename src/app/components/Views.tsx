@@ -1,31 +1,20 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import {
-  ArrowBigUp, ShoppingBag, Lightbulb, Plus, Bell, Settings, Edit3, ExternalLink, MapPin, Globe2,
-  UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard,
-  CheckCheck, Clock, ArrowRight, ArrowUpRight, MessageSquare, AlertTriangle, Filter, LogIn, LogOut,
-  ChevronDown, X,
-} from 'lucide-react';
+import { Plus, Bell, Edit3, MapPin, Globe2, UserPlus, Check, Camera, Palette, Sparkles, Calendar, Users, Trash2, PenLine, Clapperboard, CheckCheck, ArrowRight, ArrowUpRight, AlertTriangle, LogOut, ChevronDown, X } from 'lucide-react';
 import type {
-  Article, BkashOrder, CartItem, CommunityIdea, CommunityPost, LinkedInReactionType,
-  NotificationItem, ReactionTargetType, StoreProduct, TopicStory, UpcomingEvent, UserProfile,
+  Article, CommunityPost, LinkedInReactionType,
+  NotificationItem, ReactionTargetType, TopicStory, UpcomingEvent, UserProfile,
 } from '../types';
-import { CARD, FEED_CARD, SectionLabel, Avatar, VerifiedBadge, FollowIconButton, Num, cn } from './Primitives';
+import { FEED_CARD, SectionLabel, Avatar, VerifiedBadge, FollowIconButton, Num, cn } from './Primitives';
 import { PILLAR_DEFS } from './LeftSidebar';
 import { TrendingList } from './RightSidebar';
 import { ImageGraphic } from './ImageGraphic';
 import { SavedList } from './SavedArticlesModal';
 import { ArticleCard } from './ArticleCard';
 import { CommunityPostCard } from './CommunityPostCard';
-import {
-  ExplorePageSkeleton,
-  EventsPageSkeleton,
-  StorePageSkeleton,
-  IdeasPageSkeleton,
-  NotificationsPageSkeleton,
-  ProfilePageSkeleton,
-} from './Skeletons';
+import { ExplorePageSkeleton, EventsPageSkeleton, NotificationsPageSkeleton, ProfilePageSkeleton } from './Skeletons';
 import { toBengaliNumerals } from '../utils/pureLogic';
 import { canCreateStory } from '../lib/auth';
+import { safeUrl } from '../lib/mappers';
 
 function ViewHeader({
   kicker,
@@ -290,7 +279,6 @@ export function ExploreView({
   onPillar,
   onOpenArticlePopup,
   onOpenPhoto,
-  onOpenStory,
   isLoading,
 }: {
   articles: Article[];
@@ -506,14 +494,6 @@ export function EventsView({
   );
 }
 
-export function StoreView(_props: any) {
-  return null;
-}
-
-export function IdeasView(_props: any) {
-  return null;
-}
-
 export function NotificationsView({
   items,
   onRead,
@@ -660,7 +640,8 @@ export function NotificationsView({
                       }
                       if (dest.startsWith('/article/')) {
                         const artId = dest.replace('/article/', '');
-                        onOpenArticle ? onOpenArticle(artId) : onNavigate(dest);
+                        if (onOpenArticle) onOpenArticle(artId);
+                          else onNavigate(dest);
                       } else {
                         onNavigate(dest);
                       }
@@ -713,9 +694,7 @@ export function ProfileView({
   authorStories = [],
   savedArticles,
   savedPosts,
-  orders,
   bookmarkIds,
-  followingIdsCount,
   dark,
   onToggleDark,
   onToggleFollow,
@@ -744,10 +723,6 @@ export function ProfileView({
   onEditComment,
   onDeleteComment,
   isLoading,
-  allProfiles = [],
-  followingIds = [],
-  allFollows = [],
-  onToggleFollowUser,
 }: {
   profile: UserProfile | null;
   isOwnProfile: boolean;
@@ -758,9 +733,7 @@ export function ProfileView({
   authorStories?: TopicStory[];
   savedArticles: Article[];
   savedPosts: CommunityPost[];
-  orders: BkashOrder[];
   bookmarkIds: string[];
-  followingIdsCount?: number;
   dark: boolean;
   onToggleDark: () => void;
   onToggleFollow: () => void;
@@ -774,12 +747,13 @@ export function ProfileView({
   onDeletePost?: (id: string) => void;
   onDeleteStory?: (id: string) => void;
   onDeleteArticle?: (id: string) => void;
+  onOpenStory?: (id: string) => void;
   onReact: (targetType: ReactionTargetType, targetId: string, type: LinkedInReactionType) => void;
   onOpenReactionsBreakdown: (targetType: ReactionTargetType, targetId: string) => void;
   onBookmarkArticle: (id: string) => void;
-  onCommentArticle: (id: string, text: string) => void;
+  onCommentArticle: (id: string, text: string, parentId?: string, replyToAuthor?: string) => void;
   onSavePost: (id: string) => void;
-  onCommentPost: (id: string, text: string) => void;
+  onCommentPost: (id: string, text: string, parentId?: string, replyToAuthor?: string) => void;
   onEditComment?: (id: string, newText: string) => void;
   onDeleteComment?: (id: string) => void;
   onShare: (label: string) => void;
@@ -788,10 +762,6 @@ export function ProfileView({
   onNavigateProfile: (userId: string) => void;
   onOpenPhoto: (images: string[], index: number, title?: string, subtitle?: string, authorName?: string, authorId?: string) => void;
   isLoading?: boolean;
-  allProfiles?: UserProfile[];
-  followingIds?: string[];
-  allFollows?: Array<{ followerId: string; followingId: string }>;
-  onToggleFollowUser?: (userId: string) => void;
 }) {
   const [tab, setTab] = useState<'articles' | 'posts' | 'stories' | 'saved'>('articles');
   const isSelf = isOwnProfile || (Boolean(currentUser?.id) && currentUser?.id === profile?.id);
@@ -801,7 +771,7 @@ export function ProfileView({
     title: string;
   } | null>(null);
 
-  if (isLoading || (!profile && !isOwnProfile)) {
+  if (isLoading) {
     return <ProfilePageSkeleton />;
   }
 
@@ -809,18 +779,18 @@ export function ProfileView({
     return (
       <section className={cn(FEED_CARD, 'p-8 text-center')}>
         <UserPlus className="mx-auto size-10 text-slate-400" />
-        <h1 className="mt-3 font-sans text-xl font-bold text-slate-900">
-          আপনার প্রোফাইল সেট আপ করুন
+        <h1 className="mt-3 font-sans text-xl font-bold text-slate-900 dark:text-white">
+          {currentUser ? 'আপনার প্রোফাইল সেট আপ করুন' : 'প্রোফাইল দেখতে লগইন করুন'}
         </h1>
         <p className="mx-auto mt-1 max-w-md font-sans text-xs text-slate-500">
-          আপনার নাম, ছবি ও বিবরণ যুক্ত করে পাঠকদের সাথে যুক্ত হোন।
+          {currentUser ? 'আপনার নাম, ছবি ও বিবরণ যুক্ত করে পাঠকদের সাথে যুক্ত হোন।' : 'আপনার অ্যাকাউন্টে প্রবেশ করুন বা নতুন অ্যাকাউন্ট খুলুন।'}
         </p>
         <button
           type="button"
-          onClick={onOpenProfileSettings}
+          onClick={currentUser ? onOpenProfileSettings : onOpenAuth}
           className="mt-4 inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#03EF62] px-4 text-xs font-bold text-[#061621] hover:bg-[#02d955]"
         >
-          <Sparkles className="size-3.5" /> প্রোফাইল তৈরি করুন
+          <Sparkles className="size-3.5" /> {currentUser ? 'প্রোফাইল তৈরি করুন' : 'লগইন / সাইন আপ'}
         </button>
       </section>
     );
@@ -939,9 +909,9 @@ export function ProfileView({
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-3 font-mono text-[10.5px] text-slate-400">
               <span>@{profile.handle}</span>
-              {profile.website && (
+              {safeUrl(profile.website) && (
                 <a
-                  href={profile.website}
+                  href={safeUrl(profile.website)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-emerald-600 hover:underline"
@@ -1113,7 +1083,7 @@ export function ProfileView({
                   onReact={(type) => onReact('article', a.id, type)}
                   onOpenReactionsBreakdown={() => onOpenReactionsBreakdown('article', a.id)}
                   onBookmark={() => onBookmarkArticle(a.id)}
-                  onComment={(t) => onCommentArticle(a.id, t)}
+                  onComment={(t, pid, rta) => onCommentArticle(a.id, t, pid, rta)}
                   onEditComment={onEditComment}
                   onDeleteComment={onDeleteComment}
                   onReactComment={(cid, type) => onReact('comment', cid, type)}
@@ -1153,7 +1123,7 @@ export function ProfileView({
                   onReact={(type) => onReact('post', p.id, type)}
                   onOpenReactionsBreakdown={() => onOpenReactionsBreakdown('post', p.id)}
                   onSave={() => onSavePost(p.id)}
-                  onComment={(t) => onCommentPost(p.id, t)}
+                  onComment={(t, pid, rta) => onCommentPost(p.id, t, pid, rta)}
                   onEditComment={onEditComment}
                   onDeleteComment={onDeleteComment}
                   onReactComment={(cid, type) => onReact('comment', cid, type)}

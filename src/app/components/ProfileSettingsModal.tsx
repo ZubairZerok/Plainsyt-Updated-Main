@@ -1,52 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, Check, Crop, Palette, Plus, Sparkles, UserCheck, Users } from 'lucide-react';
+import { Camera, Crop, Palette, Sparkles } from 'lucide-react';
 import type { UserProfile } from '../types';
 import { COVER_GRADIENT_PRESETS } from '../utils/pureLogic';
 import { Avatar, CloseButton, Modal, SectionLabel, cn } from './Primitives';
 import { AvatarCropModal } from './AvatarCropModal';
-
-function compressImageFile(file: File, maxDim = 360): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        canvas.width = Math.max(1, Math.round(img.width * scale));
-        canvas.height = Math.max(1, Math.round(img.height * scale));
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(String(reader.result));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.86));
-      };
-      img.onerror = reject;
-      img.src = String(reader.result);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+import { dataUrlToBlob, uploadImage } from '../lib/media';
+import { toast } from 'sonner';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   currentUser: UserProfile | null;
-  allProfiles: UserProfile[];
   onSaveProfile: (profile: UserProfile) => void;
-  onSwitchUser: (userId: string) => void;
 }
 
 export function ProfileSettingsModal({
   open,
   onClose,
   currentUser,
-  allProfiles,
   onSaveProfile,
-  onSwitchUser,
 }: Props) {
   const [name, setName] = useState('');
   const [nameBn, setNameBn] = useState('');
@@ -106,7 +78,7 @@ export function ProfileSettingsModal({
     if (!currentUser || !name.trim()) return;
     const cleanHandle =
       handle.trim().replace(/^@/, '') ||
-      name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '.') + '.' + Math.floor(Math.random() * 90 + 10);
+      name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '.') + '.' + (crypto.getRandomValues(new Uint32Array(1))[0] % 90 + 10);
     const initials = name
       .trim()
       .split(/\s+/)
@@ -328,7 +300,7 @@ export function ProfileSettingsModal({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Hasan Zubair"
+                  placeholder="e.g. Rafiq Ahmed"
                   className={inputCls}
                 />
               </div>
@@ -364,7 +336,7 @@ export function ProfileSettingsModal({
                 <input
                   value={handle}
                   onChange={(e) => setHandle(e.target.value)}
-                  placeholder="zubair.hasan"
+                  placeholder="rafiq.ahmed"
                   className={cn(inputCls, 'font-mono')}
                 />
               </div>
@@ -422,9 +394,12 @@ export function ProfileSettingsModal({
             open={cropOpen}
             imageSrc={cropImageSrc}
             onClose={() => setCropOpen(false)}
-            onApply={(croppedUrl) => {
-              setAvatar(croppedUrl);
+            onApply={async (croppedUrl) => {
               setCropOpen(false);
+              if (!currentUser) return;
+              const res = await uploadImage(await dataUrlToBlob(croppedUrl), currentUser.id, 512);
+              if (res.ok) setAvatar(res.url);
+              else toast.error(res.error);
             }}
           />
         )}

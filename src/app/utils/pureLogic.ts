@@ -172,7 +172,7 @@ export const setPostLinkedInReaction = (
 };
 
 export const appendArticleComment = (article: Article, newComment: Comment): Article => {
-  const nextComments = [newComment, ...article.comments.filter((c) => c.id !== newComment.id)];
+  const nextComments = [...article.comments.filter((c) => c.id !== newComment.id), newComment];
   return {
     ...article,
     comments: nextComments,
@@ -203,7 +203,7 @@ export const makeComment = (
   parentId?: string | null,
   replyToAuthor?: string,
 ): Comment => ({
-  id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  id: `c-${globalThis.crypto.randomUUID()}`,
   targetType,
   targetId,
   authorId: user.id,
@@ -211,7 +211,7 @@ export const makeComment = (
   avatar: user.avatar,
   role: `${user.role}${user.organization ? ` · ${user.organization}` : ''}`,
   text,
-  timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' }),
+  timestamp: 'এইমাত্র',
   likes: 0,
   reactionCounts: {},
   userReaction: null,

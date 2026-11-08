@@ -46,7 +46,7 @@ export function buildYouTubeEmbedSrc(
 export function ytPostCommand(iframe: HTMLIFrameElement | null, func: string, args: unknown[] = []) {
   iframe?.contentWindow?.postMessage(
     JSON.stringify({ event: 'command', func, args }),
-    '*',
+    'https://www.youtube-nocookie.com',
   );
 }
 

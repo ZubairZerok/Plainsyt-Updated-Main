@@ -1,28 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { isZubairIdentifier } from '../lib/auth';
-import {
-  X,
-  Heart,
-  MessageCircle,
-  Share2,
-  Bookmark,
-  Pause,
-  Play,
-  Send,
-  UserPlus,
-  Check,
-  Volume2,
-  VolumeX,
-  ChevronLeft,
-  ChevronRight,
-  Smile,
-  ThumbsUp,
-} from 'lucide-react';
+import { X, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { Avatar, FollowIconButton, Num, cn } from './Primitives';
-import type { CommentItem, LinkedInReactionType, ReactionTargetType, TopicStory, UserProfile } from '../types';
-import { toBengaliNumerals, LINKEDIN_REACTIONS, getReactionMeta } from '../utils/pureLogic';
-import { YouTubeMark, buildYouTubeEmbedSrc, ytPostCommand, parseDurationLabel } from './YouTubeMark';
-import { LinkedInReactionBadge } from './LinkedInReactionBar';
+import type { TopicStory, UserProfile } from '../types';
+import { toBengaliNumerals } from '../utils/pureLogic';
+import { YouTubeMark, buildYouTubeEmbedSrc, ytPostCommand } from './YouTubeMark';
+
 
 export interface AccountStoryGroup {
   authorId: string;
@@ -54,11 +36,8 @@ interface Props {
   initialStoryId?: string | null;
   currentUser: UserProfile | null;
   followingIds: string[];
-  comments?: CommentItem[];
-  savedStoryIds?: string[];
   onClose: () => void;
   onToggleFollow: (authorId: string) => void;
-  onSave?: (storyId: string) => void;
   onOpenAuth: () => void;
   onNavigateProfile?: (userId: string) => void;
 }
@@ -69,11 +48,8 @@ export function StoryViewerModal({
   initialStoryId,
   currentUser,
   followingIds,
-  comments = [],
-  savedStoryIds = [],
   onClose,
   onToggleFollow,
-  onSave,
   onOpenAuth,
   onNavigateProfile,
 }: Props) {
@@ -82,7 +58,7 @@ export function StoryViewerModal({
     if (!stories || stories.length === 0) return [];
     const groups: AccountStoryGroup[] = [];
     for (const story of stories) {
-      const authorId = story.authorId || 'usr-plainsyt-admin';
+      const authorId = story.authorId || 'unknown';
       let g = groups.find((grp) => grp.authorId === authorId);
       if (!g) {
         g = {
@@ -316,7 +292,6 @@ export function StoryViewerModal({
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!pointerStart.current || isRotating) return;
     const deltaX = e.clientX - pointerStart.current.x;
-    const deltaY = e.clientY - pointerStart.current.y;
 
     if (Math.abs(deltaX) > 12) {
       // Detected horizontal drag
@@ -430,7 +405,6 @@ export function StoryViewerModal({
   if (!open || !currentGroup || !currentStory) return null;
 
   const isFollowing = followingIds.includes(currentGroup.authorId);
-  const isSaved = savedStoryIds.includes(currentStory.id);
 
   return (
     <div

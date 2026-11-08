@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { SPLASH_STORAGE_KEY, shouldShowSplash } from '../lib/splash';
 
 /**
  * PLAINSYT — Ultra Precision Procedural Splash Screen
@@ -80,20 +81,6 @@ const AMBIENT_DOTS = [
   { x: 265, y: 125, r: 4.0, t0: 0.0, greenTail: { dx: 65, dy: -18 } },
 ];
 
-const SPLASH_STORAGE_KEY = 'plainsyt_splash_shown';
-
-function shouldShowSplash(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('splash')) return true; // Allows forced preview via ?splash=1
-    // Won't appear every time you refresh; only the first time
-    return !sessionStorage.getItem(SPLASH_STORAGE_KEY);
-  } catch {
-    return false;
-  }
-}
-
 export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -145,7 +132,7 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
     }
 
     try {
-      sessionStorage.setItem(SPLASH_STORAGE_KEY, 'true');
+      localStorage.setItem(SPLASH_STORAGE_KEY, 'true');
     } catch {
       // ignore
     }
@@ -298,7 +285,7 @@ export function SiteLoader({ onComplete }: { onComplete?: () => void }) {
           ctx.stroke();
 
           if (line.hasDot) {
-            const dp = Ease.outQuart(invLerp(line.dotStart, line.end + 0.2, t));
+            const dp = Ease.outQuart(invLerp(line.dotStart ?? 0, line.end + 0.2, t));
             const dx = lerp(line.x1, line.x2, dp * 0.72);
             const dy = lerp(line.y1, line.y2, dp * 0.72);
             ctx.fillStyle = `rgba(255, 255, 255, ${0.96 * cadAlpha})`;

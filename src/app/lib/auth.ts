@@ -1,407 +1,94 @@
 import { supabase } from './supabase';
+import { fromProfileRow, PROFILE_COLS } from './mappers';
 import type { UserProfile } from '../types';
 
-export const ADMIN_CANONICAL_ID = 'usr-plainsyt-admin';
-export const ADMIN_ALIASES = ['plaiinsyt@gmail.com', 'pl@insyt.bd'] as const;
-export const ZUBAIR_ID = 'usr-zubair';
-export const ZUBAIR_PROD_ID = '55dba730-185d-4c61-bee8-6b9ab22e3703';
-export const ZUBAIR_EMAIL = 'Zubair2001!';
-export const ZUBAIR_ALIASES = [
-  'zubair2001!',
-  'zubair2001',
-  'z65gt9@gmail.com',
-  'zubair2001@gmail.com',
-  'hasanzubair',
-  '55dba730-185d-4c61-bee8-6b9ab22e3703',
-  '688ac4e8-af95-4458-8623-13b5e1ae41ba',
-  '70e85603-ca08-476a-a73d-98ef214c7dab',
-  '6d8fd586-0225-4754-8013-c4fb2c07de18',
-  'zubair.bau.01@gmail.com',
-  'h.xubaiir@gmail.com',
-] as const;
+/** Editors/admins are granted server-side (app_admins table). The client only reads the result. */
+export const isEditor = (user?: UserProfile | null): boolean => Boolean(user?.isEditor);
+export const canCreateStory = isEditor;
+export const isEditorialAuthorized = isEditor;
 
-export function isZubairIdentifier(idOrEmailOrHandle?: string | null): boolean {
-  if (!idOrEmailOrHandle) return false;
-  const val = String(idOrEmailOrHandle).toLowerCase().trim().replace(/^@/, '');
-  return (
-    val === 'usr-zubair' ||
-    val === 'usr-zubair-bau' ||
-    val === 'zubair.bau' ||
-    val === '55dba730-185d-4c61-bee8-6b9ab22e3703' ||
-    val === '688ac4e8-af95-4458-8623-13b5e1ae41ba' ||
-    val === '70e85603-ca08-476a-a73d-98ef214c7dab' ||
-    val === '6d8fd586-0225-4754-8013-c4fb2c07de18' ||
-    val === 'hasanzubair' ||
-    val === 'zubair2001' ||
-    val === 'zubair2001!' ||
-    val === 'z65gt9@gmail.com' ||
-    val === 'zubair2001@gmail.com' ||
-    val === 'zubair.bau.01@gmail.com' ||
-    val === 'h.xubaiir@gmail.com'
-  );
+const isPlainObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+/** Load the signed-in user's profile (created by the handle_new_user DB trigger) plus their role. */
+export async function loadProfile(userId: string): Promise<UserProfile | null> {
+  const { data, error } = await supabase.from('profiles').select(PROFILE_COLS).eq('id', userId).maybeSingle();
+  if (error || !data) return null;
+  const profile = fromProfileRow(data as unknown as Record<string, unknown>);
+  const { data: sess } = await supabase.auth.getSession();
+  profile.email = sess.session?.user.email ?? undefined; // own e-mail comes from the auth session, never the public table
+  const role = await supabase.rpc('my_role');
+  profile.isEditor = !role.error && (role.data === 'admin' || role.data === 'editor');
+  return profile;
 }
 
-export const ADMIN_PROFILE: UserProfile = {
-  id: ADMIN_CANONICAL_ID,
-  name: 'PLAiNSYT',
-  nameBn: 'প্লেইনসাইট',
-  handle: 'plainsyt',
-  role: 'Admin',
-  organization: 'PLAiNSYT Editorial & Agro-Tech Publishing',
-  location: 'ঢাকা, বাংলাদেশ',
-  bio: 'কৃষি, প্রযুক্তি, গবেষণা ও জ্ঞানভিত্তিক বাংলাদেশের উন্মুক্ত প্রকাশনা প্ল্যাটফর্ম।',
-  avatar: '/logos/icon.png',
-  coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
-  isVerified: true,
-  focusArea: 'Nuclear Agronomy, Agro-IoT & Biotech',
-  publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
-  email: 'plaiinsyt@gmail.com',
-  createdAt: '2026-01-01T00:00:00.000Z',
-};
+export type AuthResult = { ok: true; needsEmailConfirmation?: boolean } | { ok: false; error: string };
 
-export const HASAN_ZUBAIR_AVATAR =
-  'https://scontent.fdac181-1.fna.fbcdn.net/v/t39.30808-6/868869490_122115169682436931_6504382327291511656_n.jpg?stp=dst-jpg_tt6&cstp=mx1254x1254&ctp=s1254x1254&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=OPH1ic41iEcQ7kNvwHfVJ22&_nc_oc=Ado4dMV71UpAFR9znBCct-4oL-vbc2Tj2XNuEOMF69HCn9LVBresJLegwGmkFlHIoao&_nc_zt=23&_nc_ht=scontent.fdac181-1.fna&_nc_gid=Y728jMG_bc65Ll0ceAYQAg&_nc_ss=7b289&oh=00_AQTWBy-QOn2nh1S1pqRbyKcEOazefMscU9_rRdxE7UTIPQ&oe=6AF4A9EF';
-
-export const AUTHORIZED_EDITORIAL_EMAILS = [
-  'z65gt9@gmail.com',
-  'plaiinsyt@gmail.com',
-  'zubair.bau.01@gmail.com',
-] as const;
-
-export function isEditorialAuthorized(user?: UserProfile | null): boolean {
-  if (!user) return false;
-  const email = (user.email || '').toLowerCase().trim();
-  if (AUTHORIZED_EDITORIAL_EMAILS.some((e) => e === email)) return true;
-  if (user.id === ADMIN_CANONICAL_ID || isZubairIdentifier(user.id) || isZubairIdentifier(user.email)) {
-    return true;
-  }
-  return false;
-}
-
-export function canCreateStory(user?: UserProfile | null): boolean {
-  return isEditorialAuthorized(user);
-}
-
-export const ZUBAIR_PROFILE: UserProfile = {
-  id: ZUBAIR_ID,
-  name: 'Hasan Zubair',
-  nameBn: 'হাসান জুবায়ের',
-  handle: 'hasanzubair',
-  role: 'Research Fellow',
-  organization: 'Bangladesh Agricultural University (BAU)',
-  location: 'ময়মনসিংহ, বাংলাদেশ',
-  bio: 'গবেষক ও এগ্রো-আইওটি ডেভেলপার। নির্ভুল তথ্যভিত্তিক কৃষি প্রযুক্তির প্রসারে নিবেদিত।',
-  avatar: HASAN_ZUBAIR_AVATAR,
-  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
-  isVerified: true,
-  focusArea: 'Agri-Tech & Agronomy',
-  publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
-  email: 'z65gt9@gmail.com',
-  createdAt: '2026-02-01T00:00:00.000Z',
-};
-
-export const ZUBAIR_PROD_PROFILE: UserProfile = {
-  ...ZUBAIR_PROFILE,
-  id: ZUBAIR_PROD_ID,
-  handle: 'hasanzubair',
-  isVerified: true,
-};
-
-export const ZUBAIR_BAU_ID = 'usr-zubair-bau';
-
-export const ZUBAIR_BAU_PROFILE: UserProfile = {
-  id: ZUBAIR_BAU_ID,
-  name: 'Hasan Zubair (BAU)',
-  nameBn: 'হাসান জুবায়ের (বাকৃবি)',
-  handle: 'zubair.bau',
-  role: 'Research Fellow',
-  organization: 'Bangladesh Agricultural University (BAU)',
-  location: 'ময়মনসিংহ, বাংলাদেশ',
-  bio: 'গবেষক, বাংলাদেশ কৃষি বিশ্ববিদ্যালয় (বাকৃবি)। নিউক্লিয়ার এগ্রোনমি ও স্মার্ট এগ্রিকালচার গবেষক।',
-  avatar: HASAN_ZUBAIR_AVATAR,
-  coverGradient: 'linear-gradient(135deg, #061621 0%, #0d2838 55%, #03EF62 100%)',
-  isVerified: true,
-  focusArea: 'Nuclear Agronomy & Smart Agriculture',
-  publicationsCount: 0,
-  followersCount: 0,
-  followingCount: 0,
-  email: 'zubair.bau.01@gmail.com',
-  createdAt: '2026-02-01T00:00:00.000Z',
-};
-
-export function isFollowableAccount(user?: UserProfile | null): boolean {
-  if (!user) return false;
-  const email = (user.email || '').toLowerCase().trim();
-  if (
-    email === 'z65gt9@gmail.com' ||
-    email === 'plaiinsyt@gmail.com' ||
-    email === 'zubair.bau.01@gmail.com'
-  ) {
-    return true;
-  }
-  return isEditorialAuthorized(user);
-}
-
-const AUTH_STORAGE_KEY = 'plainsyt_auth_session_v1';
-
-export function resolveEmailAlias(rawEmail: string): {
-  normalizedEmail: string;
-  canonicalEmail: string;
-  canonicalUserId: string | null;
-  isAdmin: boolean;
-} {
-  const normalized = (rawEmail || '').trim().toLowerCase();
-  if (normalized === 'plaiinsyt@gmail.com' || normalized === 'pl@insyt.bd') {
-    return {
-      normalizedEmail: normalized,
-      canonicalEmail: 'plaiinsyt@gmail.com',
-      canonicalUserId: ADMIN_CANONICAL_ID,
-      isAdmin: true,
-    };
-  }
-  if (isZubairIdentifier(normalized)) {
-    return {
-      normalizedEmail: normalized,
-      canonicalEmail: normalized.includes('@') ? normalized : 'z65gt9@gmail.com',
-      canonicalUserId: ZUBAIR_ID,
-      isAdmin: false,
-    };
-  }
-  return {
-    normalizedEmail: normalized,
-    canonicalEmail: normalized,
-    canonicalUserId: null,
-    isAdmin: false,
-  };
-}
-
-export function getStoredAuth(): { user: UserProfile | null; email: string | null } {
+export async function loginWithPassword(email: string, password: string): Promise<AuthResult> {
+  if (!password || password.length < 6) return { ok: false, error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' };
   try {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && parsed.user) return parsed;
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+    if (error) {
+      return { ok: false, error: 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' };
     }
+    return { ok: true };
   } catch {
-    // ignore storage error
-  }
-  return { user: null, email: null };
-}
-
-export function getStoredAuthUser(): UserProfile | null {
-  return getStoredAuth().user;
-}
-
-export function setStoredAuth(user: UserProfile | null, email: string | null) {
-  try {
-    if (!user) {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    } else {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, email }));
-    }
-  } catch {
-    // ignore
+    return { ok: false, error: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।' };
   }
 }
 
-export async function loginWithPassword(email: string, pass: string): Promise<{
-  ok: boolean;
-  user?: UserProfile;
-  error?: string;
-}> {
-  const { normalizedEmail, canonicalEmail, canonicalUserId, isAdmin } = resolveEmailAlias(email);
-
-  if (!pass || pass.length < 6) {
-    return { ok: false, error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' };
-  }
-
-  // 1. Try real Supabase Auth
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: canonicalEmail,
-      password: pass,
-    });
-
-    if (data?.user && !error) {
-      const u = data.user;
-      let profile: UserProfile;
-
-      // Check if profile exists in public.profiles
-      const { data: profData } = await supabase.from('profiles').select('*').eq('id', u.id).single();
-      if (profData) {
-        profile = {
-          id: profData.id,
-          name: profData.name,
-          nameBn: profData.name_bn || profData.name,
-          handle: profData.handle,
-          role: profData.role || (isAdmin ? 'Admin' : 'Member'),
-          organization: profData.organization,
-          location: profData.location,
-          bio: profData.bio,
-          avatar: profData.avatar,
-          coverGradient: profData.cover_gradient,
-          isVerified: Boolean(profData.is_verified),
-          focusArea: profData.focus_area,
-          email: normalizedEmail,
-          publicationsCount: profData.publications_count || 0,
-          followersCount: profData.followers_count || 0,
-          followingCount: profData.following_count || 0,
-          createdAt: profData.created_at,
-        };
-      } else if (isAdmin) {
-        profile = { ...ADMIN_PROFILE, id: u.id, email: normalizedEmail };
-      } else if (normalizedEmail === ZUBAIR_EMAIL) {
-        profile = { ...ZUBAIR_PROFILE, id: u.id, email: normalizedEmail };
-      } else {
-        profile = {
-          id: u.id,
-          name: u.user_metadata?.name || normalizedEmail.split('@')[0],
-          nameBn: u.user_metadata?.name || normalizedEmail.split('@')[0],
-          handle: normalizedEmail.split('@')[0].replace(/[^a-z0-9]/g, '.'),
-          role: 'Member',
-          organization: 'Plainsyt Reader',
-          location: 'Bangladesh',
-          bio: '',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-          coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
-          isVerified: false,
-          focusArea: 'Agri-Tech',
-          publicationsCount: 0,
-          followersCount: 0,
-          followingCount: 0,
-          email: normalizedEmail,
-          createdAt: new Date().toISOString(),
-        };
-      }
-
-      setStoredAuth(profile, normalizedEmail);
-      return { ok: true, user: profile };
-    }
-  } catch (err) {
-    return {
-      ok: false,
-      error: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।',
-    };
-  }
-
-  return { ok: false, error: 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' };
-}
-
-export async function signupWithEmail(email: string, pass: string, name: string): Promise<{
-  ok: boolean;
-  user?: UserProfile;
-  error?: string;
-}> {
-  const { normalizedEmail } = resolveEmailAlias(email);
-
+export async function signupWithEmail(email: string, password: string, name: string): Promise<AuthResult> {
   if (!name.trim()) return { ok: false, error: 'নাম প্রদান করুন।' };
-  if (!pass || pass.length < 6) return { ok: false, error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' };
-
+  if (!password || password.length < 6) return { ok: false, error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' };
   try {
     const { data, error } = await supabase.auth.signUp({
-      email: normalizedEmail,
-      password: pass,
-      options: { data: { name: name.trim() } },
+      email: email.trim().toLowerCase(),
+      password,
+      options: { data: { name: name.trim() }, emailRedirectTo: `${window.location.origin}/` },
     });
     if (error) {
-      const msg = error.message.toLowerCase().includes('already')
-        ? 'এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা হয়েছে। অনুগ্রহ করে লগইন করুন।'
-        : error.message;
-      return { ok: false, error: msg };
+      const already = error.message.toLowerCase().includes('already');
+      return { ok: false, error: already ? 'এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা হয়েছে। অনুগ্রহ করে লগইন করুন।' : error.message };
     }
-    const newId = data?.user?.id || `u-${Date.now().toString(36)}`;
-    const newProfile: UserProfile = {
-      id: newId,
-      name: name.trim(),
-      nameBn: name.trim(),
-      handle: name.trim().toLowerCase().replace(/[^a-z0-9]/g, '.') + '.' + Math.floor(Math.random() * 90 + 10),
-      role: 'Member',
-      organization: 'Plainsyt Reader',
-      location: 'Bangladesh',
-      bio: '',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-      coverGradient: 'linear-gradient(135deg, #04301f 0%, #17754f 55%, #f2c14e 100%)',
-      isVerified: false,
-      focusArea: 'Agri-Tech',
-      publicationsCount: 0,
-      followersCount: 0,
-      followingCount: 0,
-      email: normalizedEmail,
-      createdAt: new Date().toISOString(),
-    };
-
-    setStoredAuth(newProfile, normalizedEmail);
-
-    // Persist new user profile to Supabase public.profiles table
-    try {
-      await supabase.from('profiles').upsert({
-        id: newProfile.id,
-        name: newProfile.name,
-        name_bn: newProfile.nameBn,
-        handle: newProfile.handle,
-        role: newProfile.role,
-        organization: newProfile.organization,
-        location: newProfile.location,
-        bio: newProfile.bio,
-        avatar: newProfile.avatar,
-        cover_gradient: newProfile.coverGradient,
-        is_verified: newProfile.isVerified,
-        focus_area: newProfile.focusArea,
-        email: newProfile.email,
-      });
-    } catch {
-      // non-blocking
-    }
-
-    return { ok: true, user: newProfile };
+    // With "Confirm email" enabled there is no session yet: the user is NOT logged in.
+    return { ok: true, needsEmailConfirmation: !data.session };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : 'সাইনআপ ত্রুটি' };
   }
 }
 
-export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
+export async function loginWithGoogle(): Promise<AuthResult> {
   try {
-    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : 'https://pla.insyt.bd/';
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'select_account',
-        },
-      },
+      options: { redirectTo: `${window.location.origin}/`, queryParams: { prompt: 'select_account' } },
     });
-
-    if (error) {
-      if (error.message.includes('not enabled') || error.message.includes('validation_failed')) {
-        return {
-          ok: false,
-          error: 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন।',
-        };
-      }
-      return { ok: false, error: error.message };
-    }
-
-    if (data?.url && typeof window !== 'undefined') {
-      window.location.assign(data.url);
-    }
-
+    if (error) return { ok: false, error: 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন।' };
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে।' };
+    return { ok: false, error: err instanceof Error ? err.message : 'গুগল সাইন-ইন সংযোগে সমস্যা হয়েছে।' };
   }
 }
 
-export async function logoutUser() {
+export async function requestPasswordReset(email: string): Promise<AuthResult> {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectTo: `${window.location.origin}/me/security`,
+    });
+    // Same neutral outcome whether or not the account exists (no enumeration).
+    if (error && isPlainObject(error) && /rate|limit/i.test(String(error.message))) {
+      return { ok: false, error: 'অনেকবার চেষ্টা করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।' };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'সংযোগ সমস্যা হয়েছে। আবার চেষ্টা করুন।' };
+  }
+}
+
+export async function logoutUser(): Promise<void> {
   try {
     await supabase.auth.signOut();
   } catch {
-    // ignore
+    // The auth listener clears local state even if the network call fails.
   }
-  setStoredAuth(null, null);
 }
+export const isFollowableAccount = (user?: UserProfile | null): boolean => Boolean(user?.isVerified);

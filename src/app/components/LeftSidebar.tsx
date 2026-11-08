@@ -4,7 +4,7 @@ import {
   Plane, Wheat, BookOpenText, CloudSun, Snowflake, Rocket, Sparkles,
 } from 'lucide-react';
 import type { Article, StoryReel, UserProfile } from '../types';
-import { Avatar, SectionLabel, VerifiedBadge, cn } from './Primitives';
+import { Avatar, VerifiedBadge, cn } from './Primitives';
 import { toBengaliNumerals } from '../utils/pureLogic';
 
 export const PILLAR_DEFS = [

@@ -7,7 +7,6 @@ import { toBengaliNumerals } from '../utils/pureLogic';
 export function PhotoLightboxModal({
   payload,
   onClose,
-  onNavigateProfile,
 }: {
   payload: LightboxPayload | null;
   onClose: () => void;
@@ -152,7 +151,7 @@ export function PhotoLightboxModal({
         )}
 
         <img
-          src={imgError ? '/images/japan_cucumber_robot.jpg' : currentSrc}
+          src={imgError ? '/logos/icon-512.png' : currentSrc}
           alt={payload.title || 'Full view'}
           onError={() => setImgError(true)}
           onClick={() => setZoom((z) => (z === 1 ? 1.5 : 1))}

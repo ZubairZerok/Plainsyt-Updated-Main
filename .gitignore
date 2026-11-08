@@ -14,10 +14,11 @@ node_modules/
 dist/
 dist-ssr/
 
-# # Environment files
-# .env
-# .env.local
-# .env.*.local
+# Environment files (never commit secrets; VITE_* values are public in the browser bundle)
+.env
+.env.local
+.env.*.local
+!.env.example
 
 # Editor and OS files
 .vscode/*
