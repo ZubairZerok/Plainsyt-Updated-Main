@@ -411,7 +411,7 @@ export function IntegratedReelCard({
                 <span className={actionIcon}>
                   <Share2 className="size-[18px]" />
                 </span>
-                <span className="font-bangla text-[11px] font-medium drop-shadow">Share</span>
+                <span className="font-bangla text-[11px] font-medium drop-shadow">শেয়ার</span>
               </div>
             </SharePopoverButton>
 
@@ -419,7 +419,7 @@ export function IntegratedReelCard({
               <span className={actionIcon}>
                 <Bookmark className={cn('size-[18px]', saved && 'fill-current text-[#03EF62]')} />
               </span>
-              <span className="font-bangla text-[11px] font-medium drop-shadow">{saved ? 'Saved' : 'Save'}</span>
+              <span className="font-bangla text-[11px] font-medium drop-shadow">{saved ? 'সংরক্ষিত' : 'সংরক্ষণ'}</span>
             </button>
 
             <button
@@ -520,7 +520,7 @@ export function IntegratedReelCard({
           className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <Share2 className="size-4 sm:size-[18px] shrink-0" />
-          <span className="truncate">Share</span>
+          <span className="truncate">শেয়ার</span>
         </button>
         <button
           type="button"
@@ -532,7 +532,7 @@ export function IntegratedReelCard({
           )}
         >
           <Bookmark className={cn('size-4 sm:size-[18px] shrink-0', saved && 'fill-current')} />
-          <span className="truncate">{saved ? 'Saved' : 'Save'}</span>
+          <span className="truncate">{saved ? 'সংরক্ষিত' : 'সংরক্ষণ'}</span>
         </button>
       </div>
     </article>

@@ -882,7 +882,7 @@ export function ProfileView({
                     onClick={onToggleDark}
                     className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-800 hover:bg-slate-50"
                   >
-                    {dark ? 'Light Mode' : 'Dark Mode'}
+                    {dark ? 'লাইট মোড' : 'ডার্ক মোড'}
                   </button>
                 </>
               ) : (
@@ -916,7 +916,7 @@ export function ProfileView({
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-emerald-600 hover:underline"
                 >
-                  <Globe2 className="size-2.5" /> Website ↗
+                  <Globe2 className="size-2.5" /> ওয়েবসাইট ↗
                 </a>
               )}
             </div>

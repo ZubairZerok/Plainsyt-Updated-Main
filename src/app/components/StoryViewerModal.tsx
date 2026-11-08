@@ -53,6 +53,16 @@ export function StoryViewerModal({
   onOpenAuth,
   onNavigateProfile,
 }: Props) {
+  // Lock page scroll while the viewer is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   // 1. Group stories by author account
   const accountGroups: AccountStoryGroup[] = useMemo(() => {
     if (!stories || stories.length === 0) return [];

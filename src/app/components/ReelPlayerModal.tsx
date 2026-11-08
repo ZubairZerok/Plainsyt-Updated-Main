@@ -403,7 +403,7 @@ export function ReelPlayerModal({
                 <span className={actionIcon}>
                   <Share2 className="size-5" />
                 </span>
-                <span className="font-mono text-[11px]">Share</span>
+                <span className="font-mono text-[11px]">শেয়ার</span>
               </div>
             </SharePopoverButton>
 
@@ -411,7 +411,7 @@ export function ReelPlayerModal({
               <span className={cn(actionIcon, isSaved && 'bg-white/20')}>
                 <Bookmark className={cn('size-5', isSaved && 'fill-white')} />
               </span>
-              <span className="font-mono text-[11px]">{isSaved ? 'Saved' : 'Save'}</span>
+              <span className="font-mono text-[11px]">{isSaved ? 'সংরক্ষিত' : 'সংরক্ষণ'}</span>
             </button>
 
             <button
