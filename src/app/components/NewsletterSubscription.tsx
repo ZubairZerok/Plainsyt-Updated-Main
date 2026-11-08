@@ -107,7 +107,7 @@ export function NewsletterSubscription({ className, variant = 'card' }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
             <div className="relative flex-1">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/40" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-white/70" />
               <input
                 type="email"
                 value={email}
@@ -116,7 +116,7 @@ export function NewsletterSubscription({ className, variant = 'card' }: Props) {
                   if (status === 'error') setStatus('idle');
                 }}
                 placeholder="আপনার ইমেইল লিখুন (e.g. name@domain.com)"
-                className="w-full rounded-xl border border-white/20 bg-white/10 pl-10 pr-4 py-2.5 text-xs sm:text-[13px] text-white placeholder-white/50 backdrop-blur-sm outline-none focus:border-[#03EF62] focus:bg-white/15 transition"
+                className="w-full rounded-xl border border-white/20 bg-white/10 pl-10 pr-4 py-2.5 text-xs sm:text-[13px] text-white placeholder-white/70 backdrop-blur-sm outline-none focus:border-[#03EF62] focus:bg-white/15 transition"
                 required
               />
             </div>
@@ -144,7 +144,7 @@ export function NewsletterSubscription({ className, variant = 'card' }: Props) {
           <p className="mt-2.5 text-xs text-rose-400 font-medium">{message}</p>
         )}
 
-        <p className="mt-3 font-mono text-[11px] text-white/40">
+        <p className="mt-3 font-mono text-[11px] text-white/70">
           যেকোনো সময় এক ক্লিকে আনসাবস্ক্রাইব করা যাবে · 100% Privacy Protected
         </p>
       </div>

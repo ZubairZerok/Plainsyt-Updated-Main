@@ -67,7 +67,7 @@ export function EventRegistrationModal({
           <div className="flex items-center gap-2.5">
             <Ticket className="size-5" />
             <div>
-              <h2 id="event-registration-title" className="font-bangla text-[18px] font-bold leading-tight">
+              <h2 id="event-registration-title" className="font-bangla text-[18px] text-[#061621] font-bold leading-tight">
                 ইভেন্ট রেজিস্ট্রেশন · Event Registration
               </h2>
               <p className="font-mono text-[11px] opacity-80">

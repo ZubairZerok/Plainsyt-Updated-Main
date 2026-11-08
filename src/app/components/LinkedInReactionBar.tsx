@@ -116,6 +116,7 @@ export function LinkedInReactionPickerButton({
   iconOnly,
   floating,
   className,
+  showLabel,
 }: {
   userReaction?: LinkedInReactionType | null;
   onSelect: (type: LinkedInReactionType) => void;
@@ -126,6 +127,8 @@ export function LinkedInReactionPickerButton({
   /** Open tray upward over dark video chrome */
   floating?: boolean;
   className?: string;
+  /** Show the reaction name beside the icon (action-bar style, matches Comment/Share/Save). */
+  showLabel?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<LinkedInReactionType | null>(null);
@@ -431,7 +434,7 @@ export function LinkedInReactionPickerButton({
         aria-pressed={!!userReaction}
         className={cn(
           'react-btn',
-          compact ? '!p-1.5 !text-xs' : countLabel ? '!px-2.5 !py-1.5' : '!p-2',
+          compact ? '!h-6 !px-2 !py-0 !text-xs' : countLabel ? '!px-2.5 !py-1.5' : '!p-2',
           className,
         )}
       >
@@ -468,6 +471,11 @@ export function LinkedInReactionPickerButton({
             </>
           )}
         </span>
+        {showLabel && (
+          <span className="truncate font-bangla text-[12px] font-semibold sm:text-[13.5px]">
+            {activeMeta ? activeMeta.labelBn : 'লাইক'}
+          </span>
+        )}
         {countLabel && (
           <span className="react-count font-bangla font-bold text-[12px]">
             <span className={cn('react-num', rollDir)}>

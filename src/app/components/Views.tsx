@@ -871,10 +871,10 @@ export function ProfileView({
                     <button
                       type="button"
                       onClick={onLogout}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50/50 dark:bg-white dark:border-white dark:text-rose-600 px-3 text-xs font-semibold text-rose-600 hover:bg-rose-100 dark:hover:bg-slate-100 shadow-xs transition"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50/50 dark:bg-white dark:border-white dark:text-rose-700 px-3 text-xs font-semibold text-rose-700 hover:bg-rose-100 dark:hover:bg-slate-100 shadow-xs transition"
                       title="সাইন আউট করুন"
                     >
-                      <LogOut className="size-3.5 text-rose-600" /> সাইন আউট
+                      <LogOut className="size-3.5 text-rose-700" /> সাইন আউট
                     </button>
                   )}
                   <button

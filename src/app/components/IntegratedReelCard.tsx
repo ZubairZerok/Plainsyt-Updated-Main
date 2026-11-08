@@ -503,21 +503,23 @@ export function IntegratedReelCard({
           userReaction={reel.userReaction}
           onSelect={onReact}
           countLabel={rxTotal > 0 ? formatBengaliNumberCompact(rxTotal) : undefined}
-          className="w-full justify-center"
+          showLabel
+          className="h-9 w-full justify-center !rounded-lg !border-transparent !bg-transparent !py-0 hover:!bg-canvas-subtle !text-[12px] sm:!text-[13.5px]"
         />
         <button
           type="button"
           onClick={onPlay}
           aria-label="মন্তব্য দেখুন"
           title="মন্তব্য"
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <MessageCircle className="size-4 sm:size-[18px] shrink-0" />
+          <span className="truncate">মন্তব্য</span>
         </button>
         <button
           type="button"
           onClick={onShare}
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <Share2 className="size-4 sm:size-[18px] shrink-0" />
           <span className="truncate">শেয়ার</span>
@@ -527,7 +529,7 @@ export function IntegratedReelCard({
           onClick={onSave}
           aria-pressed={saved}
           className={cn(
-            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            'flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
             saved ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/70 dark:text-slate-200',
           )}
         >

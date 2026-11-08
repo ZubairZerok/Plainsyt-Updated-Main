@@ -54,7 +54,7 @@ export function TrendingList({
             onClick={() => onOpenPopup(a.id)}
             className="flex min-w-0 flex-1 items-start gap-2 text-left"
           >
-            <span className="w-5 shrink-0 font-display text-lg font-bold text-slate-300 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-[#03EF62] transition-colors">
+            <span className="w-8 shrink-0 whitespace-nowrap tabular-nums font-display text-lg font-bold text-slate-400 dark:text-slate-600 group-hover:text-emerald-500 dark:group-hover:text-[#03EF62] transition-colors">
               {String(idx + 1).padStart(2, '0')}
             </span>
             <span className="min-w-0 flex-1">

@@ -501,7 +501,7 @@ export function ReelPlayerModal({
 
             <div className="flex-1 overflow-y-auto p-3 space-y-3 divide-y divide-white/5 no-scrollbar">
               {itemComments.length === 0 ? (
-                <div className="py-12 text-center text-white/50 font-bangla text-[13.5px]">
+                <div className="py-12 text-center text-white/70 font-bangla text-[13.5px]">
                   এখনো কোনো মন্তব্য নেই। প্রথম মন্তব্যটি আপনিই করুন!
                 </div>
               ) : (
@@ -567,7 +567,7 @@ export function ReelPlayerModal({
                               <p className="mt-0.5 font-bangla text-[13px] text-white/90 leading-relaxed break-words">
                                 {c.text}
                                 {c.isEdited && (
-                                  <span className="ml-1 text-[11px] text-white/40 font-normal">(সম্পাদিত)</span>
+                                  <span className="ml-1 text-[11px] text-white/70 font-normal">(সম্পাদিত)</span>
                                 )}
                               </p>
                             )}
@@ -715,7 +715,7 @@ export function ReelPlayerModal({
                   <button
                     type="submit"
                     disabled={!commentText.trim()}
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#03EF62] text-[#061621] transition hover:bg-[#02d955] disabled:opacity-40 active:scale-95 cursor-pointer"
+                    className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#03EF62] text-[#061621] transition hover:bg-[#02d955] disabled:opacity-60 active:scale-95 cursor-pointer"
                   >
                     <Send className="size-4" />
                   </button>

@@ -290,7 +290,7 @@ export function AuthModal({
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-[11px] font-medium text-[#008f3c] dark:text-[#03EF62] hover:underline"
+                    className="text-[11px] font-medium text-accent-fg dark:text-[#03EF62] hover:underline"
                   >
                     পাসওয়ার্ড ভুলে গেছেন?
                   </button>
@@ -319,7 +319,7 @@ export function AuthModal({
                 </button>
               </div>
               {forgotSent && (
-                <p className="mt-1 text-[11px] text-[#008f3c] dark:text-[#03EF62]">
+                <p className="mt-1 text-[11px] text-accent-fg dark:text-[#03EF62]">
                   পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে।
                 </p>
               )}
@@ -357,12 +357,12 @@ export function AuthModal({
                 {isNewUser ? (
                   <span>
                     ইতিমধ্যে অ্যাকাউন্ট আছে? সরাসরি{' '}
-                    <span className="font-bold underline text-[#03EF62]">লগইন করতে ক্লিক করুন</span>
+                    <span className="font-bold underline text-accent-fg">লগইন করতে ক্লিক করুন</span>
                   </span>
                 ) : (
                   <span>
                     নতুন সদস্য? সরাসরি অ্যাকাউন্ট তৈরি করতে{' '}
-                    <span className="font-bold underline text-[#03EF62]">ক্লিক করুন</span>
+                    <span className="font-bold underline text-accent-fg">ক্লিক করুন</span>
                   </span>
                 )}
               </button>

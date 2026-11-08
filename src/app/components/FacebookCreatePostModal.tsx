@@ -142,7 +142,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               <h2 id="upload-reel-title" className="font-display text-[19px] font-semibold">
                 Upload Video Reel / Field Story
               </h2>
-              <p className="text-[12px] text-slate-400">
+              <p className="text-[12px] text-slate-300">
                 কমিউনিটির সাথে ভিডিও বা ফিল্ড স্টোরি শেয়ার করুন
               </p>
             </div>
@@ -305,7 +305,7 @@ export function FacebookCreatePostModal({ open, onClose, currentUser, onSubmitRe
               type="submit"
               disabled={!canSubmit}
               className={cn(
-                'inline-flex h-11 items-center gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700 px-6 text-[14px] font-bold text-white shadow-md disabled:opacity-40 transition',
+                'inline-flex h-11 items-center gap-2 rounded-full bg-emerald-700 hover:bg-emerald-800 px-6 text-[14px] font-bold text-white shadow-md disabled:opacity-60 transition',
               )}
             >
               <Video className="size-4" /> প্রকাশ করুন

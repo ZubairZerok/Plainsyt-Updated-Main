@@ -200,16 +200,18 @@ export function ArticleCard({
           userReaction={a.userReaction}
           onSelect={onReact}
           countLabel={reactionTotal > 0 ? formatBengaliNumberCompact(reactionTotal) : undefined}
-          className="w-full justify-center"
+          showLabel
+          className="h-9 w-full justify-center !rounded-lg !border-transparent !bg-transparent !py-0 hover:!bg-canvas-subtle !text-[12px] sm:!text-[13.5px]"
         />
         <button
           type="button"
           onClick={() => setShowComments((s) => !s)}
           aria-label="মন্তব্য দেখুন বা লিখুন"
           title="মন্তব্য"
-          className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+          className="flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
         >
           <MessageCircle className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
+          <span className="truncate">মন্তব্য</span>
           {a.stats.commentsCount > 0 && (
             <span className="font-bangla font-bold text-[12px] opacity-90">
               (<Num>{toBengaliNumerals(a.stats.commentsCount)}</Num>)
@@ -217,12 +219,13 @@ export function ArticleCard({
           )}
         </button>
         <SharePopoverButton
+          wrapperClassName="w-full"
           title={a.title}
           url={`/article/${a.slug || a.id}`}
         >
           <button
             type="button"
-            className="flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
+            className="flex w-full items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold text-pine-900/70 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0"
           >
             <Share2 className="size-4 sm:size-[18px] shrink-0 dark:text-[#03EF62]" />
             <span className="truncate">শেয়ার</span>
@@ -234,7 +237,7 @@ export function ArticleCard({
           aria-pressed={bookmarked}
           aria-label="Bookmark"
           className={cn(
-            'flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
+            'flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13px] font-semibold transition hover:bg-canvas-subtle whitespace-nowrap min-w-0',
             bookmarked ? 'text-emerald-600 dark:text-[#03EF62]' : 'text-pine-900/70 dark:text-slate-200',
           )}
         >
@@ -286,7 +289,7 @@ export function ArticleCard({
                             <button
                               type="submit"
                               disabled={!editingText.trim()}
-                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                             >
                               সংরক্ষণ
                             </button>
@@ -334,7 +337,7 @@ export function ArticleCard({
                       </button>
                       {canManageComment(c) && (
                         <>
-                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                           <button
                             type="button"
                             onClick={() => {
@@ -346,7 +349,7 @@ export function ArticleCard({
                           >
                             এডিট
                           </button>
-                          <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                          <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                           <button
                             type="button"
                             onClick={() => onDeleteComment?.(c.id)}
@@ -390,7 +393,7 @@ export function ArticleCard({
                         <button
                           type="submit"
                           disabled={!replyText.trim()}
-                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-40"
+                          className="h-7 px-3 rounded-full bg-[#03EF62] text-[#061621] text-[11px] font-bold disabled:opacity-60"
                         >
                           উত্তর
                         </button>
@@ -437,7 +440,7 @@ export function ArticleCard({
                                       <button
                                         type="submit"
                                         disabled={!editingText.trim()}
-                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-40 cursor-pointer"
+                                        className="rounded-lg bg-[#03EF62] px-2.5 py-1 font-bangla text-xs font-bold text-[#061621] hover:bg-[#02d857] transition disabled:opacity-60 cursor-pointer"
                                       >
                                         সংরক্ষণ
                                       </button>
@@ -481,7 +484,7 @@ export function ArticleCard({
                                 </button>
                                 {canManageComment(r) && (
                                   <>
-                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                     <button
                                       type="button"
                                       onClick={() => {
@@ -493,7 +496,7 @@ export function ArticleCard({
                                     >
                                       এডিট
                                     </button>
-                                    <span className="text-slate-300 dark:text-white/20 select-none">·</span>
+                                    <span className="text-slate-400 dark:text-white/50 select-none">·</span>
                                     <button
                                       type="button"
                                       onClick={() => onDeleteComment?.(r.id)}
@@ -534,7 +537,7 @@ export function ArticleCard({
                 type="submit"
                 disabled={!text.trim()}
                 aria-label="Send comment"
-                className="flex size-7 items-center justify-center rounded-full text-accent-fg disabled:opacity-30"
+                className="flex size-7 items-center justify-center rounded-full text-accent-fg disabled:opacity-50"
               >
                 <Send className="size-4" />
               </button>

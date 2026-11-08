@@ -94,7 +94,7 @@ export function FollowIconButton({
         showLabel ? 'h-8 px-3.5 gap-1.5 text-xs font-bold' : 'size-7',
         isFollowing
           ? (limeTick
-              ? 'bg-[#03EF62] text-white border border-[#03EF62] hover:bg-[#02d857]'
+              ? 'bg-[#03EF62] text-[#061621] border border-[#03EF62] hover:bg-[#02d857]'
               : 'bg-slate-100 dark:bg-white/15 text-slate-800 dark:text-white border border-slate-200 dark:border-white/20 hover:bg-slate-200 dark:hover:bg-white/25')
           : 'bg-[#03EF62] text-[#061621] hover:bg-[#02d857] hover:scale-105',
         className,

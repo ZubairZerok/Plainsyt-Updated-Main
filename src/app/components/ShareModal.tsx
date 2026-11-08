@@ -13,12 +13,15 @@ export function SharePopoverButton({
   url,
   children,
   className,
+  wrapperClassName,
   floating,
 }: {
   title: string;
   url?: string;
   children?: React.ReactNode;
   className?: string;
+  /** Extra classes for the outer wrapper — pass `w-full` to stretch inside a grid cell. */
+  wrapperClassName?: string;
   floating?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -99,12 +102,12 @@ export function SharePopoverButton({
   const hasNative = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   return (
-    <div ref={rootRef} className="relative inline-flex items-center">
-      <div onClick={(e) => { e.stopPropagation(); setOpen((prev) => !prev); }} className="cursor-pointer">
+    <div ref={rootRef} className={cn('relative inline-flex items-center', wrapperClassName)}>
+      <div onClick={(e) => { e.stopPropagation(); setOpen((prev) => !prev); }} className={cn('cursor-pointer', wrapperClassName?.includes('w-full') && 'w-full')}>
         {children || (
           <button
             type="button"
-            className={className || "flex items-center justify-center gap-1 sm:gap-1.5 rounded-lg py-1.5 sm:py-2 px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0 cursor-pointer"}
+            className={className || "flex items-center justify-center gap-1 sm:gap-1.5 h-9 rounded-lg px-1 text-[12px] sm:text-[13.5px] font-semibold text-pine-900/65 dark:text-slate-200 transition hover:bg-canvas-subtle whitespace-nowrap min-w-0 cursor-pointer"}
             aria-label="শেয়ার"
             title="শেয়ার"
           >

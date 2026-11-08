@@ -382,7 +382,7 @@ export function ProfileSettingsModal({
               <button
                 type="submit"
                 disabled={!name.trim()}
-                className="h-10 rounded-full bg-[#03EF62] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition disabled:opacity-40"
+                className="h-10 rounded-full bg-[#03EF62] px-6 text-[14px] font-bold text-[#061621] shadow-sm hover:bg-[#02d955] active:scale-95 transition disabled:opacity-60"
               >
                 Save Profile
               </button>

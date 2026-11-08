@@ -87,10 +87,17 @@ html.dark .user-pfp-dropdown span svg {
   --pine-950: #061621;
   --pine-900: #061621;
   --pine-800: #0d2838;
-  --pine-700: #00bf50;
+  --pine-700: #00703a; /* was #00bf50 (2.4:1 on white); now a readable green for text */
   --pine-600: #03EF62;
   --pine-500: #03EF62;
   --accent-fg: #00703a; /* readable green for TEXT on light surfaces (>= 5:1) */
+
+  /* Tailwind greys/greens/reds darkened just enough that small text passes WCAG AA (4.5:1)
+     on white AND on the #f4f6f8 canvas. Light mode only; .dark restores/overrides below. */
+  --color-slate-400: #5d6d85;
+  --color-slate-500: #4d5d75;
+  --color-emerald-600: #047857;
+  --color-rose-500: #c8183f;
   --pine-400: #29f57c;
   --pine-200: #b3fad1;
   --pine-100: #e2fceb;
@@ -162,45 +169,29 @@ html.dark .user-pfp-dropdown span svg {
   --canvas-subtle: #0f271d;
   --canvas-border: #1a3c2c;
   --tactile: #03EF62;
+  --icon-color: #03EF62;
+  --color-emerald-600: oklch(59.6% 0.145 163.225);
+  --color-rose-500: #fb7185;
+  /* restore light greys for text/placeholders in dark mode (light mode darkens these above) */
+  --color-slate-400: #a3b3c9;
+  --color-slate-500: #94a3b8;
+  /* pastel tints become deep tints so pale bg-*-50/100 never sit under forced-white text */
+  --color-emerald-50: #0f271d;
+  --color-emerald-100: #133627;
+  --color-emerald-200: #1f5a3f;
+  --color-rose-50: #2a1218;
+  --color-rose-100: #3a1620;
+  --color-rose-200: #6b2335;
+  --color-amber-50: #2a2010;
+  --color-amber-100: #3a2c12;
+  --color-amber-200: #6b4f17;
+  --color-blue-50: #0f1d33;
+  --color-blue-200: #1f4380;
+  --color-purple-50: #1e1433;
 
-  /* Tailwind slate palette mapped in dark mode to white or near-white */
-  --color-slate-950: #ffffff;
-  --color-slate-900: #ffffff;
-  --color-slate-800: #f8fafc;
-  --color-slate-700: #f8fafc;
-  --color-slate-600: #f1f5f9;
-  --color-slate-500: #f1f5f9;
-  --color-slate-400: #e2e8f0;
-  --color-slate-300: #e2e8f0;
-
-  /* Tailwind gray palette mapped in dark mode */
-  --color-gray-950: #ffffff;
-  --color-gray-900: #ffffff;
-  --color-gray-800: #f8fafc;
-  --color-gray-700: #f8fafc;
-  --color-gray-600: #f1f5f9;
-  --color-gray-500: #f1f5f9;
-  --color-gray-400: #e2e8f0;
-  --color-gray-300: #e2e8f0;
-
-  /* Tailwind zinc & neutral palettes */
-  --color-zinc-950: #ffffff;
-  --color-zinc-900: #ffffff;
-  --color-zinc-800: #f8fafc;
-  --color-zinc-700: #f8fafc;
-  --color-zinc-600: #f1f5f9;
-  --color-zinc-500: #f1f5f9;
-  --color-zinc-400: #e2e8f0;
-  --color-zinc-300: #e2e8f0;
-
-  --color-neutral-950: #ffffff;
-  --color-neutral-900: #ffffff;
-  --color-neutral-800: #f8fafc;
-  --color-neutral-700: #f8fafc;
-  --color-neutral-600: #f1f5f9;
-  --color-neutral-500: #f1f5f9;
-  --color-neutral-400: #e2e8f0;
-  --color-neutral-300: #e2e8f0;
+  /* NOTE: the slate/gray/zinc/neutral scales are intentionally NOT remapped here.
+     Remapping them made every `bg-slate-900` title bar turn white under white text.
+     Text legibility on dark surfaces is handled by the `.dark .text-*` rules below. */
 }
 
 @theme inline {
@@ -300,21 +291,15 @@ html.dark .user-pfp-dropdown span svg {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Centralized Global Dark Green Icon Color System (--icon-color: #064E3B) */
-.lucide, svg.lucide, [data-icon] {
-  color: var(--icon-color) !important;
-  stroke: var(--icon-color) !important;
-}
+/* Icons inherit `currentColor` from their own text-* class or their parent, so they follow the
+   theme and every surface they sit on. (A global `color: ... !important` here used to force every
+   icon dark green, which made icons nearly invisible on dark surfaces and ignored all text-* classes.) */
 
-/* Allow crisp white icons for active navigation, lightbox modals, and text-white components */
-.text-white .lucide,
-.text-white svg.lucide,
+/* Crisp white icons only where explicitly requested (icons otherwise inherit currentColor). */
 .lightbox-ui .lucide,
 .lightbox-ui svg.lucide,
 .nav-active .lucide,
 .nav-active svg.lucide,
-button.text-white .lucide,
-button.text-white svg.lucide,
 [data-white-icon="true"] .lucide,
 [data-white-icon="true"] svg.lucide,
 [data-white-icon="true"] {
@@ -437,13 +422,17 @@ button.text-white svg.lucide,
   color: #ffffff;
 }
 
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4,
-.dark h5,
-.dark h6 {
-  color: #ffffff;
+/* In @layer base so that explicit utilities (e.g. text-[#061621] on a lime header bar)
+   still win; an unlayered rule here used to force white headings onto light bars. */
+@layer base {
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6 {
+    color: #ffffff;
+  }
 }
 
 .dark .text-slate-950,
@@ -498,10 +487,28 @@ button.text-white svg.lucide,
   color: #ffffff !important;
 }
 
+/* Deep-green text utilities are meant for light surfaces; lift them on dark ones. */
+.dark .text-emerald-700:not([class*="bg-[#03EF62]"]):not(.bg-emerald-400):not(.bg-emerald-300),
+.dark .text-emerald-800:not([class*="bg-[#03EF62]"]):not(.bg-emerald-400):not(.bg-emerald-300),
+.dark .text-emerald-900:not([class*="bg-[#03EF62]"]):not(.bg-emerald-400):not(.bg-emerald-300) {
+  color: #4ade9a;
+}
+
+.dark .bg-slate-200,
+.dark .bg-slate-300 {
+  background-color: #1a3c2c;
+}
+
 .dark .bg-slate-50,
 .dark .bg-slate-100 {
   background-color: #0f271d !important;
   color: #f8fafc !important;
+}
+
+.dark [class*="border-slate-200/"]:not([class*="dark:border"]),
+.dark [class*="border-slate-300/"]:not([class*="dark:border"]),
+.dark [class*="border-slate-100/"]:not([class*="dark:border"]) {
+  border-color: #1a3c2c;
 }
 
 .dark .border-slate-200,
@@ -843,6 +850,13 @@ button.text-white svg.lucide,
 }
 
 /* Placeholders must stay readable (>= 4.5:1). Utility classes on a field still win over this default. */
+/* Icons never get squeezed to nothing by a flex-1 sibling (e.g. icon + input rows). */
+@layer base {
+  svg.lucide {
+    flex-shrink: 0;
+  }
+}
+
 @layer base {
   input::placeholder,
   textarea::placeholder {
